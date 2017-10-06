@@ -77,6 +77,7 @@ const stylesX = {
   	let enable_my = `#!/bin/bash\nsource userpass \n`;
 
   	this.state.coins.map(o=>{
+  		let enable_my_coins = "";
   		if(o.status){
 	  		const ipport = o.rpc.split(":");
 	  		const jsonPart = {
@@ -86,14 +87,18 @@ const stylesX = {
 	  				ipaddr: ipport[0], 
 	  				port: ipport[1],
 	  			};
-			enable_my += `curl --url "http://127.0.0.1:7783" --data "${JSON.stringify(jsonPart).replaceAll("\"","\\\"")}"\n`;
-			const cmd = `echo "${enable_my}" > ${ROOT_DEX}enable_my`;
-			fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
-				console.log(err);
-			    history.push("/mainPage");
-			});
+			enable_my_coins += `curl --url "http://127.0.0.1:7783" --data "${JSON.stringify(jsonPart).replaceAll("\"","\\\"")}"\n`;
   		}
   	})
+
+  	//remove this later need to ask dev
+  	enable_my_coins = `curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"136.243.45.140\",\"port\":50001}"`;
+  	
+	const cmd = `echo "${enable_my + enable_my_coins}" > ${ROOT_DEX}enable_my`;
+	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
+		console.log(err);
+	    history.push("/mainPage");
+	});  	
   }
   render() {
     return (
