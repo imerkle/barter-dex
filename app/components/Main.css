@@ -1,0 +1,7 @@
+.container{
+	display: flex;
+}
+.container2{
+	display: flex;
+	flex-flow: column;
+}

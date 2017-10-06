@@ -8,6 +8,10 @@ import { Snackbar, Button, TextField} from 'material-ui';
 import AppLogo from './AppLogo';
 import { history } from '../store/configureStore.js';
 
+import { exec } from 'child_process';
+import { ROOT_DEX }  from '../utils/constants.js';
+
+
 export default class Login extends Component {
   constructor(props){
   	 
@@ -23,7 +27,13 @@ export default class Login extends Component {
 	this.setState({ passphrase: e.target.value });
   }
   _handleLogin = () => {
-  	history.push("/startup");
+    exec(`
+          cd ${ROOT_DEX}
+        
+          echo "export passphrase=\"${this.state.passphrase}\"" > passphrase 
+    `,(err, stdout, stderr) => {
+  		history.push("/startup");
+    });  	
   }
    _handleSave = () => {
   	if(this.state.passphrase.length < 1){

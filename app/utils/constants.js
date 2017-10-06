@@ -1,1 +1,1 @@
-export const ROOT_DEX = '~/gitRepos/sprnt/SuperNET/iguana/dexscripts/';
+export const ROOT_DEX = '/home/slim/gitRepos/sprnt/SuperNET/iguana/dexscripts/';

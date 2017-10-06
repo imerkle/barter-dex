@@ -7,10 +7,12 @@ import LoginPage from './containers/LoginPage';
 import PinPage from './containers/PinPage';
 import RegisterPage from './containers/RegisterPage';
 import StartupScreen from './components/StartupScreen';
+import MainPage from './components/MainPage';
 
 export default () => (
   <App>
     <Switch>
+      <Route path="/mainPage" component={MainPage} />
       <Route path="/startup" component={StartupScreen} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/pin" component={PinPage} />
