@@ -30,7 +30,7 @@
 	flex: 30% 1;
 }
 .switchGroup{
-	max-height: 430px;
+	max-height: 280px;
 	overflow: auto;
 	flex-direction: row!important;
 }

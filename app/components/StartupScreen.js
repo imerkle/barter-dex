@@ -58,26 +58,23 @@ const stylesX = {
   	})
     	let enabled_coins = localStorage.getItem("enabled_coins");
 		  if(enabled_coins) enabled_coins = JSON.parse(enabled_coins);
-	this.setState({ lastEnabledCoins: enabled_coins })	  
-
-
+	    this.setState({ lastEnabledCoins: enabled_coins })	  
 
       //let state heat up 
       setTimeout(()=>{
         startClient(ROOT_DEX);
         this.getCoins()
-    
       },2000);
   }
   getCoins = () => {
-  	const { lastEnabledCoins, ROOT_DEX } = this.state;
-  	exec(`
-  		cd ${ROOT_DEX}
-  		./getcoins
-  		`,(err, stdout, stderr) => {
-  			if(err){
-  				this.setState({ client: false,err: "Running Client Please Wait" });
-  				setTimeout(this.getCoins, timeoutSec)
+    const { lastEnabledCoins, ROOT_DEX } = this.state;
+    exec(`
+      cd ${ROOT_DEX}
+      ./getcoins
+      `,(err, stdout, stderr) => {
+        if(err){
+          this.setState({ client: false,err: "Running Client Please Wait" });
+          setTimeout(this.getCoins, timeoutSec)
   				return false;
   			}else if((stdout && JSON.parse(stdout).error)){
   				this.setState({ client: false,err: `Please run  'echo export userpass=\"\`./inv | cut -d \"\\"\" -f 4\`\"" > userpass' in ${ROOT_DEX}`});

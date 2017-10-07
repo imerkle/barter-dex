@@ -62,7 +62,7 @@ export default class MainPage extends Component {
       	</div>
  	      <div className={styles.container2} style={{flex: "1 1 auto"}}>
            <div className={cx(styles.section, styles.graph_bar)}>
-            Graph here
+              Graph Here
            </div>
            
            <div className={cx(styles.section2, styles.bs_bar)}>
