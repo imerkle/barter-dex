@@ -2,11 +2,14 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Main.css';
-import HeaderNav from './HeaderNav';
 
 import FlipMove from 'react-flip-move';
 import cx from 'classnames';
-import { Button, TextField } from 'material-ui';
+
+
+import BuySell from './BuySell';
+import HeaderNav from './HeaderNav';
+
 const mockData = [
   {coin: "KMD",name:"Komodo",price: .5, volume: 44.40, change: 500 },
   {coin: "LTC",name:"Litecoin",price: 1.5, volume: 100.4, change: -4.5 },
@@ -17,7 +20,8 @@ export default class MainPage extends Component {
 
     this.state = {
        coins: [],
-       currentCoin: { ticker: "KMD"},
+       currentCoin: { ticker: "KMD", balance: 45},
+       baseCoin: {ticker: "BTC", balance: 1.4},
     };
   }
   componentDidMount(){
@@ -29,7 +33,7 @@ export default class MainPage extends Component {
     this.setState({ coins: coins });
   }
   render() {
-    const  { currentCoin } = this.state;
+    const  { currentCoin, baseCoin } = this.state;
     return (
       <div className={styles.container, styles.container2}>
       <HeaderNav />
@@ -41,7 +45,7 @@ export default class MainPage extends Component {
               <div className={cx(styles.oneDiv,styles.name)}>Name</div>
               <div className={cx(styles.oneDiv,styles.price)}>Price</div>
               <div className={cx(styles.oneDiv,styles.volume)}>Volume</div>
-              <div className={cx(styles.oneDiv,styles.change)}>Change</div>          
+              <div className={cx(styles.oneDiv,styles.change)}>Change</div>
             </div> 
             <FlipMove duration={750} easing="ease-out" style={{padding: "10px"}}>
               {this.state.coins.map((o, i) => (
@@ -62,20 +66,8 @@ export default class MainPage extends Component {
            </div>
            
            <div className={cx(styles.section2, styles.bs_bar)}>
-              <div className={cx(styles.section, styles.buysell)}>
-                 <div className={cx(styles.bs_tr, styles.bs_header)}>{`Buy ${currentCoin.ticker}`}</div>
-                 <div className={cx(styles.bs_tr)}><TextField placeholder="Price" /></div>
-                 <div className={cx(styles.bs_tr)}><TextField placeholder="Amount" /></div>
-                 <div className={cx(styles.bs_tr)}><TextField placeholder="Total" /></div>
-                 <div className={cx(styles.bs_tr)}><Button raised color="accent">{`Buy ${currentCoin.ticker}`}</Button></div>
-              </div>
-              <div className={cx(styles.section, styles.buysell)}>
-                 <div className={cx(styles.bs_tr, styles.bs_header)}>{`Sell ${currentCoin.ticker}`}</div>
-                 <div className={cx(styles.bs_tr)}><TextField placeholder="Price" /></div>
-                 <div className={cx(styles.bs_tr)}><TextField placeholder="Amount" /></div>
-                 <div className={cx(styles.bs_tr)}><TextField placeholder="Total" /></div>
-                 <div className={cx(styles.bs_tr)}><Button raised color="primary">{`Sell ${currentCoin.ticker}`}</Button></div>
-              </div>              
+              <BuySell baseCoin={baseCoin} currentCoin={currentCoin} isBuy/>
+              <BuySell baseCoin={baseCoin} currentCoin={currentCoin} isBuy={false} />           
            </div>
            <div className={cx(styles.section, styles.trades_bar)}>
             <div className={cx(styles.section_header)}>Recent Trades</div> 

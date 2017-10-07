@@ -1,4 +1,6 @@
 
+import { exec } from 'child_process';
+
 export const maxPinLength = 10;
 export const range = (start, end) => Array.from({length: (end - start)}, (v, k) => k + start);
 export const shuffle = (array) => {
@@ -7,4 +9,13 @@ export const shuffle = (array) => {
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+}
+
+export const startClient = (ROOT_DEX) => {
+	exec(`
+		cd ${ROOT_DEX}
+		./client
+	`,(err, stdout, stderr)=>{
+		if(err) alert('Check your client path again!');
+	  });
 }

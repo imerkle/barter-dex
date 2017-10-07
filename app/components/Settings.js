@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Login.css';
+import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 
 import {
@@ -15,7 +15,7 @@ import {
 export default class Settings extends Component {
   render() {
     return (
-        <div className={styles.container}>
+        <div className={styles.container2}>
         	<HeaderNav />
 			<List>
 				{makeList('Select Coins','donut_small','startup')}

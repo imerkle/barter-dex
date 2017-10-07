@@ -14,7 +14,7 @@ export default class Home extends Component {
       		<AppLogo />	
            <div className={cx(styles.nav)}>
             <Link to="/mainPage"><Button raised color="accent">Exchange</Button></Link>
-            <Button color="accent" >Wallet</Button>
+            <Link to="/wallet"><Button color="accent" >Wallet</Button></Link>
             <Button color="accent">Orders</Button>
             <Link to="/settings"><Button color="accent">Settings</Button></Link>
            </div>

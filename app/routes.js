@@ -9,10 +9,12 @@ import RegisterPage from './containers/RegisterPage';
 import StartupScreen from './components/StartupScreen';
 import MainPage from './components/MainPage';
 import Settings from './components/Settings';
+import Wallet from './components/Wallet';
 
 export default () => (
   <App>
     <Switch>
+      <Route path="/wallet" component={Wallet} />
       <Route path="/settings" component={Settings} />
       <Route path="/mainPage" component={MainPage} />
       <Route path="/startup" component={StartupScreen} />

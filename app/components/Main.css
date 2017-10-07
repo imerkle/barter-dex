@@ -7,6 +7,7 @@
 }
 .oneDiv{
 	margin: 0 5px;
+    text-align: right;
 }
 .profit{
   color: #40ff40;
@@ -43,6 +44,7 @@
    color: #FFF;
 }
 .r_side_bar{ min-height: 500px; }
+.w_bar{ min-height: 400px; flex: 1 1 auto; }
 .graph_bar{height:120px;}
 .trades_bar{height:250px;}
 /*.bs_bar{height: ;}*/
@@ -71,6 +73,15 @@
 	margin: 5px 0;
     flex-direction: column;
 }
+.bs_tr_row{
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+}
 .nomargin .AppLogo{
     margin: 35px 80px;	
+}
+.basevalue{
+	opacity: .75;
+	font-size: 85%;
 }

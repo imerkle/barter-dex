@@ -15,22 +15,26 @@ import { ROOT_DEX }  from '../utils/constants.js';
 export default class Login extends Component {
   constructor(props){
   	 
-  	 super(props)
+   super(props)
 
 	 this.state = {
 	 	passphrase: "",
 	 	snackMsg: "",
 	 	snackOpen: false,
+    ROOT_DEX: ROOT_DEX,
 	 }
   }
+  componentDidMount(){
+    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
+    if(ROOT_DEX) this.setState({ ROOT_DEX });
+  }
   _handleChange = (e) => {
-	this.setState({ passphrase: e.target.value });
+  	this.setState({ passphrase: e.target.value });
   }
   _handleLogin = () => {
     exec(`
-          cd ${ROOT_DEX}
-        
-          echo "export passphrase=\"${this.state.passphrase}\"" > passphrase 
+      cd ${this.state.ROOT_DEX}
+      echo "export passphrase=\"${this.state.passphrase}\"" > passphrase
     `,(err, stdout, stderr) => {
   		history.push("/startup");
     });  	

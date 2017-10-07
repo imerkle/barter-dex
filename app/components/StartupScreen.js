@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
 import AppLogo from './AppLogo';
-import RunClient from './RunClient';
+import LoadingWaitText from './LoadingWaitText';
 import { Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
 
 import { history } from '../store/configureStore.js';
@@ -14,6 +14,7 @@ import green from 'material-ui/colors/red';
 
 import { exec } from 'child_process';
 import { ROOT_DEX } from '../utils/constants';
+import { startClient } from '../utils/basic';
 import fs from 'fs';
 
 
@@ -42,29 +43,58 @@ const stylesX = {
   		checked: {},
   		client: true,
   		coins: [{coin:"BTC", status: true,rpc: "127.0.0.1:8332" }],
+  		lastEnabledCoins: [],
+  		err: "Running Client Please Wait",
+  		ROOT_DEX: ROOT_DEX,
   	};
   }
   componentDidMount(){
+
+    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
+    if(ROOT_DEX) this.setState({ ROOT_DEX });
+
   	this.setState({
   		passphrase: localStorage.getItem("passphrase"),
   	})
-  	this.getCoins()
+    	let enabled_coins = localStorage.getItem("enabled_coins");
+		  if(enabled_coins) enabled_coins = JSON.parse(enabled_coins);
+	this.setState({ lastEnabledCoins: enabled_coins })	  
+
+
+
+      //let state heat up 
+      setTimeout(()=>{
+        startClient(ROOT_DEX);
+        this.getCoins()
+    
+      },2000);
   }
   getCoins = () => {
+  	const { lastEnabledCoins, ROOT_DEX } = this.state;
   	exec(`
   		cd ${ROOT_DEX}
   		./getcoins
   		`,(err, stdout, stderr) => {
-  			if(err || (stdout && JSON.parse(stdout).error)  ){
-  				this.setState({ client: false });
+  			if(err){
+  				this.setState({ client: false,err: "Running Client Please Wait" });
+  				setTimeout(this.getCoins, timeoutSec)
+  				return false;
+  			}else if((stdout && JSON.parse(stdout).error)){
+  				this.setState({ client: false,err: `Please run  'echo export userpass=\"\`./inv | cut -d \"\\"\" -f 4\`\"" > userpass' in ${ROOT_DEX}`});
   				setTimeout(this.getCoins, timeoutSec)
   				return false;
   			}
   			this.setState({ client: true });
 			const out = JSON.parse(stdout);
 			const coins = out.coins || out;
-			const c = coins.map(o=>{ return {coin: o.coin, status: o.status === 'active',rpc: o.rpc }});
-		this.setState({ coins: c });
+			const c = coins.map(o=>{ 
+				let isEnabled = false;
+				if((lastEnabledCoins && lastEnabledCoins.indexOf(o.coin) > -1) || (o.status === 'active') ){
+					isEnabled = true;
+				}
+				return {coin: o.coin, status: isEnabled,rpc: o.rpc }
+			});
+			this.setState({ coins: c });
   	});  	
   }
   _handleStartup = () => {
@@ -74,6 +104,7 @@ const stylesX = {
   	this.saveCoins();
   }
   saveCoins = () => {
+  	const { ROOT_DEX } = this.state;
   	let enable_my = `#!/bin/bash\nsource userpass \n`;
 
   	let enable_my_coins = "";
@@ -96,7 +127,6 @@ const stylesX = {
 
 	const cmd = `echo "${enable_my + enable_my_coins}" > ${ROOT_DEX}enable_my`;
 	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
-		console.log(err);
 	    history.push("/mainPage");
 	});  	
   }
@@ -104,7 +134,7 @@ const stylesX = {
     return (
        <div className={styles.container}>
        		<AppLogo />
-       		{(this.state.client) ? this.output() : <RunClient />}
+       		{(this.state.client) ? this.output() : <LoadingWaitText text={this.state.err} />}
        </div>
     );
   }

@@ -19,9 +19,14 @@ export default class Register extends Component {
 
     this.state = {
       passphrase: "",
+      ROOT_DEX: ROOT_DEX,
     };
   }
   componentDidMount(){
+
+    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
+    if(ROOT_DEX) this.setState({ ROOT_DEX });
+
     this.generatePassPhrase();
   }
   generatePassPhrase = () => {
@@ -37,8 +42,8 @@ export default class Register extends Component {
   }
 
   _handleRegister = () => {
+    const { ROOT_DEX } = this.state;
     const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
-
     exec(`
           cd ${ROOT_DEX}
         
