@@ -76,8 +76,8 @@ const stylesX = {
   saveCoins = () => {
   	let enable_my = `#!/bin/bash\nsource userpass \n`;
 
+  	let enable_my_coins = "";
   	this.state.coins.map(o=>{
-  		let enable_my_coins = "";
   		if(o.status){
 	  		const ipport = o.rpc.split(":");
 	  		const jsonPart = {
@@ -93,7 +93,7 @@ const stylesX = {
 
   	//remove this later need to ask dev
   	enable_my_coins = `curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"136.243.45.140\",\"port\":50001}"`;
-  	
+
 	const cmd = `echo "${enable_my + enable_my_coins}" > ${ROOT_DEX}enable_my`;
 	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
 		console.log(err);

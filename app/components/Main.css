@@ -5,3 +5,72 @@
 	display: flex;
 	flex-flow: column;
 }
+.oneDiv{
+	margin: 0 5px;
+}
+.profit{
+  color: #40ff40;
+  font-weight: bold;
+}
+.loss{
+  color: #ff2992;
+  font-weight: bold;	
+}
+
+.tr{
+  display: flex;
+}
+.coin{ flex: 5% 1;  }
+.name{ flex: 5% 1;  }
+.price{ flex: 5% 1;  }
+.volume{ flex: 5% 1;  }
+.change{ flex: 5% 1;  }
+.section{
+   background: rgba(28, 33, 66, 0.25);
+   border-radius: 5px;
+   overflow: hidden;
+   margin: 8px 20px;
+}
+.section_header{
+   background: #0c3379;
+   padding: 10px;
+   font-weight: bold;
+   cursor: pointer;
+   color: #e8e7e7;
+   text-align: center;
+}
+.section_header .oneDiv:hover{
+   color: #FFF;
+}
+.r_side_bar{ min-height: 500px; }
+.graph_bar{height:120px;}
+.trades_bar{height:250px;}
+/*.bs_bar{height: ;}*/
+.nav{
+    display: flex;
+    height: 120px;
+    justify-content: flex-end;
+    align-items: center;	
+    flex: 1 1 auto;
+}
+.nav button{
+	margin: 0 10px;
+}
+.section2{
+	display: flex;
+}
+
+.buysell{
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+    flex: 50% 1;
+}
+.bs_tr{
+	display: flex;
+	margin: 5px 0;
+    flex-direction: column;
+}
+.nomargin .AppLogo{
+    margin: 35px 80px;	
+}

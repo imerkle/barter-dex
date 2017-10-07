@@ -2,47 +2,86 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Main.css';
-import AppLogo  from './AppLogo';
+import HeaderNav from './HeaderNav';
 
 import FlipMove from 'react-flip-move';
-
+import cx from 'classnames';
+import { Button, TextField } from 'material-ui';
+const mockData = [
+  {coin: "KMD",name:"Komodo",price: .5, volume: 44.40, change: 500 },
+  {coin: "LTC",name:"Litecoin",price: 1.5, volume: 100.4, change: -4.5 },
+];
 export default class MainPage extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-       enabled_coins: [],
+       coins: [],
+       currentCoin: { ticker: "KMD"},
     };
   }
   componentDidMount(){
-    this.setState({ enabled_coins: JSON.parse(localStorage.getItem("enabled_coins")) });
+    const enabled_coins = JSON.parse(localStorage.getItem("enabled_coins"))
+    let coins = [];
+    mockData.map(o=>{
+      if(enabled_coins.indexOf(o.coin) > -1) coins.push(o);
+    });
+    this.setState({ coins: coins });
   }
   render() {
+    const  { currentCoin } = this.state;
     return (
-      <div className={styles.container}>
-      	<div className={styles.container2}>
-      		<AppLogo />	
-      		<table>
-      			<tbody>
-      				<tr>
-      					<td>Coin</td>
-      					<td>Name</td>
-      					<td>Price</td>
-      					<td>Volume</td>
-      					<td>Change</td>
-      				</tr>
-      			</tbody>
-      		</table>
-          <FlipMove duration={750} easing="ease-out">
-            {this.state.enabled_coins.map((o, i) => (
-              <div key={i}>
-                  {o}
-              </div>
-              ))}
-           </FlipMove>         
+      <div className={styles.container, styles.container2}>
+      <HeaderNav />
+       <div className={styles.container}>
+        <div className={styles.container2}>
+           <div className={cx(styles.section, styles.r_side_bar)}>   
+            <div className={cx(styles.tr, styles.section_header)}>
+              <div className={cx(styles.oneDiv,styles.coin)}>Coin</div>
+              <div className={cx(styles.oneDiv,styles.name)}>Name</div>
+              <div className={cx(styles.oneDiv,styles.price)}>Price</div>
+              <div className={cx(styles.oneDiv,styles.volume)}>Volume</div>
+              <div className={cx(styles.oneDiv,styles.change)}>Change</div>          
+            </div> 
+            <FlipMove duration={750} easing="ease-out" style={{padding: "10px"}}>
+              {this.state.coins.map((o, i) => (
+                <div className={styles.tr} key={o.coin}>
+                  <div className={cx(styles.oneDiv,styles.coin)}>{o.coin}</div>
+                  <div className={cx(styles.oneDiv,styles.name)}>{o.name}</div>
+                  <div className={cx(styles.oneDiv,styles.price)}>{o.price}</div>
+                  <div className={cx(styles.oneDiv,styles.volume)}>{o.volume}</div>
+                  <div className={cx(styles.oneDiv,styles.change, ((o.change > 0) ? styles.profit : styles.loss ) )}>{((o.change > 0) ? "+" : "-" ) + o.change+"%"}</div>
+                </div>
+                ))}
+             </FlipMove>         
+            </div>
       	</div>
- 	      <div className={styles.container2}>
- 	      </div>
+ 	      <div className={styles.container2} style={{flex: "1 1 auto"}}>
+           <div className={cx(styles.section, styles.graph_bar)}>
+            Graph here
+           </div>
+           
+           <div className={cx(styles.section2, styles.bs_bar)}>
+              <div className={cx(styles.section, styles.buysell)}>
+                 <div className={cx(styles.bs_tr, styles.bs_header)}>{`Buy ${currentCoin.ticker}`}</div>
+                 <div className={cx(styles.bs_tr)}><TextField placeholder="Price" /></div>
+                 <div className={cx(styles.bs_tr)}><TextField placeholder="Amount" /></div>
+                 <div className={cx(styles.bs_tr)}><TextField placeholder="Total" /></div>
+                 <div className={cx(styles.bs_tr)}><Button raised color="accent">{`Buy ${currentCoin.ticker}`}</Button></div>
+              </div>
+              <div className={cx(styles.section, styles.buysell)}>
+                 <div className={cx(styles.bs_tr, styles.bs_header)}>{`Sell ${currentCoin.ticker}`}</div>
+                 <div className={cx(styles.bs_tr)}><TextField placeholder="Price" /></div>
+                 <div className={cx(styles.bs_tr)}><TextField placeholder="Amount" /></div>
+                 <div className={cx(styles.bs_tr)}><TextField placeholder="Total" /></div>
+                 <div className={cx(styles.bs_tr)}><Button raised color="primary">{`Sell ${currentCoin.ticker}`}</Button></div>
+              </div>              
+           </div>
+           <div className={cx(styles.section, styles.trades_bar)}>
+            <div className={cx(styles.section_header)}>Recent Trades</div> 
+           </div>           
+        </div>
+ 	    </div>
 
       </div>
     );
