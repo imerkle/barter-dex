@@ -10,10 +10,12 @@ import StartupScreen from './components/StartupScreen';
 import MainPage from './components/MainPage';
 import Settings from './components/Settings';
 import Wallet from './components/Wallet';
+import CoinSelection from './components/CoinSelection';
 
 export default () => (
   <App>
     <Switch>
+      <Route path="/coinSelection" component={CoinSelection} />
       <Route path="/wallet" component={Wallet} />
       <Route path="/settings" component={Settings} />
       <Route path="/mainPage" component={MainPage} />

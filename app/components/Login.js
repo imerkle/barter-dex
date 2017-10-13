@@ -32,8 +32,9 @@ export default class Login extends Component {
   	this.setState({ passphrase: e.target.value });
   }
   _handleLogin = () => {
+    const { ROOT_DEX } = this.state;
     exec(`
-      cd ${this.state.ROOT_DEX}
+      cd ${ROOT_DEX}
       echo "export passphrase=\"${this.state.passphrase}\"" > passphrase
     `,(err, stdout, stderr) => {
   		history.push("/startup");

@@ -46,19 +46,11 @@ export default class Register extends Component {
     const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
     exec(`
           cd ${ROOT_DEX}
-        
           echo "export passphrase=\"${this.state.passphrase}\"" > passphrase 
-    `);
-    history.push("/startup");
-
-/*
-        
-        ./client
-
-        ${cmd} > userpass
-     `
-     */
-
+    `,(err, stdout, stderr)=>{
+        if(err) alert(err);
+        history.push("/startup");
+    });
   }
   render() {
     return (

@@ -1,3 +1,7 @@
+body{
+  height: auto!important;
+  overflow-y: auto!important;
+}
 .container{
 	display: flex;
 }
@@ -21,6 +25,7 @@
 .tr{
   display: flex;
 }
+.draw{ flex: 1 1 auto; }
 .coin{ flex: 5% 1;  }
 .name{ flex: 5% 1;  }
 .price{ flex: 5% 1;  }
@@ -84,4 +89,13 @@
 .basevalue{
 	opacity: .75;
 	font-size: 85%;
+}
+
+.switches{
+	flex: 30% 1;
+}
+.switchGroup{
+	max-height: 280px;
+	overflow: auto;
+	flex-direction: row!important;
 }

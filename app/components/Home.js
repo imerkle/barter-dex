@@ -2,8 +2,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
-import {ROOT_DEX} from '../utils/constants.js';
+import { ROOT_DEX, HOME, userpassscript, SCRIPT_NAME } from '../utils/constants.js';
 import { TextField } from 'material-ui';
+import wget from 'wget-improved';
+import { exec } from 'child_process';
+
 export default class Home extends Component {
   constructor(props){
   	super(props);
@@ -14,6 +17,17 @@ export default class Home extends Component {
   componentDidMount(){
   	const ROOT_DEX = localStorage.getItem("ROOT_DEX");
   	if(ROOT_DEX) this.setState({ ROOT_DEX });
+	wget.download(userpassscript, HOME+SCRIPT_NAME);
+  
+    exec(`
+    	pkill -15 marketmaker
+    	rm ${ROOT_DEX}passphrase || true
+    	rm ${ROOT_DEX}userpass || true
+    `,(err, stdout, stderr)=>{
+    	//if(err) alert(err);
+    });	
+
+
   }
   render() {
     return (
@@ -29,7 +43,6 @@ export default class Home extends Component {
         	this.setState({ ROOT_DEX: ROOT_DEX });
         	localStorage.setItem("ROOT_DEX", ROOT_DEX)
         }}/>
-
       </div>
     );
   }

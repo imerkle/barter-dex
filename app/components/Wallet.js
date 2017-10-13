@@ -34,7 +34,7 @@ export default class Wallet extends Component {
        	 <HeaderNav />
          <div className={cx(styles.section, styles.w_bar)}>   
             <div className={cx(styles.tr, styles.section_header)}>
-              <div className={cx(styles.oneDiv,styles.coin)}>Deposit/Withdraw</div>
+              <div className={cx(styles.oneDiv,styles.draw)}>Deposit/Withdraw</div>
               <div className={cx(styles.oneDiv,styles.coin)}>Coin</div>
               <div className={cx(styles.oneDiv,styles.name)}>Name</div>
               <div className={cx(styles.oneDiv,styles.price)}>Balance</div>
@@ -44,7 +44,7 @@ export default class Wallet extends Component {
             <FlipMove duration={750} easing="ease-out" style={{padding: "10px"}}>
               {wallet.map((o, i) => (
                 <div className={styles.tr} key={o.coin}>
-                  <div className={cx(styles.oneDiv,styles.coin)}>
+                  <div className={cx(styles.oneDiv,styles.draw)}>
                   	<Button raised color="accent">Deposit</Button>
                   	<Button raised color="primary">Withdraw</Button>
                   </div>
