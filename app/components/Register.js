@@ -11,22 +11,19 @@ import bip39 from 'bip39';
 import qrcode from 'qrcode';
 
 import { exec } from 'child_process';
-import { ROOT_DEX }  from '../utils/constants.js';
+import { inject, observer } from 'mobx-react';
 
-export default class Register extends Component {
+@inject('HomeStore')
+@observer
+class Register extends Component {
   constructor(props){
     super(props);
 
     this.state = {
       passphrase: "",
-      ROOT_DEX: ROOT_DEX,
     };
   }
   componentDidMount(){
-
-    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
-    if(ROOT_DEX) this.setState({ ROOT_DEX });
-
     this.generatePassPhrase();
   }
   generatePassPhrase = () => {
@@ -42,7 +39,7 @@ export default class Register extends Component {
   }
 
   _handleRegister = () => {
-    const { ROOT_DEX } = this.state;
+    const { ROOT_DEX } = this.props.HomeStore;
     const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
     exec(`
           cd ${ROOT_DEX}
@@ -71,3 +68,5 @@ export default class Register extends Component {
     );
   }
 }
+
+export default Register;

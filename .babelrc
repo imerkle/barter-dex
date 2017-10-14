@@ -17,6 +17,7 @@
       "plugins": [
         "transform-class-properties",
         "transform-es2015-classes",
+        "transform-decorators-legacy",
         ["flow-runtime", {
           "assert": true,
           "annotate": true

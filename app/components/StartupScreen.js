@@ -8,25 +8,24 @@ import LoadingWaitText from './LoadingWaitText';
 import { history } from '../store/configureStore.js';
 
 import { exec, spawn } from 'child_process';
-import { HOME, ROOT_DEX, SCRIPT_NAME } from '../utils/constants';
+import { HOME, SCRIPT_NAME } from '../utils/constants';
 import fs from 'fs';
+import { observer, inject } from 'mobx-react';
 
 
  const timeoutSec = 4000;
+
+ @inject('HomeStore')
+ @observer
  class StartupScreen extends Component {
   constructor(props){
   	super(props);
 
   	this.state = {
   		err: "Running Client Please Wait",
-  		ROOT_DEX: ROOT_DEX,
   	};
   }
   componentDidMount(){
-
-    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
-    if(ROOT_DEX) this.setState({ ROOT_DEX });
-
       //let state heat up 
       setTimeout(()=>{
         this.startClient();
@@ -34,7 +33,7 @@ import fs from 'fs';
       },2000);
   }
   startClient = () => {
-    const {ROOT_DEX} = this.state;
+    const { ROOT_DEX } = this.props.HomeStore;
     const mm = spawn(`./client`,[],{
       cwd: ROOT_DEX
     })

@@ -13,9 +13,9 @@ import { history } from '../store/configureStore.js';
 import { withStyles } from 'material-ui/styles';
 import green from 'material-ui/colors/red';
 
-import { ROOT_DEX } from '../utils/constants';
 import fs from 'fs';
 import shell from 'shelljs';
+import { observer, inject } from 'mobx-react';
 
 
 String.prototype.replaceAll = function(search, replacement) {
@@ -35,6 +35,10 @@ const stylesX = {
     },
   },
 };
+
+@withStyles(stylesX)
+@inject('HomeStore')
+@observer
  class CoinSelection extends Component {
   constructor(props){
   	super(props);
@@ -43,14 +47,12 @@ const stylesX = {
   		checked: {},
   		coins: [{coin:"BTC", status: true,rpc: "127.0.0.1:8332" }],
   		lastEnabledCoins: [],
-  		ROOT_DEX: ROOT_DEX,
   	};
   }
   componentDidMount(){
 
-    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
-    if(ROOT_DEX) this.setState({ ROOT_DEX });
-
+  	const { ROOT_DEX } = this.props.HomeStore;
+  	
   	this.setState({
   		passphrase: localStorage.getItem("passphrase"),
   	})
@@ -62,7 +64,9 @@ const stylesX = {
 	this.getCoins()
   }
   getCoins = () => {
-    const { lastEnabledCoins, ROOT_DEX } = this.state;
+    const { lastEnabledCoins } = this.state;
+  	const { ROOT_DEX } = this.props.HomeStore;
+
     shell.exec(`./getcoins`,(err, stdout, stderr) => {
         if(err){
         	alert(err);
@@ -87,7 +91,7 @@ const stylesX = {
   	this.saveCoins();
   }
   saveCoins = () => {
-  	const { ROOT_DEX } = this.state;
+  	const { ROOT_DEX } = this.props.HomeStore;
   	let enable_my = `#!/bin/bash\nsource userpass \n`;
 
   	let enable_my_coins = "";
@@ -156,5 +160,5 @@ const stylesX = {
     );
   }
 }
-export default withStyles(stylesX)(CoinSelection);
+export default CoinSelection;
 

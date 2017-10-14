@@ -9,10 +9,12 @@ import AppLogo from './AppLogo';
 import { history } from '../store/configureStore.js';
 
 import { exec } from 'child_process';
-import { ROOT_DEX }  from '../utils/constants.js';
+import { observer, inject } from 'mobx-react';
 
 
-export default class Login extends Component {
+@inject('HomeStore')
+@observer
+class Login extends Component {
   constructor(props){
   	 
    super(props)
@@ -21,18 +23,13 @@ export default class Login extends Component {
 	 	passphrase: "",
 	 	snackMsg: "",
 	 	snackOpen: false,
-    ROOT_DEX: ROOT_DEX,
 	 }
-  }
-  componentDidMount(){
-    const ROOT_DEX = localStorage.getItem("ROOT_DEX");
-    if(ROOT_DEX) this.setState({ ROOT_DEX });
   }
   _handleChange = (e) => {
   	this.setState({ passphrase: e.target.value });
   }
   _handleLogin = () => {
-    const { ROOT_DEX } = this.state;
+    const { ROOT_DEX } = this.props.HomeStore;
     exec(`
       cd ${ROOT_DEX}
       echo "export passphrase=\"${this.state.passphrase}\"" > passphrase
@@ -79,3 +76,4 @@ export default class Login extends Component {
     );
   }
 }
+export default Login;

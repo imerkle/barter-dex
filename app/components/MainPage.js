@@ -6,7 +6,6 @@ import styles from './Main.css';
 import FlipMove from 'react-flip-move';
 import cx from 'classnames';
 
-
 import BuySell from './BuySell';
 import HeaderNav from './HeaderNav';
 

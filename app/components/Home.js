@@ -6,7 +6,12 @@ import { ROOT_DEX, HOME, userpassscript, SCRIPT_NAME } from '../utils/constants.
 import { TextField } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
+import { inject, observer } from 'mobx-react';
 
+
+ 
+@inject('HomeStore')
+@observer
 export default class Home extends Component {
   constructor(props){
   	super(props);
@@ -16,16 +21,18 @@ export default class Home extends Component {
   }	
   componentDidMount(){
   	const ROOT_DEX = localStorage.getItem("ROOT_DEX");
-  	if(ROOT_DEX) this.setState({ ROOT_DEX });
-	wget.download(userpassscript, HOME+SCRIPT_NAME);
-  
+  	if(ROOT_DEX){
+     this.props.HomeStore.ROOT_DEX = ROOT_DEX;
+     this.setState({ ROOT_DEX });
+    }
+	  
+
+    wget.download(userpassscript, HOME+SCRIPT_NAME);
     exec(`
     	pkill -15 marketmaker
     	rm ${ROOT_DEX}passphrase || true
     	rm ${ROOT_DEX}userpass || true
-    `,(err, stdout, stderr)=>{
-    	//if(err) alert(err);
-    });	
+    `);	
 
 
   }
@@ -41,6 +48,7 @@ export default class Home extends Component {
         <TextField value={this.state.ROOT_DEX} onChange={(e)=>{
         	const ROOT_DEX = e.target.value;
         	this.setState({ ROOT_DEX: ROOT_DEX });
+          this.props.HOMESTORE.ROOT_DEX = ROOT_DEX;
         	localStorage.setItem("ROOT_DEX", ROOT_DEX)
         }}/>
       </div>

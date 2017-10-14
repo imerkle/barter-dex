@@ -25,7 +25,7 @@ body{
 .tr{
   display: flex;
 }
-.draw{ flex: 1 1 auto; }
+.draw{ flex: 2 1 auto; width: 15%; }
 .coin{ flex: 5% 1;  }
 .name{ flex: 5% 1;  }
 .price{ flex: 5% 1;  }
@@ -38,7 +38,7 @@ body{
    margin: 8px 20px;
 }
 .section_header{
-   background: #0c3379;
+   background: #175d42;
    padding: 10px;
    font-weight: bold;
    cursor: pointer;

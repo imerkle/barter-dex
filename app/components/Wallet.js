@@ -6,6 +6,11 @@ import HeaderNav from './HeaderNav';
 import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 import { Button } from 'material-ui';
+import shell from 'shelljs';
+
+import { coinNameFromTicker } from '../utils/basic.js';
+import { __URL__ } from '../utils/constants.js';
+
 const mockWallet = [
 {
 	coin: "KMD",
@@ -18,14 +23,32 @@ const mockWallet = [
 export default class Wallet extends Component {
   constructor(props){
   	super(props);
+
   	this.state = {
-  		//wallet : [],
-  		wallet : mockWallet,
-  		baseCoin: {ticker: "BTC"}
+  		wallet : [],
+  		//wallet : mockWallet,
+  		baseCoin: {ticker: "BTC"},
+  		enabled_coins: [],
   	};	
   }	
-  componentDidMount(){
+  componentDidMount(){  	
+	let enabled_coins = localStorage.getItem("enabled_coins");
+	if(enabled_coins) enabled_coins = JSON.parse(enabled_coins);
 
+	const wallet = [];
+	enabled_coins.map(o=>{
+		wallet.push({
+			coin: o,
+			name: coinNameFromTicker(o),
+		});
+	})
+    this.setState({ wallet })
+    shell.exec(`curl --url "${__URL__}" --data "{\"userpass\":\"$userpass\",\"method\":\"enable\",\"coin\":\"KMD\"}"`,(err,stdout,stderr)=>{
+    //shell.exec(`curl --url "${__URL__}" --data "{\"userpass\":\"$userpass\",\"method\":\"inventory\",\"coin\":\"KMD\"}"`,(err,stdout,stderr)=>{
+    	console.log(err);
+    	console.log(stdout);
+    	console.log(stderr);
+    });
   }
   render() {
   	const { baseCoin, wallet } = this.state;
