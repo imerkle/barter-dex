@@ -6,7 +6,6 @@ import styles from './Login.css';
 import { Snackbar, Button, TextField} from 'material-ui';
 
 import AppLogo from './AppLogo';
-import { history } from '../store/configureStore.js';
 
 import { exec } from 'child_process';
 import { observer, inject } from 'mobx-react';
@@ -34,7 +33,7 @@ class Login extends Component {
       cd ${ROOT_DEX}
       echo "export passphrase=\"${this.state.passphrase}\"" > passphrase
     `,(err, stdout, stderr) => {
-  		history.push("/startup");
+  		this.props.history.push("/startup");
     });  	
   }
    _handleSave = () => {

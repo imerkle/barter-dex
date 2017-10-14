@@ -1,10 +1,11 @@
 // @flow
 import React from 'react';
-import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'react-router-redux';
 import Routes from '../routes';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+
+import history from '../history.js';
+import { Router } from 'react-router'
 
 const theme = createMuiTheme({
   palette: {
@@ -12,19 +13,20 @@ const theme = createMuiTheme({
   },
 });
 
-type RootType = {
-  store: {},
-  history: {}
-};
 
-export default function Root({ store, history }: RootType) {
+class BrowserRouter2 extends React.Component {
+  render() {
+    return <Router history={history} children={this.props.children}/>
+  }
+}
+
+
+export default function Root() {
   return (
-    <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <MuiThemeProvider theme={theme}>
-        	<Routes />
-        </MuiThemeProvider>	
-      </ConnectedRouter>
-    </Provider>
+   <BrowserRouter2 onUpdate={() => window.scrollTo(0, 0)}>
+      <MuiThemeProvider theme={theme}>
+       	<Routes />
+      </MuiThemeProvider>	
+   </BrowserRouter2>
   );
 }

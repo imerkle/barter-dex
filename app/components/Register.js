@@ -5,7 +5,6 @@ import AppLogo  from './AppLogo';
 import styles from './Login.css';
 
 import { Button, TextField } from 'material-ui';
-import { history } from '../store/configureStore.js';
 
 import bip39 from 'bip39';
 import qrcode from 'qrcode';
@@ -46,7 +45,7 @@ class Register extends Component {
           echo "export passphrase=\"${this.state.passphrase}\"" > passphrase 
     `,(err, stdout, stderr)=>{
         if(err) alert(err);
-        history.push("/startup");
+        this.props.history.push("/startup");
     });
   }
   render() {

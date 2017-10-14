@@ -9,10 +9,8 @@ import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
 
 
- 
-@inject('HomeStore')
-@observer
-export default class Home extends Component {
+@inject('HomeStore') @observer
+class Home extends React.Component {
   constructor(props){
   	super(props);
   	this.state = {
@@ -55,3 +53,4 @@ export default class Home extends Component {
     );
   }
 }
+export default Home;

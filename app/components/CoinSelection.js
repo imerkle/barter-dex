@@ -7,9 +7,6 @@ import HeaderNav from './HeaderNav';
 import LoadingWaitText from './LoadingWaitText';
 import { Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
 
-import { history } from '../store/configureStore.js';
-
-
 import { withStyles } from 'material-ui/styles';
 import green from 'material-ui/colors/red';
 
@@ -114,7 +111,7 @@ const stylesX = {
 
 	const cmd = `echo "${enable_my + enable_my_coins}" > ${ROOT_DEX}enable_my`;
 	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
-	    history.push("/mainPage");
+	    this.props.history.push("/mainPage");
 	});  	
   }
   render() {

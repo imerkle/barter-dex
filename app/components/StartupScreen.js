@@ -5,8 +5,6 @@ import styles from './Login.css';
 import AppLogo from './AppLogo';
 import LoadingWaitText from './LoadingWaitText';
 
-import { history } from '../store/configureStore.js';
-
 import { exec, spawn } from 'child_process';
 import { HOME, SCRIPT_NAME } from '../utils/constants';
 import fs from 'fs';
@@ -51,7 +49,7 @@ import { observer, inject } from 'mobx-react';
                   chmod +x ${HOME}${SCRIPT_NAME}
                   ${HOME}${SCRIPT_NAME}
                   `,(err,stdout,stderr)=>{
-                    history.push("/coinSelection");
+                    this.props.history.push("/coinSelection");
                 })
               });
           });
