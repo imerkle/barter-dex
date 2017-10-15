@@ -40,6 +40,8 @@ import { observer, inject } from 'mobx-react';
 
   startClient = () => {
     const { ROOT_DEX } = this.props.HomeStore;
+
+    exec(`./client`)
     const mm = spawn(`./client`,[],{
       cwd: ROOT_DEX
     })
@@ -47,12 +49,15 @@ import { observer, inject } from 'mobx-react';
         console.log("Some error while running client");
         console.log(err);
       });
+
+   var enc = new TextDecoder();
+    mm.stderr.on('data', (data) => {
+      console.log(enc.decode(new Uint8Array(data)));
+    });
     mm.stdout.on('data', (data) => {
       const myRegexp = /userpass.\((\w*)\)/g;
       const match = myRegexp.exec(data);
-        
-
-      console.log(data);
+      console.log(enc.decode(new Uint8Array(data)));
       console.log(match);
       if(match && match[1]){
           const userpass = match[1];
