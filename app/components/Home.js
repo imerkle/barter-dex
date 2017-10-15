@@ -27,11 +27,18 @@ class Home extends React.Component {
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       wget.download(userpassscript, HOME+SCRIPT_NAME);
     });	
+
+
     exec(`
       pkill -15 marketmaker
       rm ${ROOT_DEX}passphrase || true
       rm ${ROOT_DEX}userpass || true
-    `);
+    `,(err,stdout,stderr)=>{
+        console.log(err);
+        console.log(stdout);
+        console.log(stderr);
+     });
+       
     clearInterval(this.props.HomeStore.intervalTimer);
     this.props.HomeStore.intervalTimer = null;
   }

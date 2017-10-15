@@ -52,6 +52,7 @@ import { observer, inject } from 'mobx-react';
       const match = myRegexp.exec(data);
         
 
+      console.log(data);
       console.log(match);
       if(match && match[1]){
           const userpass = match[1];
