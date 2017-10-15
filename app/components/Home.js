@@ -24,13 +24,14 @@ class Home extends React.Component {
      this.setState({ ROOT_DEX });
     }
 	  
-
-    wget.download(userpassscript, HOME+SCRIPT_NAME);
+    exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
+      wget.download(userpassscript, HOME+SCRIPT_NAME);
+    });	
     exec(`
-    	pkill -15 marketmaker
-    	rm ${ROOT_DEX}passphrase || true
-    	rm ${ROOT_DEX}userpass || true
-    `);	
+      pkill -15 marketmaker
+      rm ${ROOT_DEX}passphrase || true
+      rm ${ROOT_DEX}userpass || true
+    `);
     clearInterval(this.props.HomeStore.intervalTimer);
     this.props.HomeStore.intervalTimer = null;
   }
