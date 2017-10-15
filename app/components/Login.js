@@ -70,7 +70,7 @@ class Login extends Component {
           		  label="Passphrase"
           		  InputProps={{ placeholder: 'Passphrase' }}		          
 		        />
-		        <Button color="accent" onClick={this._handleSave}>Save Passphrase</Button>
+		        {/*<Button color="accent" onClick={this._handleSave}>Save Passphrase</Button>*/}
 		        <Button raised color="primary" onClick={this._handleLogin}>Login</Button>
         </div>
     );
