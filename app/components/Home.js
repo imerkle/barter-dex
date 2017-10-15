@@ -46,7 +46,7 @@ class Home extends React.Component {
         <TextField value={this.state.ROOT_DEX} onChange={(e)=>{
         	const ROOT_DEX = e.target.value;
         	this.setState({ ROOT_DEX: ROOT_DEX });
-          this.props.HOMESTORE.ROOT_DEX = ROOT_DEX;
+          this.props.HomeStore.ROOT_DEX = ROOT_DEX;
         	localStorage.setItem("ROOT_DEX", ROOT_DEX)
         }}/>
       </div>
