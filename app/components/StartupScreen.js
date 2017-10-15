@@ -40,6 +40,7 @@ import { observer, inject } from 'mobx-react';
       const match = myRegexp.exec(data);
       if(match && match[1]){
           const userpass = match[1];
+          this.props.HomeStore.userpass = userpass;
           fs.readFile(`${HOME}${SCRIPT_NAME}`, 'utf8', (err,data) => {
             data = data.replace("[USERPASS]",userpass);
             data = data.replace("[ROOT_DEX]",ROOT_DEX);

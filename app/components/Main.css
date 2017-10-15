@@ -22,9 +22,6 @@ body{
   font-weight: bold;	
 }
 
-.tr{
-  display: flex;
-}
 .draw{ flex: 2 1 auto; width: 15%; }
 .coin{ flex: 5% 1;  }
 .name{ flex: 5% 1;  }
@@ -48,7 +45,7 @@ body{
 .section_header .oneDiv:hover{
    color: #FFF;
 }
-.r_side_bar{ min-height: 500px; }
+.r_side_bar{ min-height: 500px; font-size: 14px;}
 .w_bar{ min-height: 400px; flex: 1 1 auto; }
 .graph_bar{height:120px;}
 .trades_bar{height:250px;}
@@ -98,4 +95,20 @@ body{
 	max-height: 280px;
 	overflow: auto;
 	flex-direction: row!important;
+}
+
+.tr{
+  display: flex;
+  padding: 10px;
+}
+.tr:hover:not(.basetr),.selectedtr{
+  cursor: pointer;
+  background: rgba(11, 51, 28, 0.38);
+}
+.bs_order_header{
+  background: rgba(0,0,0,.1);
+  font-size: 14px;
+}
+.canvas{
+   margin: 10px auto;
 }

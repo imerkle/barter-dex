@@ -176,6 +176,7 @@
     "redux-logger": "^3.0.6",
     "rimraf": "^2.6.1",
     "sass-loader": "^6.0.6",
+    "shebang-loader": "^0.0.1",
     "sinon": "^2.3.5",
     "spectron": "^3.7.0",
     "style-loader": "^0.18.1",
@@ -189,7 +190,6 @@
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
-    "axios": "^0.16.2",
     "bip39": "^2.4.0",
     "classnames": "^2.2.5",
     "devtron": "^1.4.0",

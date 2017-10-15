@@ -18,7 +18,7 @@ export default class Settings extends Component {
         <div className={styles.container2}>
         	<HeaderNav />
 			<List>
-				{makeList('Select Coins','donut_small','startup')}
+				{makeList('Select Coins','donut_small','coinSelection')}
 			</List>
         </div>
     );

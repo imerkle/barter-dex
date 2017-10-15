@@ -17,7 +17,7 @@
 .numpad{
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;	
+    flex-wrap: wrap;
 }
 .numpad button{
     flex: 30% 1;

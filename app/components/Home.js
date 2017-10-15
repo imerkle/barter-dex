@@ -31,8 +31,8 @@ class Home extends React.Component {
     	rm ${ROOT_DEX}passphrase || true
     	rm ${ROOT_DEX}userpass || true
     `);	
-
-
+    clearInterval(this.props.HomeStore.intervalTimer);
+    this.props.HomeStore.intervalTimer = null;
   }
   render() {
     return (

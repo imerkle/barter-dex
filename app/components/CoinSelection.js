@@ -8,12 +8,11 @@ import LoadingWaitText from './LoadingWaitText';
 import { Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
-import green from 'material-ui/colors/red';
 
 import fs from 'fs';
 import shell from 'shelljs';
 import { observer, inject } from 'mobx-react';
-
+import { stylesX } from '../utils/constants';
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
@@ -22,16 +21,6 @@ String.prototype.replaceAll = function(search, replacement) {
 
 
 const timeoutSec = 4000;
-
-const stylesX = {
-  bar: {},
-  checked: {
-    color: green[500],
-    '& + $bar': {
-      backgroundColor: green[500],
-    },
-  },
-};
 
 @withStyles(stylesX)
 @inject('HomeStore')
@@ -42,21 +31,18 @@ const stylesX = {
 
   	this.state = {
   		checked: {},
-  		coins: [{coin:"BTC", status: true,rpc: "127.0.0.1:8332" }],
+  		coins: [{coin:"BTC", status: true,rpc: "127.0.0.1:8332",smartaddress: "0" }],
   		lastEnabledCoins: [],
   	};
   }
   componentDidMount(){
 
-  	const { ROOT_DEX } = this.props.HomeStore;
+  	const { ROOT_DEX, enabled_coins, passphrase } = this.props.HomeStore;
   	
   	this.setState({
-  		passphrase: localStorage.getItem("passphrase"),
+  		passphrase: passphrase,
+  		lastEnabledCoins: enabled_coins,
   	})
-	let enabled_coins = localStorage.getItem("enabled_coins");
-	  if(enabled_coins) enabled_coins = JSON.parse(enabled_coins);
-    this.setState({ lastEnabledCoins: enabled_coins })	  
-	
 	shell.cd(ROOT_DEX);
 	this.getCoins()
   }
@@ -76,15 +62,24 @@ const stylesX = {
 			if((lastEnabledCoins && lastEnabledCoins.indexOf(o.coin) > -1) || (o.status === 'active') ){
 				isEnabled = true;
 			}
-			return {coin: o.coin, status: isEnabled,rpc: o.rpc }
+			return {coin: o.coin, status: isEnabled,rpc: o.rpc, smartaddress: o.smartaddress }
 		});
 		this.setState({ coins: c });
   	});  	
   }
   _handleStartup = () => {
   	let enabled_coins = [];
-  	this.state.coins.map(o=>{ if(o.status) enabled_coins.push(o.coin) })
-  	localStorage.setItem("enabled_coins", JSON.stringify(enabled_coins));
+  	this.state.coins.map(o=>{ 
+  		if(o.status){
+  			enabled_coins.push(o.coin);
+  			let newC = {};
+  			if(this.props.HomeStore.coins[o.coin]) newC = this.props.HomeStore.coins[o.coin];
+  			newC = Object.assign(newC,o)
+  			this.props.HomeStore.coins[o.coin] = newC;
+  		}
+  	})
+  	//localStorage.setItem("enabled_coins", JSON.stringify(enabled_coins));
+  	this.props.HomeStore.enabled_coins = enabled_coins;
   	this.saveCoins();
   }
   saveCoins = () => {
@@ -99,19 +94,39 @@ const stylesX = {
 	  				userpass: "$userpass",
 	  				"method": "electrum",
 	  				"coin": o.coin,
-	  				ipaddr: ipport[0], 
-	  				port: ipport[1],
 	  			};
 			enable_my_coins += `curl --url "http://127.0.0.1:7783" --data "${JSON.stringify(jsonPart).replaceAll("\"","\\\"")}"\n`;
   		}
   	})
 
   	//remove this later need to ask dev
-  	enable_my_coins = `curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"136.243.45.140\",\"port\":50001}"`;
-
-	const cmd = `echo "${enable_my + enable_my_coins}" > ${ROOT_DEX}enable_my`;
+  	/*
+  	enable_my_coins = `
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"ARG\",\"ipaddr\":\"173.212.225.176\",\"port\":50081}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"136.243.45.140\",\"port\":50001}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"173.212.225.176\",\"port\":50001}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"CRW\",\"ipaddr\":\"173.212.225.176\",\"port\":50041}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DASH\",\"ipaddr\":\"173.212.225.176\",\"port\":50098}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DGB\",\"ipaddr\":\"136.243.45.140\",\"port\":50022}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DGB\",\"ipaddr\":\"173.212.225.176\",\"port\":50022}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DOGE\",\"ipaddr\":\"173.212.225.176\",\"port\":50015}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"FAIR\",\"ipaddr\":\"173.212.225.176\",\"port\":50005}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"HUSH\",\"ipaddr\":\"173.212.225.176\",\"port\":50013}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"KMD\",\"ipaddr\":\"136.243.45.140\",\"port\":50011}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"KMD\",\"ipaddr\":\"173.212.225.176\",\"port\":50011}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"LTC\",\"ipaddr\":\"173.212.225.176\",\"port\":50012}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"MONA\",\"ipaddr\":\"173.212.225.176\",\"port\":50002}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"NMC\",\"ipaddr\":\"173.212.225.176\",\"port\":50036}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"VTC\",\"ipaddr\":\"173.212.225.176\",\"port\":50088}"
+curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"ZEC\",\"ipaddr\":\"173.212.225.176\",\"port\":50032}"
+  	`;
+  	*/
+	enable_my += enable_my_coins;
 	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
-	    this.props.history.push("/mainPage");
+		shell.exec(`./enable_my`,(err, stdout, stderr) => {
+			if(err)alert(err);
+	    	this.props.history.push("/mainPage");
+		});
 	});  	
   }
   render() {

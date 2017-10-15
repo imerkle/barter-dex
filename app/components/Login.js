@@ -29,6 +29,7 @@ class Login extends Component {
   }
   _handleLogin = () => {
     const { ROOT_DEX } = this.props.HomeStore;
+    this.props.HomeStore.passphrase = this.state.passphrase;
     exec(`
       cd ${ROOT_DEX}
       echo "export passphrase=\"${this.state.passphrase}\"" > passphrase

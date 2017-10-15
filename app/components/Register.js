@@ -7,10 +7,10 @@ import styles from './Login.css';
 import { Button, TextField } from 'material-ui';
 
 import bip39 from 'bip39';
-import qrcode from 'qrcode';
 
 import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
+import { generateQR } from '../utils/basic.js';
 
 @inject('HomeStore')
 @observer
@@ -27,19 +27,14 @@ class Register extends Component {
   }
   generatePassPhrase = () => {
     const passphrase = bip39.generateMnemonic()
-    this.generateQR(passphrase);
+    generateQR(passphrase,"QR");
     this.setState({ passphrase })    
-  }
-  generateQR = (content) => {
-    const canvas = document.getElementById("QR");
-    qrcode.toCanvas(canvas, content, function (error) {
-      if (error) console.error(error)
-    })    
   }
 
   _handleRegister = () => {
     const { ROOT_DEX } = this.props.HomeStore;
     const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
+    this.props.HomeStore.passphrase = this.state.passphrase;
     exec(`
           cd ${ROOT_DEX}
           echo "export passphrase=\"${this.state.passphrase}\"" > passphrase 

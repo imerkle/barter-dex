@@ -71,6 +71,13 @@ export default merge.smart(baseConfig, {
           }
         }
       },
+      { 
+        test: /\.jsx?$/,
+        include: [/node_modules\/JSONStream/],
+        use: {
+          loader: 'shebang-loader',
+        },
+      },
       {
         test: /\.global\.css$/,
         use: [
