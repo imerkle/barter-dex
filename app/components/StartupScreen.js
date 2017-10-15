@@ -41,7 +41,8 @@ import { observer, inject } from 'mobx-react';
   startClient = () => {
     const { ROOT_DEX } = this.props.HomeStore;
 
-    exec(`./client`)
+    exec(`chmod +x ${ROOT_DEX}client`)
+    exec(`chmod +x ${ROOT_DEX}getcoins`)
     const mm = spawn(`./client`,[],{
       cwd: ROOT_DEX
     })

@@ -2,12 +2,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
-import { ROOT_DEX, HOME, userpassscript, SCRIPT_NAME } from '../utils/constants.js';
+import { ROOT_DEX, HOME, userpassscript, clientscript, getcoinsscript, SCRIPT_NAME } from '../utils/constants.js';
 import { TextField } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
-
+import fs from 'fs';
 
 @inject('HomeStore') @observer
 class Home extends React.Component {
@@ -26,9 +26,9 @@ class Home extends React.Component {
 	  
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       wget.download(userpassscript, HOME+SCRIPT_NAME);
+      wget.download(clientscript, ROOT_DEX+"client");
+      wget.download(getcoinsscript, ROOT_DEX+"getcoins");
     });	
-
-
     exec(`
       pkill -15 marketmaker
       rm ${ROOT_DEX}passphrase || true
@@ -38,7 +38,6 @@ class Home extends React.Component {
         console.log(stdout);
         console.log(stderr);
      });
-       
     clearInterval(this.props.HomeStore.intervalTimer);
     this.props.HomeStore.intervalTimer = null;
   }
