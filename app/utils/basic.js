@@ -86,6 +86,9 @@ export const coinNameFromTicker = (ticker) => {
 		case "KMD":
 			c = "Komodo";
 		break;
+		case "BTC":
+			c = "BTC";
+		break;
 	}
 	return c;
 }

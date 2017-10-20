@@ -135,7 +135,7 @@ class Wallet extends Component {
             <Button raised color="accent"
               onClick={()=>{
                 runCommand(ROOT_DEX,makeCommand("withdraw",{coin: coin.coin, outputs: [{ [withdrawAddress]: withdrawValue }] }),(res)=>{
-                    if(!res.completed){
+                    if(!res.complete){
                       DarkErrorStore.alert("Withdrawal not successful");
                     }else{
                       DarkErrorStore.alert("Withdrawal completed successfully. Your Transaction ID: " + txid);
