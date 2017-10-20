@@ -15,7 +15,7 @@ import HeaderNav from './HeaderNav';
 import { makeConfig, coinNameFromTicker, runCommand, makeCommand, getSorted, zeroGray } from '../utils/basic.js';
 import { green } from '../utils/chartTheme.js';
 
-
+const MAX_VOLUME = .002;
 
 ReactHighstock.Highcharts.theme = green;
 ReactHighstock.Highcharts.setOptions(ReactHighstock.Highcharts.theme);
@@ -26,7 +26,7 @@ const mockData = [
 ];
 
 let toggleState = {};
-@inject('HomeStore')
+@inject('HomeStore') @observer
 class MainPage extends Component {
   constructor(props){
     super(props);
@@ -34,12 +34,14 @@ class MainPage extends Component {
     this.state = {
        currentCoin: { coin: "KMD", balance: 0, mock: true},
        config : false,
-       graphVisible: true,
+       graphVisible: false,
     };
   }
   componentDidMount = () => {  
     this.resetWallet();
-    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 10000);
+    clearInterval(this.props.HomeStore.intervalTimer);
+    this.props.HomeStore.intervalTimer = null;
+    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 60000);
   }
 
   sortBy = (prop) => {
@@ -96,9 +98,9 @@ class MainPage extends Component {
           const yesterday = res[0][1];
           const change = ((today - yesterday)/yesterday * 100).toFixed(2);
           coins[o.coin].change = change;
-          //console.log(makeConfig(res));
-          if(!this.state.config){
+          if(!this.madeGraph){
             this.setState({ config: makeConfig(res, base.coin, maxdecimal) });
+            this.madeGraph = true;
           }
         });
         
@@ -137,7 +139,10 @@ class MainPage extends Component {
       break;
     }
     return (
-              <div className={cx(styles.section, styles.buysell)}>
+              <div className={cx(styles.section, styles.buysell,
+                {[styles.buyBox] : buyOrSell == 0 },
+                {[styles.sellBox] : buyOrSell == 1},
+                )}>
                  <div className={cx(styles.bs_tr, styles.bs_header,styles.bs_tr_row)}>
                   <div className={cx(styles.mainHead)}>{`${header} Orders`}</div>
                  </div>
@@ -153,15 +158,17 @@ class MainPage extends Component {
                       const total = (o.price * amt).toFixed(maxdecimal);
                       const tooltip_title = o.address; 
                       const price = o.price.toFixed(maxdecimal);
+                      const widthPercent = (total/MAX_VOLUME * 100)+"%";
                       return (
                       <Tooltip placement={placement} title={tooltip_title} key={o.coin+""+i}>
-                        <div className={cx(styles.tr)}  
+                        <div className={cx(styles.tr , { [styles.myorder] : o.address == currentCoin.smartaddress } )}  
                           onClick={()=>{
                              this.props.HomeStore[BS].price = o.price;
                              this.props.HomeStore[BS].amount = amt;
                              this.props.HomeStore[BS].total = total;
                           }}
                         >
+                          <div className={cx(styles.volumeSpread)} style={{ width: widthPercent }}></div>
                           <div className={cx(styles.oneDiv,styles.price)}>{zeroGray(price)}</div>
                           <div className={cx(styles.oneDiv,styles.volume)}>{zeroGray(amt)}</div>
                           <div className={cx(styles.oneDiv,styles.total)}>{zeroGray(total)}</div>
@@ -181,7 +188,7 @@ class MainPage extends Component {
       <div className={styles.container, styles.container2}>
       <HeaderNav />
        <div className={styles.container}>
-        <div className={styles.container2} style={{flex: "1 1 auto"}}>
+        <div className={cx(styles.container2,styles.right_list)}>
            <div className={cx(styles.section, styles.r_side_bar)}>   
             <div className={cx(styles.tr, styles.section_header)}>
               <div className={cx(styles.oneDiv,styles.coin)} onClick={()=>this.sortBy("coin")}>Coin</div>

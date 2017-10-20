@@ -10,8 +10,9 @@ body{
 	flex-flow: column;
 }
 .oneDiv{
-	margin: 0 5px;
-    text-align: right;
+	 margin: 0 5px;
+   text-align: right;
+   z-index: 2;
 }
 .profit{
   color: #40ff40;
@@ -99,14 +100,17 @@ body{
 	flex: 30% 1;
 }
 .switchGroup{
+  /*
 	max-height: 280px;
 	overflow: auto;
+  */
 	flex-direction: row!important;
 }
 
 .tr{
   display: flex;
   padding: 10px;
+  position: relative;
 }
 .tr:hover:not(.basetr),.selectedtr{
   cursor: pointer;
@@ -195,3 +199,17 @@ body{
 .container_buttons button{
   flex: 30% 1;
 }
+.right_list{
+  flex: 10% 1 !important;
+}
+.myorder{
+  background: rgba(0,0,0,.1)
+}
+.volumeSpread{
+    position: absolute;
+    height: 40%;
+    top: 30%;
+    left: 0;
+}
+.sellBox .volumeSpread{background: #f19595;}
+.buyBox .volumeSpread{background: rgba(126, 255, 102,1)}

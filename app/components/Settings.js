@@ -20,6 +20,7 @@ export default class Settings extends Component {
 			<List>
 				{makeList('Select Coins','donut_small','coinSelection')}
 				{makeList('Change Base Coin','donut_large','baseSelection')}
+				{makeList('Change Percent Indicator Value','format_list_numbered','indicatorSelection')}
 			</List>
         </div>
     );

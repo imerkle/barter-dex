@@ -32,7 +32,7 @@ const timeoutSec = 4000;
 
   	this.state = {
   		checked: {},
-  		coins: [{coin:"BTC", status: true,rpc: "127.0.0.1:8332",smartaddress: "0" }],
+  		coins: [{coin:"BTC", enabled: true,rpc: "127.0.0.1:8332",smartaddress: "0" }],
   		lastEnabledCoins: [],
   	};
   }
@@ -50,6 +50,7 @@ const timeoutSec = 4000;
   getCoins = () => {
     const { lastEnabledCoins } = this.state;
   	const { ROOT_DEX } = this.props.HomeStore;
+  	const { DarkErrorStore } = this.props;
 
     shell.exec(`./getcoins`,(err, stdout, stderr) => {
         if(err){
@@ -60,10 +61,10 @@ const timeoutSec = 4000;
 		const coins = out.coins || out;
 		const c = coins.map(o=>{ 
 			let isEnabled = false;
-			if((lastEnabledCoins && lastEnabledCoins.indexOf(o.coin) > -1) || (o.status === 'active') ){
+			if((lastEnabledCoins && lastEnabledCoins.indexOf(o.coin) > -1) ){
 				isEnabled = true;
 			}
-			return {coin: o.coin, status: isEnabled,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance }
+			return {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance, enabled: isEnabled }
 		});
 		this.setState({ coins: c });
   	});  	
@@ -71,7 +72,7 @@ const timeoutSec = 4000;
   _handleStartup = () => {
   	let enabled_coins = [];
   	this.state.coins.map(o=>{ 
-  		if(o.status){
+  		if(o.enabled){
   			enabled_coins.push(o.coin);
   			let newC = {};
   			if(this.props.HomeStore.coins[o.coin]) newC = this.props.HomeStore.coins[o.coin];
@@ -85,53 +86,18 @@ const timeoutSec = 4000;
   }
   saveCoins = () => {
   	const { ROOT_DEX } = this.props.HomeStore;
-	this.props.history.push("/mainPage");
-
-  	this.state.coins.map(o=>{
-  		if(o.status){
+  	let c = 0,c1=0;
+  	this.state.coins.map(o=>{ if(o.enabled) c++; })
+  	this.state.coins.map((o,i)=>{
+  		if(o.enabled){
+  			c1++;
   			runCommand(ROOT_DEX,makeCommand("enable",{coin: o.coin }),(res)=>{
-  				console.log(res);
+  				if(c == c1){
+  					this.props.history.push("/mainPage");
+  				}
   			});
   		}
   	})
-
-  	/*
-  	let enable_my = `#!/bin/bash\nsource userpass \n`;
-
-  	let enable_my_coins = "";
-  	this.state.coins.map(o=>{
-  		if(o.status){
-  			
-	  		const ipport = o.rpc.split(":");
-	  		const jsonPart = {
-	  				userpass: "$userpass",
-	  				"method": "electrum",
-	  				"coin": o.coin,
-	  			};
-			enable_my_coins += `curl --url "http://127.0.0.1:7783" --data "${JSON.stringify(jsonPart).replaceAll("\"","\\\"")}"\n`;
-			
-  			//runCommand(ROOT_DEX,makeCommand("enable",{coin: o.coin }),(res)=>{
-  				//console.log(res);
-  			//});
-  		}
-  	})
-	enable_my += enable_my_coins;
-	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
-		shell.exec(`./enable_my`,(err, stdout, stderr) => {
-			if(err) DarkErrorStore.alert(err);
-	    	this.props.history.push("/mainPage");
-		});
-	});  	
-	*/
-
-/*
-	shell.cd(ROOT_DEX);
-	shell.exec('./enable_my',(err,stdout,stderr)=>{
-		console.log(err);
-		console.log(stdout);
-		console.log(stderr);
-	});
-*/
   }
   render() {
 	const { classes } = this.props;
@@ -148,12 +114,12 @@ const timeoutSec = 4000;
 							        <FormControlLabel
 							          control={
 							            <Switch
-							              checked={o.status || false}
+							              checked={o.enabled || false}
 							              onChange={(event, checked) => {
 							              	const c = this.state.coins;
 											c.map(ox=> {
 											  if(o.coin == ox.coin){
-												ox.status = !ox.status;
+												ox.enabled = !ox.enabled;
 											   }
 											});
 							              	this.setState({ checked: c })	

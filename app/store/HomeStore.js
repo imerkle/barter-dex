@@ -20,5 +20,6 @@ class HomeStore{
 	};
 	@observable intervalTimer = null;
 	@observable maxdecimal = 8;
+	@observable indicator = [25,50,75,100];
 }
 export default new HomeStore;

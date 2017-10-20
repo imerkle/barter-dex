@@ -97,6 +97,7 @@ class BuySell extends Component {
   render() {
   	const { currentCoin, baseCoin, isBuy } = this.props;
   	const { total, price, amount } = this.props.HomeStore[this.BS];
+    const { indicator } = this.props.HomeStore;
 
   	const buyTxt = (isBuy)  ? "Buy" : "Sell";
   	const accent = (isBuy)  ? "accent" : "primary";
@@ -115,10 +116,7 @@ class BuySell extends Component {
 	         <div className={cx(styles.bs_tr)}><TextField value={amount} label="Amount" placeholder="Amount" onChange={this._putAmount} /></div>
 	         <div className={cx(styles.bs_tr)}><TextField value={total} label="Total" disabled placeholder="Total" /></div>
 	         <div className={cx(styles.bs_tr,styles.bs_tr_row)}>
-	            <Button fab color={primary} onClick={()=>{ this._handleFab(25) }}>25%</Button>
-	            <Button fab color={accent} onClick={()=>{ this._handleFab(50) }} >50%</Button>
-	            <Button fab color={primary} onClick={()=>{ this._handleFab(75) }}>75%</Button>
-	            <Button fab color={accent} onClick={()=>{ this._handleFab(100) }} >100%</Button>
+              {indicator.map( (o,i)=><Button key={i} fab color={(i%2 == 0) ?  accent : primary} onClick={()=>{ this._handleFab(o) }}>{o}%</Button>)}
 	         </div>
 	         <div className={cx(styles.bs_tr)}><Button raised color={accent} onClick={this._handleBuySell}>{`${buyTxt} ${currentCoin.coin}`}</Button></div>
 	      </div>
