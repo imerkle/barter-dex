@@ -23,6 +23,7 @@ import { observer, inject } from 'mobx-react';
   		err: "Running Client Please Wait",
       timer: 0,
   	};
+    this.intervalTimer = null;
   }
   componentDidMount(){
       //let state heat up 
@@ -30,52 +31,53 @@ import { observer, inject } from 'mobx-react';
         this.startClient();
         //this.getCoins()
       },2000);
-      this.runTimer();
+      //this.runTimer();
+  }
+  componentWillUnmount(){
+    clearInterval(this.intervalTimer);
+    this.intervalTimer = null;
   }
   runTimer  = () => {
-    setInterval(()=>{
+    this.intervalTimer = setInterval(()=>{
       this.setState({ timer: this.state.timer+1 });
     },1000)
   }
-
   startClient = () => {
     const { ROOT_DEX } = this.props.HomeStore;
 
     exec(`chmod +x ${ROOT_DEX}client`)
     exec(`chmod +x ${ROOT_DEX}getcoins`)
+    exec(`chmod +x ${ROOT_DEX}enable_my`)
     const mm = spawn(`./client`,[],{
       cwd: ROOT_DEX
     })
-      mm.on('error', function(err) {
-        console.log("Some error while running client");
-        console.log(err);
-      });
+    mm.on('error', function(err) {
+      if(err) alert('Error Starting Client');
+    });
 
    var enc = new TextDecoder();
-    mm.stderr.on('data', (data) => {
-      console.log(enc.decode(new Uint8Array(data)));
-    });
     mm.stdout.on('data', (data) => {
       const myRegexp = /userpass.\((\w*)\)/g;
       const match = myRegexp.exec(data);
-      console.log(enc.decode(new Uint8Array(data)));
-      console.log(match);
+      //console.log(enc.decode(new Uint8Array(data)));
       if(match && match[1]){
           const userpass = match[1];
-          console.log(userpass);
           this.props.HomeStore.userpass = userpass;
           fs.readFile(`${HOME}${SCRIPT_NAME}`, 'utf8', (err,data) => {
-            console.log(err);
             data = data.replace("[USERPASS]",userpass);
             data = data.replace("[ROOT_DEX]",ROOT_DEX);
-
             fs.writeFile(`${HOME}${SCRIPT_NAME}`,data, (err) => {
-                console.log(err);
                 exec(`
                   chmod +x ${HOME}${SCRIPT_NAME}
                   ${HOME}${SCRIPT_NAME}
                   `,(err,stdout,stderr)=>{
-                    this.props.history.push("/coinSelection");
+
+                    const mnm = spawn(`./enable_my`,[],{
+                      cwd: ROOT_DEX
+                    })
+                    mnm.stdout.on('data', (data) => {
+                      this.props.history.push("/coinSelection");
+                    });
                 })
               });
           });

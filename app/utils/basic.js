@@ -1,15 +1,72 @@
 
+import React from 'react';	
 import { exec } from 'child_process';
 import shell from 'shelljs';
 import fs from 'fs';
 import { __URL__ ,HOME, SCRIPT_NAME } from './constants';
 import qrcode from "qrcode";
-	
+import styles from '../components/Main.css';
+
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+export const makeConfig = (data, ticker, maxdecimal) => {
+const new_data = [];
+	  data.map(o=>{
+	    new_data.push([o[0]*1000,+(o[1]).toFixed(maxdecimal || 8)]);
+	  });
+return {
+        rangeSelector: {
+            //selected: 1
+            inputEnabled: false,
+        },
+        scrollbar: {
+            enabled: false
+        },
+        series: [{
+        	name: `${ticker} Price`,
+            //type: 'area',
+            data: new_data,
+            /*
+            dataGrouping: {
+                units: [
+                    [
+                        'week', // unit name
+                        [1] // allowed multiples
+                    ], [
+                        'month',
+                        [1, 2, 3, 4, 6]
+                    ]
+                ]
+            }*/
+        }]
+    };  
+}    
+export const zeroGray = (number) => {
+	number = number + "";
+	const num_arr = number.split(".");
+	const dec = num_arr[1];
+	let include_index = 0;
+	for(let i=dec.length - 1 ;i>0;i--){
+		if(!include_index && parseInt(dec.charAt(i)) !==0){
+			include_index = i;
+		}
+	}
+	
+	let before_trail = "";
+	for(let i=0;i<= include_index;i++){
+		before_trail += dec.charAt(i);
+	}
+	return (
+		<span className={styles.number_zero}>
+			{num_arr[0] + "." + before_trail}
+			<span className={styles.number_trail}>{("0").repeat(dec.length - include_index -1)}</span>
+		</span>
+		);
+	return str;
+}
 export const maxPinLength = 10;
 export const range = (start, end) => Array.from({length: (end - start)}, (v, k) => k + start);
 export const shuffle = (array) => {
@@ -35,6 +92,7 @@ export const coinNameFromTicker = (ticker) => {
 export const makeCommand = (method, props = {}) =>{
   let payload = {
     userpass: "$userpass",
+    gui: "gecko",
     method,
     ...props,
   };
@@ -54,7 +112,7 @@ export const runCommand = (ROOT_DEX, command, callback) => {
 				chmod a+x ${path}
 				./${RANDOM}
 				`,(err,stdout,stderr)=>{
-				if(err) alert(err);
+				//if(err) alert(err);
 				if(stdout){
 					callback(JSON.parse(stdout));
 				}
@@ -68,4 +126,7 @@ export const generateQR = (content, id) => {
     qrcode.toCanvas(canvas, content, function (error) {
       if (error) alert(error)
     })    
-  }
+ }
+export const getSorted = (asc, data, prop) => {
+	return (asc) ? data.sort((a, b) => parseFloat(a[prop]) - parseFloat(b[prop]) ) : data.sort((b, a) => parseFloat(a[prop]) - parseFloat(b[prop]) );
+}

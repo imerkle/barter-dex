@@ -19,6 +19,7 @@ export default class Settings extends Component {
         	<HeaderNav />
 			<List>
 				{makeList('Select Coins','donut_small','coinSelection')}
+				{makeList('Change Base Coin','donut_large','baseSelection')}
 			</List>
         </div>
     );

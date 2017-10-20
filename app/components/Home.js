@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
-import { ROOT_DEX, HOME, userpassscript, clientscript, getcoinsscript, SCRIPT_NAME } from '../utils/constants.js';
+import { ROOT_DEX, HOME, userpassscript, clientscript, getcoinsscript, enable_myscript,  SCRIPT_NAME } from '../utils/constants.js';
 import { TextField } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
@@ -28,16 +28,13 @@ class Home extends React.Component {
       wget.download(userpassscript, HOME+SCRIPT_NAME);
       wget.download(clientscript, ROOT_DEX+"client");
       wget.download(getcoinsscript, ROOT_DEX+"getcoins");
+      wget.download(enable_myscript, ROOT_DEX+"enable_my");
     });	
     exec(`
       pkill -15 marketmaker
       rm ${ROOT_DEX}passphrase || true
       rm ${ROOT_DEX}userpass || true
-    `,(err,stdout,stderr)=>{
-        console.log(err);
-        console.log(stdout);
-        console.log(stderr);
-     });
+    `);
     clearInterval(this.props.HomeStore.intervalTimer);
     this.props.HomeStore.intervalTimer = null;
   }

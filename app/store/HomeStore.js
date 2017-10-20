@@ -19,5 +19,6 @@ class HomeStore{
 		total: "",
 	};
 	@observable intervalTimer = null;
+	@observable maxdecimal = 8;
 }
 export default new HomeStore;

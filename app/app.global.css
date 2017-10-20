@@ -5,7 +5,8 @@ body {
   color: white;
   background-color: #232c39;
   background-image: linear-gradient(65deg, rgba(0, 216, 255, 0.5) 45%, rgba(0, 1, 127, 0.7));
-  font-family: 'Montserrat', Arial, Helvetica, Helvetica Neue, serif;
+  font-family: Arial, Helvetica, Helvetica Neue, serif;
+  /*'Montserrat'*/
   height: 100vh;
   overflow-y: hidden;
 

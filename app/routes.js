@@ -4,6 +4,7 @@ import { Switch, Route } from 'react-router';
 import { Provider } from 'mobx-react';
 import { withRouter } from 'react-router';
 
+import DarkError from './components/DarkError';
 import Home from './components/Home';
 import Login from './components/Login';
 import Pin from './components/Pin';
@@ -13,16 +14,20 @@ import MainPage from './components/MainPage';
 import Settings from './components/Settings';
 import Wallet from './components/Wallet';
 import CoinSelection from './components/CoinSelection';
+import BaseSelection from './components/BaseSelection';
 
 import HomeStore from './store/HomeStore.js';
+import DarkErrorStore from './store/DarkErrorStore.js';
 
 const stores = { 
-  HomeStore
+  HomeStore,
+  DarkErrorStore,
 };
 
 const MainRoutes = () => (
      <main>
       <Switch>
+        <Route path="/baseSelection" component={BaseSelection} />
         <Route path="/coinSelection" component={CoinSelection} />
         <Route path="/wallet" component={Wallet} />
         <Route path="/settings" component={Settings} />
@@ -41,6 +46,7 @@ class AppMain extends React.Component {
        <Provider {...stores}>
           <div>
             <MainRoutes />
+            <DarkError />
           </div>
         </Provider>
       );

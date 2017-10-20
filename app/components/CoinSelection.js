@@ -13,6 +13,7 @@ import fs from 'fs';
 import shell from 'shelljs';
 import { observer, inject } from 'mobx-react';
 import { stylesX } from '../utils/constants';
+import { runCommand, makeCommand } from '../utils/basic.js';
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
@@ -23,7 +24,7 @@ String.prototype.replaceAll = function(search, replacement) {
 const timeoutSec = 4000;
 
 @withStyles(stylesX)
-@inject('HomeStore')
+@inject('HomeStore','DarkErrorStore')
 @observer
  class CoinSelection extends Component {
   constructor(props){
@@ -52,7 +53,7 @@ const timeoutSec = 4000;
 
     shell.exec(`./getcoins`,(err, stdout, stderr) => {
         if(err){
-        	alert(err);
+        	DarkErrorStore.alert(err);
         	return false;
   		}
 		const out = JSON.parse(stdout);
@@ -62,7 +63,7 @@ const timeoutSec = 4000;
 			if((lastEnabledCoins && lastEnabledCoins.indexOf(o.coin) > -1) || (o.status === 'active') ){
 				isEnabled = true;
 			}
-			return {coin: o.coin, status: isEnabled,rpc: o.rpc, smartaddress: o.smartaddress }
+			return {coin: o.coin, status: isEnabled,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance }
 		});
 		this.setState({ coins: c });
   	});  	
@@ -84,11 +85,23 @@ const timeoutSec = 4000;
   }
   saveCoins = () => {
   	const { ROOT_DEX } = this.props.HomeStore;
+	this.props.history.push("/mainPage");
+
+  	this.state.coins.map(o=>{
+  		if(o.status){
+  			runCommand(ROOT_DEX,makeCommand("enable",{coin: o.coin }),(res)=>{
+  				console.log(res);
+  			});
+  		}
+  	})
+
+  	/*
   	let enable_my = `#!/bin/bash\nsource userpass \n`;
 
   	let enable_my_coins = "";
   	this.state.coins.map(o=>{
   		if(o.status){
+  			
 	  		const ipport = o.rpc.split(":");
 	  		const jsonPart = {
 	  				userpass: "$userpass",
@@ -96,38 +109,29 @@ const timeoutSec = 4000;
 	  				"coin": o.coin,
 	  			};
 			enable_my_coins += `curl --url "http://127.0.0.1:7783" --data "${JSON.stringify(jsonPart).replaceAll("\"","\\\"")}"\n`;
+			
+  			//runCommand(ROOT_DEX,makeCommand("enable",{coin: o.coin }),(res)=>{
+  				//console.log(res);
+  			//});
   		}
   	})
-
-  	//remove this later need to ask dev
-  	/*
-  	enable_my_coins = `
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"ARG\",\"ipaddr\":\"173.212.225.176\",\"port\":50081}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"136.243.45.140\",\"port\":50001}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"BTC\",\"ipaddr\":\"173.212.225.176\",\"port\":50001}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"CRW\",\"ipaddr\":\"173.212.225.176\",\"port\":50041}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DASH\",\"ipaddr\":\"173.212.225.176\",\"port\":50098}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DGB\",\"ipaddr\":\"136.243.45.140\",\"port\":50022}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DGB\",\"ipaddr\":\"173.212.225.176\",\"port\":50022}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"DOGE\",\"ipaddr\":\"173.212.225.176\",\"port\":50015}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"FAIR\",\"ipaddr\":\"173.212.225.176\",\"port\":50005}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"HUSH\",\"ipaddr\":\"173.212.225.176\",\"port\":50013}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"KMD\",\"ipaddr\":\"136.243.45.140\",\"port\":50011}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"KMD\",\"ipaddr\":\"173.212.225.176\",\"port\":50011}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"LTC\",\"ipaddr\":\"173.212.225.176\",\"port\":50012}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"MONA\",\"ipaddr\":\"173.212.225.176\",\"port\":50002}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"NMC\",\"ipaddr\":\"173.212.225.176\",\"port\":50036}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"VTC\",\"ipaddr\":\"173.212.225.176\",\"port\":50088}"
-curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\":\"electrum\",\"coin\":\"ZEC\",\"ipaddr\":\"173.212.225.176\",\"port\":50032}"
-  	`;
-  	*/
 	enable_my += enable_my_coins;
 	fs.writeFile(`${ROOT_DEX}enable_my`,enable_my,(err)=>{
 		shell.exec(`./enable_my`,(err, stdout, stderr) => {
-			if(err)alert(err);
+			if(err) DarkErrorStore.alert(err);
 	    	this.props.history.push("/mainPage");
 		});
 	});  	
+	*/
+
+/*
+	shell.cd(ROOT_DEX);
+	shell.exec('./enable_my',(err,stdout,stderr)=>{
+		console.log(err);
+		console.log(stdout);
+		console.log(stderr);
+	});
+*/
   }
   render() {
 	const { classes } = this.props;
@@ -135,7 +139,7 @@ curl --url "http://127.0.0.1:7783" --data "{\"userpass\":\"$userpass\",\"method\
     return (
        <div className={styles.container2}>
        	<HeaderNav />
-		<div className={styles.container2} style={{margin: "0 auto"}}>
+		<div className={styles.container2} style={{margin: "0 auto",padding: "0px 170px"}}>
 			        	<Typography type="headline" component="h4">Select Coins to Trade</Typography>
 						 <FormGroup className={styles.switchGroup}>
 							 {

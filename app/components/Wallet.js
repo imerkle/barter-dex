@@ -13,6 +13,7 @@ import { withStyles } from 'material-ui/styles';
 import { inject, observer } from 'mobx-react';
 import { stylesX } from '../utils/constants';
 import { generateQR } from '../utils/basic';
+import { runCommand, makeCommand, zeroGray } from '../utils/basic.js';
 
 
 const mockWallet = [
@@ -26,7 +27,7 @@ const mockWallet = [
 ];
 
 @withStyles(stylesX)
-@inject('HomeStore') @observer
+@inject('HomeStore','DarkErrorStore') @observer
 class Wallet extends Component {
   constructor(props){
   	super(props);
@@ -36,6 +37,7 @@ class Wallet extends Component {
       openDeposit: false,
       openWithdraw: false,
       withdrawAddress: "",
+      withdrawValue: "",
       hideZero: false,
   	};	
   }
@@ -95,14 +97,28 @@ class Wallet extends Component {
     );
   }
   withdrawWalletDialog = () => {
-    const { coin, openWithdraw, withdrawAddress } = this.state;
+    const { coin, openWithdraw, withdrawAddress, withdrawValue } = this.state;
+    const { ROOT_DEX } = this.props.HomeStore;
+    const { DarkErrorStore } = this.props;
     return(
         <Dialog open={openWithdraw} onRequestClose={this.handleRequestCloseWithdraw}>
           <DialogTitle>Withdraw</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Withdraw {coin.coin} to this Address.
+              Withdraw {coin.coin} to this Address 
+              <span className={styles.hint} onClick={()=>{ this.setState({ withdrawValue: coin.balance  }) }}> ( Max: {coin.balance}) </span>
             </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label={`Withdraw Amount(${coin.coin})`}
+              type="text"
+              fullWidth
+              value={withdrawValue}
+              onChange={(e)=>{
+                this.setState({ withdrawValue: e.target.value })
+              }}
+            />            
             <TextField
               autoFocus
               margin="dense"
@@ -116,7 +132,17 @@ class Wallet extends Component {
             />
           </DialogContent>
           <DialogActions>
-            <Button raised color="accent">
+            <Button raised color="accent"
+              onClick={()=>{
+                runCommand(ROOT_DEX,makeCommand("withdraw",{coin: coin.coin, outputs: [{ [withdrawAddress]: withdrawValue }] }),(res)=>{
+                    if(!res.completed){
+                      DarkErrorStore.alert("Withdrawal not successful");
+                    }else{
+                      DarkErrorStore.alert("Withdrawal completed successfully. Your Transaction ID: " + txid);
+                    }
+                });
+
+              }}>
               Withdraw {coin.coin}
             </Button>
             <Button raised onClick={this.handleRequestCloseWithdraw} color="primary">
@@ -127,8 +153,8 @@ class Wallet extends Component {
     );
   }  
   render() {
-    const { base, coins } = this.props.HomeStore;
-    const { hideZero } = this.state;
+    const { base, coins, maxdecimal } = this.props.HomeStore;
+    const { hideZero } = this.state;    
     return (
        <div className={styles.container2}>
        	 <HeaderNav />
@@ -150,6 +176,9 @@ class Wallet extends Component {
                 if(hideZero && (!o.balance || o.balance == 0)){
                   return null;
                 }
+                const value = o.value || 0;
+                const orders = o.orders || 0;
+                const balance = o.balance || 0;
                 return (
                   <div className={styles.tr} key={o.coin}>
                     <div className={cx(styles.oneDiv,styles.draw)}>
@@ -169,9 +198,9 @@ class Wallet extends Component {
                     </div>
                     <div className={cx(styles.oneDiv,styles.coin)}>{o.coin}</div>
                     <div className={cx(styles.oneDiv,styles.name)}>{o.name}</div>
-                    <div className={cx(styles.oneDiv,styles.price)}>{o.balance}</div>
-                    <div className={cx(styles.oneDiv,styles.volume)}>{o.orders}</div>
-                    <div className={cx(styles.oneDiv,styles.change)}>{o.value}</div>
+                    <div className={cx(styles.oneDiv,styles.price)}>{zeroGray((balance).toFixed(maxdecimal))}</div>
+                    <div className={cx(styles.oneDiv,styles.volume)}>{zeroGray((orders).toFixed(maxdecimal))}</div>
+                    <div className={cx(styles.oneDiv,styles.change)}>{zeroGray((value).toFixed(maxdecimal))}</div>
                   </div>
                 )
                 })}

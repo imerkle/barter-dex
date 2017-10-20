@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-//import styles from './Login.css';
+import styles from './Main.css';
 
 export default class LoadingWaitText extends Component {
   constructor(props){
@@ -9,7 +9,9 @@ export default class LoadingWaitText extends Component {
   render() {
   	const { text } = this.props;
 	return (
-		<div>{text}</div>
+		<div className={styles.loadingBar}>
+			<div className={styles.loadingBar_inner}></div>
+		</div>
 	);
   }
 }

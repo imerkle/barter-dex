@@ -19,7 +19,11 @@ body{
 }
 .loss{
   color: #ff2992;
-  font-weight: bold;	
+  font-weight: bold;  
+}
+.nothing{
+  color: #f3d42c;
+  font-weight: bold;  
 }
 
 .draw{ flex: 2 1 auto; width: 15%; }
@@ -28,6 +32,7 @@ body{
 .price{ flex: 5% 1;  }
 .volume{ flex: 5% 1;  }
 .change{ flex: 5% 1;  }
+.total{ flex: 5% 1;  }
 .section{
    background: rgba(28, 33, 66, 0.25);
    border-radius: 5px;
@@ -47,7 +52,9 @@ body{
 }
 .r_side_bar{ min-height: 500px; font-size: 14px;}
 .w_bar{ min-height: 400px; flex: 1 1 auto; }
-.graph_bar{height:120px;}
+.graph_bar{
+  background: none;
+}
 .trades_bar{height:250px;}
 /*.bs_bar{height: ;}*/
 .nav{
@@ -111,4 +118,80 @@ body{
 }
 .canvas{
    margin: 10px auto;
+}
+.loadingBar{
+  background: rgba(0,0,0,.5);
+  /*border: 2px dashed rgb(255, 192, 14);*/
+  width: 100%;
+  height: 25px;
+  padding: 5px;
+  border-radius: 5px;
+}
+.loadingBar_inner{
+  height: 100%;
+  background: rgb(255, 192, 14);
+  background: linear-gradient(180deg, rgba(255, 192, 14,1) 45%, rgb(226, 174, 27));
+  width: 100%;
+  transition: .15s linear width;
+
+
+  animation-name: loadingFake;
+  animation-duration: 37s;  
+}
+@keyframes loadingFake{
+  from{
+    width: 0%;
+  }
+  to{
+    width: 100%;
+  }
+}
+
+.error_overlay{
+  position: fixed;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: rgba(255, 46, 46, 0.9);
+  color: #FFF;
+
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;  
+  z-index: 100000;
+  
+
+
+  animation-name: showUp;
+  animation-duration: .3s;  
+
+}
+.error_text{
+  font-size: 25px;
+}
+.invisible{display: none!important;}
+@keyframes showUp{
+  from{
+    opacity: 0;
+    transform: scale(0);
+  }
+  to{
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.number_trail{
+  opacity: .5;
+}
+.hint{
+  font-size:  70%;
+  opacity: .7;
+}
+.container_buttons{
+  display: flex;
+  flex-wrap: wrap;
+}
+.container_buttons button{
+  flex: 30% 1;
 }

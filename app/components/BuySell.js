@@ -5,32 +5,53 @@ import styles from './Main.css';
 import cx from 'classnames';
 import { Button, TextField } from 'material-ui';
 import { inject, observer } from 'mobx-react';
+import { runCommand, makeCommand } from '../utils/basic.js';
 
 const decimals = 2;
 
-@inject('HomeStore')
+@inject('HomeStore','DarkErrorStore')
 @observer
 class BuySell extends Component {
   constructor(props){
   	super(props);
-    /*
-  	this.state = {
-  		price: "",
-  		total: "",
-  		amount: "",
-    }
-    */
     this.BS = (props.isBuy) ? "buyState" : "sellState";
   }
+  _handleBuySell = () => {
+  	 const { isBuy, baseCoin, currentCoin, HomeStore, DarkErrorStore } = this.props;
+     const { ROOT_DEX } = HomeStore;
+
+      if(isBuy){
+          //we buying my current or we buying api base
+          //api rel = currency paying with  = my base
+          //api base = currency i wanna buy  = my current
+          runCommand(ROOT_DEX, makeCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }),(res)=>{
+            if(res.error){
+              DarkErrorStore.alert(res.error);
+            }
+          });
+      }else{
+          runCommand(ROOT_DEX, makeCommand("sell",{base: currentCoin.coin, rel: baseCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }),(res)=>{
+            if(res.error){
+              DarkErrorStore.alert(res.error);
+            }
+          });
+      }
+  }  
   _handleFab = (percent) => {
-  	const { isBuy, baseCoin, currentCoin, HomeStore } = this.props;
+    const { isBuy, baseCoin, currentCoin, HomeStore } = this.props;
   	const balance = (isBuy) ? baseCoin.balance : currentCoin.balance;
   	let { price } = this.props.HomeStore[this.BS];
   	price = parseFloat(price);
 
+    let amount,total;
   	if(isNaN(price)) return false;
-  	const total = (percent / 100  * balance);
-  	const amount =  (total / price);
+    if(isBuy){
+      total = (percent / 100  * balance);
+      amount =  (total / price);
+    }else{
+      amount = (percent / 100  * balance);
+      total =  (amount* price);
+    }
     
     HomeStore[this.BS].total = total;
     HomeStore[this.BS].amount = amount;
@@ -99,7 +120,7 @@ class BuySell extends Component {
 	            <Button fab color={primary} onClick={()=>{ this._handleFab(75) }}>75%</Button>
 	            <Button fab color={accent} onClick={()=>{ this._handleFab(100) }} >100%</Button>
 	         </div>
-	         <div className={cx(styles.bs_tr)}><Button raised color={accent}>{`${buyTxt} ${currentCoin.coin}`}</Button></div>
+	         <div className={cx(styles.bs_tr)}><Button raised color={accent} onClick={this._handleBuySell}>{`${buyTxt} ${currentCoin.coin}`}</Button></div>
 	      </div>
     );
   }

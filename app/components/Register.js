@@ -8,11 +8,12 @@ import { Button, TextField } from 'material-ui';
 
 import bip39 from 'bip39';
 
-import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
 import { generateQR } from '../utils/basic.js';
 
-@inject('HomeStore')
+import fs from 'fs';
+
+@inject('HomeStore','DarkErrorStore')
 @observer
 class Register extends Component {
   constructor(props){
@@ -20,6 +21,7 @@ class Register extends Component {
 
     this.state = {
       passphrase: "",
+      passphrase_rp: "",
     };
   }
   componentDidMount(){
@@ -28,20 +30,25 @@ class Register extends Component {
   generatePassPhrase = () => {
     const passphrase = bip39.generateMnemonic()
     generateQR(passphrase,"QR");
-    this.setState({ passphrase })    
+    this.setState({ passphrase, passphrase_rp: "" })    
   }
-
   _handleRegister = () => {
     const { ROOT_DEX } = this.props.HomeStore;
-    const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
+    const { DarkErrorStore } = this.props;
+    //const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
     this.props.HomeStore.passphrase = this.state.passphrase;
-    exec(`
-          cd ${ROOT_DEX}
-          echo "export passphrase=\"${this.state.passphrase}\"" > passphrase 
-    `,(err, stdout, stderr)=>{
-        if(err) alert(err);
-        this.props.history.push("/startup");
-    });
+
+    if(this.state.passphrase != this.state.passphrase_rp){
+      DarkErrorStore.alert("Repeat Passphrase do not match!");
+      return false;
+    }else{
+      const data = `export passphrase="${this.state.passphrase}"`;
+      fs.writeFile(`${ROOT_DEX}passphrase`,data,(err,res)=>{
+            if(err) DarkErrorStore.alert(err);
+            this.props.history.push("/startup");
+
+      })
+    }
   }
   render() {
     return (
@@ -55,6 +62,16 @@ class Register extends Component {
                 label="Passphrase"
                 InputProps={{ placeholder: 'Passphrase' }}
             />
+         <TextField
+              value={this.state.passphrase_rp}
+              multiline
+              margin="normal"
+                label="Passphrase Repeat"
+                InputProps={{ placeholder: 'Passphrase Repeat' }}
+                onChange={(e)=>{
+                  this.setState({ passphrase_rp: e.target.value }); 
+                }}
+            />            
             <canvas id="QR" className={styles.canvas}></canvas>
             <Button color="accent" onClick={this.generatePassPhrase} >Regenerate</Button>
             <Button raised color="primary" onClick={this._handleRegister}>Create Wallet</Button>      

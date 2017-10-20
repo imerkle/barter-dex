@@ -7,6 +7,7 @@ export const SCRIPT_NAME = 'userpassscript.sh';
 export const __URL__ = 'http://127.0.0.1:7783';
 export const clientscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/client';
 export const getcoinsscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/getcoins';
+export const enable_myscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/enable_my';
 export const stylesX = {
   bar: {},
   checked: {

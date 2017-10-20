@@ -4222,6 +4222,14 @@ he@1.1.x:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
+highcharts@^5.0.0:
+  version "5.0.14"
+  resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-5.0.14.tgz#0ef14cca9f1345408568b533dae1478950d96810"
+
+highcharts@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-6.0.2.tgz#e3c4c998a21ce6bfa79458fa2c87d967e9234abe"
+
 highlight.js@^9.3.0:
   version "9.12.0"
   resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.12.0.tgz#e6d9dbe57cbefe60751f02af336195870c90c01e"
@@ -6010,10 +6018,6 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
-node-callback-queue@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/node-callback-queue/-/node-callback-queue-1.0.1.tgz#173f03e01abaa7c0797d6c799f36523fc1913fcc"
-
 node-emoji@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-1.5.1.tgz#fd918e412769bf8c448051238233840b2aff16a1"
@@ -6154,13 +6158,6 @@ node-sass@^4.5.3:
     request "^2.79.0"
     sass-graph "^2.1.1"
     stdout-stream "^1.4.0"
-
-node-simple-rpc@^1.0.14:
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/node-simple-rpc/-/node-simple-rpc-1.0.14.tgz#226df9d83d9ba6b4bd5ee51422f2f7e8a5c5e365"
-  dependencies:
-    debug "^2.2.0"
-    node-callback-queue "^1.0.1"
 
 "nopt@2 || 3":
   version "3.0.6"
@@ -7205,6 +7202,12 @@ react-event-listener@^0.5.0:
 react-flip-move@^2.9.15:
   version "2.9.15"
   resolved "https://registry.yarnpkg.com/react-flip-move/-/react-flip-move-2.9.15.tgz#c33c817d394917c6537aba282732350bba384961"
+
+react-highcharts@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/react-highcharts/-/react-highcharts-13.0.0.tgz#141dbae29722f1dfa357f9ef927a94145675a11b"
+  dependencies:
+    highcharts "^5.0.0"
 
 react-hot-loader@3.0.0-beta.6:
   version "3.0.0-beta.6"
