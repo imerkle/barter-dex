@@ -3,12 +3,17 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
 import { TextField, Button, IconButton, Icon } from 'material-ui';
-import AppLogo from './AppLogo';
+import { inject, observer } from 'mobx-react';
 import crypto from 'crypto';
-import { maxPinLength, range, shuffle } from '../utils/basic.js';
+import fs from 'fs';
 
+import AppLogo from './AppLogo';
+import { range, shuffle } from '../utils/basic.js';
+import { HOME, maxPinLength, algorithm } from '../utils/constants.js';
 
 const A = shuffle(range(1,10));
+
+@inject("HomeStore","DarkErrorStore") @observer
 export default class Pin extends Component {
   constructor(props){
     super(props);
@@ -34,14 +39,17 @@ export default class Pin extends Component {
     }) 
   }
   encryptPassphrase = () => {
-    const encrypted_pass = crypto.createHmac('sha256', this.state.pin)
-                   .update(localStorage.getItem("passphrase"))
-                   .digest('hex');
-    localStorage.setItem("passphrase", encrypted_pass);
-  }
+    const { HomeStore } = this.props;
+    const encryp = crypto.createCipher(algorithm, this.state.pin);
+    let encrypted_pass = encryp.update(HomeStore.passphrase,'utf8','hex');
+        encrypted_pass += encryp.final('hex');
+       fs.writeFile(`${HOME}encrypted_pass`,encrypted_pass,()=>{});
+      this.props.history.push("/pinConfirm");          
+    }
+
   render() {
     return (
-       <div className={styles.container} data-tid="container">
+       <div className={styles.container}>
           <AppLogo />
           <div className={styles.numpad}>
             {A.map((o,i)=>(<Button disabled={this.state.maxReached} key={i} raised color="accent"
@@ -53,7 +61,7 @@ export default class Pin extends Component {
             <IconButton onClick={()=>{this.setState({ pw_visible: !this.state.pw_visible })}}><Icon>{(this.state.pw_visible) ? "visibility" : "visibility_off"}</Icon></IconButton>
           </div>
           <div className={styles.fbox + " " + styles.clm}>
-            <Button color="primary" raised disabled={!this.state.maxReached} onClick={this.encryptPassphrase}>Next</Button>
+            <Button color="primary" raised disabled={!this.state.maxReached} onClick={this.encryptPassphrase}>Save</Button>
           </div>
        </div>
     );

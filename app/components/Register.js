@@ -11,8 +11,6 @@ import bip39 from 'bip39';
 import { inject, observer } from 'mobx-react';
 import { generateQR } from '../utils/basic.js';
 
-import fs from 'fs';
-
 @inject('HomeStore','DarkErrorStore')
 @observer
 class Register extends Component {
@@ -33,7 +31,6 @@ class Register extends Component {
     this.setState({ passphrase, passphrase_rp: "" })    
   }
   _handleRegister = () => {
-    const { ROOT_DEX } = this.props.HomeStore;
     const { DarkErrorStore } = this.props;
     //const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
     this.props.HomeStore.passphrase = this.state.passphrase;
@@ -42,12 +39,8 @@ class Register extends Component {
       DarkErrorStore.alert("Repeat Passphrase do not match!");
       return false;
     }else{
-      const data = `export passphrase="${this.state.passphrase}"`;
-      fs.writeFile(`${ROOT_DEX}passphrase`,data,(err,res)=>{
-            if(err) DarkErrorStore.alert(err);
-            this.props.history.push("/startup");
-
-      })
+      this.props.HomeStore.passphrase = this.state.passphrase;
+      this.props.history.push("/startup");
     }
   }
   render() {

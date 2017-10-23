@@ -5,28 +5,16 @@ import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 import cx from 'classnames';
 import FlipMove from 'react-flip-move';
-import shell from 'shelljs';
 
 import { FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
+import { stylesY } from '../utils/constants';
 import { inject, observer } from 'mobx-react';
-import { stylesX } from '../utils/constants';
 import { generateQR } from '../utils/basic';
-import { runCommand, makeCommand, zeroGray } from '../utils/basic.js';
+import { zeroGray } from '../utils/basic.js';
 
-
-const mockWallet = [
-{
-	coin: "KMD",
-	name: "Komodo" ,
-	balance: 50,
-	orders: 200,
-	value: .5,
-}
-];
-
-@withStyles(stylesX)
+@withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore') @observer
 class Wallet extends Component {
   constructor(props){
@@ -98,8 +86,7 @@ class Wallet extends Component {
   }
   withdrawWalletDialog = () => {
     const { coin, openWithdraw, withdrawAddress, withdrawValue } = this.state;
-    const { ROOT_DEX } = this.props.HomeStore;
-    const { DarkErrorStore } = this.props;
+    const { DarkErrorStore, HomeStore } = this.props;
     return(
         <Dialog open={openWithdraw} onRequestClose={this.handleRequestCloseWithdraw}>
           <DialogTitle>Withdraw</DialogTitle>
@@ -134,14 +121,19 @@ class Wallet extends Component {
           <DialogActions>
             <Button raised color="accent"
               onClick={()=>{
-                runCommand(ROOT_DEX,makeCommand("withdraw",{coin: coin.coin, outputs: [{ [withdrawAddress]: withdrawValue }] }),(res)=>{
+                HomeStore.runCommand("withdraw",{coin: coin.coin, outputs: [{ [withdrawAddress]: withdrawValue }] }).then((res)=>{                  
                     if(!res.complete){
                       DarkErrorStore.alert("Withdrawal not successful");
                     }else{
-                      DarkErrorStore.alert("Withdrawal completed successfully. Your Transaction ID: " + txid);
+                      const txid = res.txid; 
+                      const txhex = res.hex;
+                      HomeStore.runCommand("sendrawtransaction",{coin: coin.coin, signedtx: txhex }).then((res)=>{
+                        console.log(res);
+                        coin.balance  = coin.balance - withdrawValue;
+                        DarkErrorStore.alert("Withdrawal completed successfully.\nYour Transaction ID: " + txid);
+                      });
                     }
                 });
-
               }}>
               Withdraw {coin.coin}
             </Button>
@@ -154,15 +146,16 @@ class Wallet extends Component {
   }  
   render() {
     const { base, coins, maxdecimal } = this.props.HomeStore;
-    const { hideZero } = this.state;    
+    const { hideZero } = this.state;  
+    const { classes } = this.props;
     return (
        <div className={styles.container2}>
-       	 <HeaderNav />
+       	 <HeaderNav primary="wallet" />
          {this.hideZeroBalance()}
          {this.depositWalletDialog()}
          {this.withdrawWalletDialog()}
-         <div className={cx(styles.section, styles.w_bar)}>   
-            <div className={cx(styles.tr, styles.section_header)}>
+         <div className={cx(styles.section, classes.AppSection, styles.w_bar)}>   
+            <div className={cx(styles.tr, styles.section_header, classes.AppSectionHeader)}>
               <div className={cx(styles.oneDiv,styles.draw)}>Deposit/Withdraw</div>
               <div className={cx(styles.oneDiv,styles.coin)}>Coin</div>
               <div className={cx(styles.oneDiv,styles.name)}>Name</div>
@@ -170,7 +163,7 @@ class Wallet extends Component {
               <div className={cx(styles.oneDiv,styles.volume)}>On Orders</div>
               <div className={cx(styles.oneDiv,styles.change)}>{base.coin} Value</div>
             </div>
-            <FlipMove duration={750} easing="ease-out" style={{padding: "10px"}}>
+            <FlipMove duration={750} easing="ease-out">
               {Object.keys(coins).map((k,v)=>{
                 const o = coins[k];
                 if(hideZero && (!o.balance || o.balance == 0)){

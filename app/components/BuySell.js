@@ -5,10 +5,13 @@ import styles from './Main.css';
 import cx from 'classnames';
 import { Button, TextField } from 'material-ui';
 import { inject, observer } from 'mobx-react';
-import { runCommand, makeCommand } from '../utils/basic.js';
+
+import { withStyles } from 'material-ui/styles';
+import { stylesY } from '../utils/constants';
 
 const decimals = 2;
 
+@withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
 @observer
 class BuySell extends Component {
@@ -18,19 +21,21 @@ class BuySell extends Component {
   }
   _handleBuySell = () => {
   	 const { isBuy, baseCoin, currentCoin, HomeStore, DarkErrorStore } = this.props;
-     const { ROOT_DEX } = HomeStore;
 
       if(isBuy){
           //we buying my current or we buying api base
           //api rel = currency paying with  = my base
           //api base = currency i wanna buy  = my current
-          runCommand(ROOT_DEX, makeCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }),(res)=>{
+          HomeStore.runCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
+         console.log(isBuy);
+            console.log(res);
             if(res.error){
               DarkErrorStore.alert(res.error);
             }
           });
       }else{
-          runCommand(ROOT_DEX, makeCommand("sell",{base: currentCoin.coin, rel: baseCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }),(res)=>{
+          HomeStore.runCommand("sell",{base: baseCoin.coin, rel: currentCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
+            console.log(res);
             if(res.error){
               DarkErrorStore.alert(res.error);
             }
@@ -95,7 +100,7 @@ class BuySell extends Component {
   	//this.setState({ total, amount });
   }
   render() {
-  	const { currentCoin, baseCoin, isBuy } = this.props;
+  	const { currentCoin, baseCoin, isBuy, classes } = this.props;
   	const { total, price, amount } = this.props.HomeStore[this.BS];
     const { indicator } = this.props.HomeStore;
 
@@ -107,7 +112,7 @@ class BuySell extends Component {
   	const basevalue = (isBuy) ? baseCoin.balance : currentCoin.balance;
 
     return (
-	      <div className={cx(styles.section, styles.buysell)}>
+	      <div className={cx(styles.section, classes.AppSection, styles.buysell)}>
 	         <div className={cx(styles.bs_tr, styles.bs_header,styles.bs_tr_row)}>
 	          <div className={cx(styles.mainHead)}>{`${buyTxt} ${currentCoin.coin}`}</div>
 	          <div className={cx(styles.basevalue)} onClick={()=>{ this._handleFab(100) }} >{basetxt}</div>

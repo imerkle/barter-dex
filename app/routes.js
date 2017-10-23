@@ -8,6 +8,7 @@ import DarkError from './components/DarkError';
 import Home from './components/Home';
 import Login from './components/Login';
 import Pin from './components/Pin';
+import PinConfirm from './components/PinConfirm';
 import Register from './components/Register';
 import StartupScreen from './components/StartupScreen';
 import MainPage from './components/MainPage';
@@ -19,6 +20,9 @@ import IndicatorSelection from './components/IndicatorSelection';
 
 import HomeStore from './store/HomeStore.js';
 import DarkErrorStore from './store/DarkErrorStore.js';
+
+import { withStyles } from 'material-ui/styles';
+import { stylesY } from './utils/constants';
 
 const stores = { 
   HomeStore,
@@ -36,19 +40,24 @@ const MainRoutes = () => (
         <Route path="/mainPage" component={MainPage} />
         <Route path="/startup" component={StartupScreen} />
         <Route path="/register" component={Register} />
+        <Route path="/pinConfirm" component={PinConfirm} />
         <Route path="/pin" component={Pin} />
         <Route path="/login" component={Login} />
         <Route path="/" component={Home} />
       </Switch>
     </main>  
 );
+
+@withStyles(stylesY)
 class AppMain extends React.Component {
   render(){
+    const { classes } = this.props;
     return (
        <Provider {...stores}>
-          <div>
+          <div className={classes.root}>
             <MainRoutes />
             <DarkError />
+            <div className={classes.AppBg}></div>
           </div>
         </Provider>
       );

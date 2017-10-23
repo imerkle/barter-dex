@@ -35,21 +35,19 @@ body{
 .change{ flex: 5% 1;  }
 .total{ flex: 5% 1;  }
 .section{
-   background: rgba(28, 33, 66, 0.25);
    border-radius: 5px;
    overflow: hidden;
    margin: 8px 20px;
 }
 .section_header{
-   background: #175d42;
    padding: 10px;
    font-weight: bold;
    cursor: pointer;
-   color: #e8e7e7;
+   opacity: .7;
    text-align: center;
 }
 .section_header .oneDiv:hover{
-   color: #FFF;
+   opacity: 1;
 }
 .r_side_bar{ min-height: 500px; font-size: 14px;}
 .w_bar{ min-height: 400px; flex: 1 1 auto; }
@@ -114,7 +112,7 @@ body{
 }
 .tr:hover:not(.basetr),.selectedtr{
   cursor: pointer;
-  background: rgba(11, 51, 28, 0.38);
+  background: rgba(0, 0, 0, 0.2);
 }
 .bs_order_header{
   background: rgba(0,0,0,.1);
@@ -157,7 +155,6 @@ body{
   height: 100%;
   width: 100%;
   background: rgba(255, 46, 46, 0.9);
-  color: #FFF;
 
   justify-content: center;
   align-items: center;
@@ -168,11 +165,17 @@ body{
 
 
   animation-name: showUp;
-  animation-duration: .3s;  
+  animation-duration: .3s;
+  flex-direction: column;
+}
+.error_header{
 
+    font-size: 35px;
+    margin: 20px;
+    font-weight: bold;
 }
 .error_text{
-  font-size: 25px;
+    font-size: 18px;
 }
 .invisible{display: none!important;}
 @keyframes showUp{
@@ -201,6 +204,7 @@ body{
 }
 .right_list{
   flex: 10% 1 !important;
+  max-width: 25%;
 }
 .myorder{
   background: rgba(0,0,0,.1)
@@ -211,5 +215,23 @@ body{
     top: 30%;
     left: 0;
 }
+/*
 .sellBox .volumeSpread{background: #f19595;}
 .buyBox .volumeSpread{background: rgba(126, 255, 102,1)}
+*/
+
+.pad{
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    height: 30px; 
+}
+.loadingBox{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.loadingText{
+    font-size: 14px;
+    margin: 10px 0;
+}

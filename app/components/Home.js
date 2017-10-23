@@ -1,58 +1,68 @@
 // @flow
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import styles from './Login.css';
-import { ROOT_DEX, HOME, userpassscript, clientscript, getcoinsscript, enable_myscript,  SCRIPT_NAME } from '../utils/constants.js';
-import { TextField } from 'material-ui';
+import { HOME, marketmakerExe, coinsJSON } from '../utils/constants.js';
+import { Icon, Button } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
 import fs from 'fs';
+import AppLogo from './AppLogo';
 
 @inject('HomeStore') @observer
 class Home extends React.Component {
   constructor(props){
   	super(props);
-  	this.state = {
-  		ROOT_DEX: ROOT_DEX
-  	};
-  }	
+  } 
   componentDidMount(){
-  	const ROOT_DEX = localStorage.getItem("ROOT_DEX");
-  	if(ROOT_DEX){
-     this.props.HomeStore.ROOT_DEX = ROOT_DEX;
-     this.setState({ ROOT_DEX });
-    }
-	  
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
-      wget.download(userpassscript, HOME+SCRIPT_NAME);
-      wget.download(clientscript, ROOT_DEX+"client");
-      wget.download(getcoinsscript, ROOT_DEX+"getcoins");
-      wget.download(enable_myscript, ROOT_DEX+"enable_my");
-    });	
-    exec(`
-      pkill -15 marketmaker
-      rm ${ROOT_DEX}passphrase || true
-      rm ${ROOT_DEX}userpass || true
-    `);
+      this.afterHomeDir();
+    });
+    exec(`pkill -15 marketmaker`);
     clearInterval(this.props.HomeStore.intervalTimer);
     this.props.HomeStore.intervalTimer = null;
+  }
+  afterHomeDir = () => {
+      fs.exists(`${HOME}marketmaker`, (exists) => {
+             if(!exists){
+                const download = wget.download(marketmakerExe, HOME+'marketmaker');
+                download.on('end', (output) => {
+                  exec(`chmod +x ${HOME}marketmaker`);
+                });
+             }
+          });
+          const coinJSONTarget =  HOME+'coins.json';
+          fs.exists(coinJSONTarget, (exists) => {
+             if(!exists){
+                const download = wget.download(coinsJSON, coinJSONTarget);
+                download.on('end', (output) => {
+                  this.saveAvailableCoins(coinJSONTarget);
+                });
+             }else{
+                this.saveAvailableCoins(coinJSONTarget);
+             }
+          });    
+  }
+  saveAvailableCoins = (coinJSONTarget) => {
+        fs.readFile(coinJSONTarget,(err, data)=>{
+          if(!err){
+            this.props.HomeStore.available_coins = JSON.parse(data);
+          }
+        });    
   }
   render() {
     return (
       <div className={styles.container}>
-        <h2>Dex</h2>
-        <Link to="/login">Start Decentralized Exchange</Link>
-        <br />
-        <Link to="/register">Register</Link>
-        <br />
-        <br />
-        <TextField value={this.state.ROOT_DEX} onChange={(e)=>{
-        	const ROOT_DEX = e.target.value;
-        	this.setState({ ROOT_DEX: ROOT_DEX });
-          this.props.HomeStore.ROOT_DEX = ROOT_DEX;
-        	localStorage.setItem("ROOT_DEX", ROOT_DEX)
-        }}/>
+        <AppLogo />
+        <div className={styles.homeButtons}>
+            <Button color="accent" raised onClick={()=>{
+              this.props.history.push('/login');
+            }}
+            >Login</Button>
+           <Button color="primary" raised onClick={()=>{
+              this.props.history.push('/register');
+            }}>Register</Button>
+        </div>
       </div>
     );
   }

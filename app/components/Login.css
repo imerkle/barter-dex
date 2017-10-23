@@ -32,3 +32,14 @@
 .canvas{
 	margin: 10px auto;
 }
+.homeButtons{
+    display: flex;
+    height: 80px;
+    justify-content: center;
+}
+.homeButtons a{
+   display: flex;
+}
+.homeButtons button{
+	flex: 45% 1;
+}

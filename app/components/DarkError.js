@@ -17,6 +17,7 @@ class DarkError extends React.Component {
 		}
 		return (
 			<div className={styles.error_overlay} onClick={this._hideError}>
+				<div className={styles.error_header} >Oops!</div>
 				<div className={styles.error_text}>{DarkErrorStore.text}</div>
 			</div>
 		);

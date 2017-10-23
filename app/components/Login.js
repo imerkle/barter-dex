@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
 
-import { Snackbar, Button, TextField} from 'material-ui';
+import { Button, TextField} from 'material-ui';
 
 import AppLogo from './AppLogo';
 
@@ -11,67 +11,41 @@ import { exec } from 'child_process';
 import { observer, inject } from 'mobx-react';
 
 
-@inject('HomeStore')
+@inject('HomeStore','DarkErrorStore')
 @observer
 class Login extends Component {
   constructor(props){
-  	 
    super(props)
-
-	 this.state = {
-	 	passphrase: "",
-	 	snackMsg: "",
-	 	snackOpen: false,
-	 }
   }
   _handleChange = (e) => {
-  	this.setState({ passphrase: e.target.value });
+  	this.props.HomeStore.passphrase = e.target.value;
   }
   _handleLogin = () => {
-    const { ROOT_DEX } = this.props.HomeStore;
-    this.props.HomeStore.passphrase = this.state.passphrase;
-    exec(`
-      cd ${ROOT_DEX}
-      echo "export passphrase=\"${this.state.passphrase}\"" > passphrase
-    `,(err, stdout, stderr) => {
-  		this.props.history.push("/startup");
-    });  	
+  	this.props.history.push("/startup");
   }
    _handleSave = () => {
-  	if(this.state.passphrase.length < 1){
-  		this.showSnack("Enter a Passphrase to Login");
+  	if(this.props.HomeStore.passphrase.length < 1){
+  		this.props.DarkErrorStore.alert("Enter a Passphrase to Login");
   	}
-  	localStorage.setItem("passphrase", this.state.passphrase);
-  	history.push("/pin");
-  }
-  showSnack = (msg) => {
-  	this.setState({
-  		snackOpen: true,
-  		snackMsg: msg,
-  	}); 
+  	this.props.history.push("/pin");
   }
   render() {
+    const { passphrase }  = this.props.HomeStore;
     return (
-        <div className={styles.container}>
-		  <Snackbar
-	          anchorOrigin={{
-	            vertical: 'bottom',
-	            horizontal: 'left',
-	          }}
-	          open={this.state.snackOpen}
-	          autoHideDuration={6000}
-	          message={this.state.snackMsg}
-		   />        
-        	<AppLogo />
+        <div className={styles.container}>      
+        <AppLogo />
 		    <TextField
-		          value={this.state.passphrase}
+		          value={passphrase}
 		          onChange={this._handleChange}
 		          margin="normal"
           		  label="Passphrase"
           		  InputProps={{ placeholder: 'Passphrase' }}		          
 		        />
-		        {/*<Button color="accent" onClick={this._handleSave}>Save Passphrase</Button>*/}
-		        <Button raised color="primary" onClick={this._handleLogin}>Login</Button>
+            <Button color="accent" onClick={this._handleSave}>Save Passphrase</Button>
+		        <Button raised color="accent" onClick={()=>{
+              this.props.history.push("/pinConfirm")
+            }}>Login with Pin</Button>
+		        <Button disabled={(passphrase.length==0)} raised color="primary" onClick={this._handleLogin}>Login</Button>
         </div>
     );
   }

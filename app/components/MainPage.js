@@ -5,45 +5,52 @@ import styles from './Main.css';
 
 import FlipMove from 'react-flip-move';
 import cx from 'classnames';
-import ReactHighcharts from 'react-highcharts';
-import ReactHighstock from 'react-highcharts/ReactHighstock.src';
-import { Tooltip } from 'material-ui';
+
+import { Tooltip, Icon, Typography } from 'material-ui';
 import { observer, inject } from 'mobx-react';
 
 import BuySell from './BuySell';
 import HeaderNav from './HeaderNav';
-import { makeConfig, coinNameFromTicker, runCommand, makeCommand, getSorted, zeroGray } from '../utils/basic.js';
-import { green } from '../utils/chartTheme.js';
-
+import { makeConfig, coinNameFromTicker, getSorted, zeroGray } from '../utils/basic.js';
+import { stylesY } from '../utils/constants.js';
+import { withStyles } from 'material-ui/styles';
+import * as CryptoIcon from 'react-cryptocoins';
 const MAX_VOLUME = .002;
 
-ReactHighstock.Highcharts.theme = green;
-ReactHighstock.Highcharts.setOptions(ReactHighstock.Highcharts.theme);
-
-const mockData = [
-  {coin: "KMD",name:"Komodo",price: .5, volume: 44.40, change: 500 },
-  {coin: "LTC",name:"Litecoin",price: 1.5, volume: 100.4, change: -4.5 },
-];
-
 let toggleState = {};
-@inject('HomeStore') @observer
+
+@withStyles(stylesY)
+@inject('HomeStore','DarkErrorStore') @observer
 class MainPage extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-       currentCoin: { coin: "KMD", balance: 0, mock: true},
+       currentCoin: false,
        config : false,
-       graphVisible: false,
     };
   }
   componentDidMount = () => {  
     this.resetWallet();
     clearInterval(this.props.HomeStore.intervalTimer);
+    clearInterval(this.props.HomeStore.checkIfRunningTimer);
+
+    this.props.HomeStore.checkIfRunningTimer = null;
     this.props.HomeStore.intervalTimer = null;
-    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 60000);
+    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 10000);
+
+    this.checkIfRunning();
   }
 
+  checkIfRunning = () => {
+    this.props.HomeStore.isRunning().then((inUse)=>{
+      if(!inUse){
+        this.props.DarkErrorStore.alert("Marketmaker Stopped Running! ");
+        return false;
+      }
+      this.props.HomeStore.checkIfRunningTimer = setTimeout(this.checkIfRunning, 3000);
+    });
+  }
   sortBy = (prop) => {
     return false;
     let data = [];
@@ -60,9 +67,10 @@ class MainPage extends Component {
       break;
     }
     if(data) this.setState({ data });
-  }   
+  }
   resetWallet = () => {
-  const { ROOT_DEX, coins, userpass, base, maxdecimal } = this.props.HomeStore;
+  const { coins, userpass, base, maxdecimal } = this.props.HomeStore;
+  const { HomeStore } = this.props;
     const wallet = [];
     Object.keys(coins).map((k,v)=>{
       const o = coins[k];
@@ -73,9 +81,9 @@ class MainPage extends Component {
       wallet.push({ coin: o.coin, smartaddress: o.smartaddress })
     })
     wallet.map(o=>{
-      runCommand(ROOT_DEX,makeCommand("balance",{coin: o.coin, address: o.smartaddress}),(res)=>{
+      HomeStore.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
        if(res.error){
-        delete this.props.HomeStore.coins[o.coin];
+        delete HomeStore.coins[o.coin];
         return false;
        } 
        if(res.result == "success"){
@@ -83,30 +91,17 @@ class MainPage extends Component {
           if(o.coin == base.coin ) base.balance = res.balance;
         } 
         coins[o.coin].orders = 0;
-        /*       
-        runCommand(ROOT_DEX,makeCommand("myprice",{base: base.ticker, rel: o.coin}),(res)=>{
-          if(res.error){
-            coins[o.coin].orders = 0;  
-          }
-        });
-        */
-        
         
         if(base.coin != o.coin){
-        runCommand(ROOT_DEX,makeCommand("pricearray",{base: o.coin, rel: base.coin}),(res)=>{
-          const today = res[res.length - 1][1];
-          const yesterday = res[0][1];
-          const change = ((today - yesterday)/yesterday * 100).toFixed(2);
-          coins[o.coin].change = change;
-          if(!this.madeGraph){
-            this.setState({ config: makeConfig(res, base.coin, maxdecimal) });
-            this.madeGraph = true;
-          }
-        });
-        
-        
-          runCommand(ROOT_DEX,makeCommand("orderbook",{base: o.coin, rel: base.coin}),(res)=>{
-            //console.log(res);
+            HomeStore.runCommand("pricearray",{base: o.coin, rel: base.coin}).then((res)=>{
+              if(res[res.length - 1]){
+                const today = res[res.length - 1][1];
+                const yesterday = res[0][1];
+                const change = ((today - yesterday)/yesterday * 100).toFixed(2);
+                coins[o.coin].change = change;
+              }
+            });
+          HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
             if(res.asks && res.asks[0]){
               coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
               coins[o.coin].price = res.asks[0].price;
@@ -124,6 +119,8 @@ class MainPage extends Component {
     const  { currentCoin } = this.state;
     const { coins, base, maxdecimal }= this.props.HomeStore;
     let prop = "", header="", BS,placement;
+    const { classes } = this.props;
+
     switch(buyOrSell){
       case 0:
         prop = "bids";
@@ -139,7 +136,7 @@ class MainPage extends Component {
       break;
     }
     return (
-              <div className={cx(styles.section, styles.buysell,
+              <div className={cx(styles.section, classes.AppSection, styles.buysell,
                 {[styles.buyBox] : buyOrSell == 0 },
                 {[styles.sellBox] : buyOrSell == 1},
                 )}>
@@ -183,22 +180,23 @@ class MainPage extends Component {
   }
   render() {
     const  { currentCoin } = this.state;
-    const { coins, base, maxdecimal }= this.props.HomeStore;
+    const { coins, base, maxdecimal }= this.props.HomeStore; 
+    const { classes } = this.props;
     return (
       <div className={styles.container, styles.container2}>
-      <HeaderNav />
+      <HeaderNav primary="exchange" />
        <div className={styles.container}>
-        <div className={cx(styles.container2,styles.right_list)}>
-           <div className={cx(styles.section, styles.r_side_bar)}>   
-            <div className={cx(styles.tr, styles.section_header)}>
-              <div className={cx(styles.oneDiv,styles.coin)} onClick={()=>this.sortBy("coin")}>Coin</div>
-              <div className={cx(styles.oneDiv,styles.name)} onClick={()=>this.sortBy("name")}>Name</div>
-              <div className={cx(styles.oneDiv,styles.price)} onClick={()=>this.sortBy("price")}>Price</div>
-              {/*<div className={cx(styles.oneDiv,styles.volume)} onClick={()=>this.sortBy("volume")}>Volume</div>*/}
-              <div className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</div>
-            </div> 
-            <FlipMove duration={750} easing="ease-out">
 
+        <div className={cx(styles.container2,styles.right_list)}>
+           <table className={cx(styles.section,classes.AppSection,styles.r_side_bar)}>   
+            <tr className={cx(styles.tr, styles.section_header, classes.AppSectionHeader)}>
+              <th className={cx(styles.oneDiv,styles.coin)} onClick={()=>this.sortBy("coin")}>Coin</th>
+              <th className={cx(styles.oneDiv,styles.name)} onClick={()=>this.sortBy("name")}>Name</th>
+              <th className={cx(styles.oneDiv,styles.price)} onClick={()=>this.sortBy("price")}>Price</th>
+              {/*<th className={cx(styles.oneDiv,styles.volume)} onClick={()=>this.sortBy("volume")}>Volume</th>*/}
+              <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
+            </tr> 
+            {/*<FlipMove duration={750} easing="ease-out">*/}
               {Object.keys(coins).map( (k,v)=>{
                 const o = coins[k];
                 const change = o.change || 0;
@@ -218,7 +216,7 @@ class MainPage extends Component {
                 }
 
                 return (
-                <div className={cx(styles.tr,
+                <tr className={cx(styles.tr,
                     {[styles.selectedtr]: currentCoin.coin == o.coin },
                     {[styles.basetr]: base.coin == o.coin }
                   )} key={o.coin}
@@ -229,48 +227,36 @@ class MainPage extends Component {
                       this.setState({ currentCoin: o });
                     }}
                   >
-                  <div className={cx(styles.oneDiv,styles.coin)}>{o.coin}</div>
-                  <div className={cx(styles.oneDiv,styles.name)}>{o.name}</div>
-                  <div className={cx(styles.oneDiv,styles.price)}>{ zeroGray((price).toFixed(maxdecimal)) }</div>
-                  {/*<div className={cx(styles.oneDiv,styles.volume)}>{zeroGray(volume)}</div>*/}
-                  <div className={cx(styles.oneDiv,styles.change,change_cl)}>{change_pref + change+"%"}</div>
-                </div>
+                  <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
+                  <td className={cx(styles.oneDiv,styles.name)}>{o.name}</td>
+                  <td className={cx(styles.oneDiv,styles.price)}>{ zeroGray((price).toFixed(maxdecimal)) }</td>
+                  {/*<td className={cx(styles.oneDiv,styles.volume)}>{zeroGray(volume)}</td>*/}
+                  <td className={cx(styles.oneDiv,styles.change,change_cl)}>{change_pref + change+"%"}</td>
+                </tr>
                 )
               })}
-             </FlipMove>        
-            </div>
+             {/*</FlipMove>*/}
+            </table>
       	</div>
- 	      <div className={styles.container2} style={{flex: "1 1 auto"}}>
-        {
-           (this.state.config) ?  
-           <div className={cx(styles.section, styles.graph_bar)}>
-              <div className={cx(styles.tr, styles.section_header)} onClick={()=>{ this.setState({ graphVisible: !this.state.graphVisible }) }}>{currentCoin.coin}/{base.coin}  Graph</div>
-              <div className={cx({ [styles.invisible] : !this.state.graphVisible })}>
-                <ReactHighstock theme={ReactHighcharts.Highcharts.theme} config={this.state.config}></ReactHighstock>
-              </div>
-           </div> : ""
-        } 
-           
+{ (this.state.currentCoin) ?
+ 	      <div className={styles.container2} style={{flex: "1 1 auto"}}>           
            <div className={cx(styles.section2, styles.bs_bar)}>
               <BuySell baseCoin={base} currentCoin={currentCoin} isBuy/>
               <BuySell baseCoin={base} currentCoin={currentCoin} isBuy={false} />           
            </div>
-
-
-
-        <div className={cx(styles.section2, styles.bs_bar)}>
-           {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.bids) ? this.orderBookDisplay(0) : ""}
-           {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.asks) ? this.orderBookDisplay(1) : ""}
+           <div className={cx(styles.section2, styles.bs_bar)}>
+             {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.bids) ? this.orderBookDisplay(0) : ""}
+             {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.asks) ? this.orderBookDisplay(1) : ""}
+           </div>
         </div>
-
-
-
-
-    
-        </div>
- 	    </div>
-
+      : 
+      <div className={styles.pad}>
+        <Icon>album</Icon>
+        <Typography type="headline" style={{ margin: "0 20px" }}>Select a Trading Pair</Typography>
       </div>
+    }
+ 	    </div>
+    </div>
     );
   }
 }
