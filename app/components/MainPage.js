@@ -32,12 +32,16 @@ class MainPage extends Component {
   }
   componentDidMount = () => {  
     this.resetWallet();
+    this.orderBookCall();
+    
     clearInterval(this.props.HomeStore.intervalTimer);
     clearInterval(this.props.HomeStore.checkIfRunningTimer);
+    clearInterval(this.props.HomeStore.intervalTimerBook);
 
     this.props.HomeStore.checkIfRunningTimer = null;
     this.props.HomeStore.intervalTimer = null;
-    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 10000);
+    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
+    this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, 2000);
 
     this.checkIfRunning();
   }
@@ -68,6 +72,30 @@ class MainPage extends Component {
     }
     if(data) this.setState({ data });
   }
+  orderBookCall = () => {
+  const { coins, userpass, base, maxdecimal } = this.props.HomeStore;
+  const { HomeStore } = this.props;
+    const wallet = [];
+    Object.keys(coins).map((k,v)=>{
+      const o = coins[k];
+      if(o.coin != base.coin && v < 2 && this.state.currentCoin.mock){
+        this.setState({ currentCoin: o })
+      }
+      coins[k] = Object.assign(o, {name: coinNameFromTicker(o.coin)});
+      wallet.push({ coin: o.coin, smartaddress: o.smartaddress })
+    })
+    wallet.map(o=>{
+        HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
+          if(res.asks && res.asks[0]){
+            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
+            coins[o.coin].price = res.asks[0].price;
+          }else{
+            coins[o.coin].value = coins[o.coin].balance;
+          }
+          coins[o.coin].orderbook = res;
+        });    
+    });    
+  }
   resetWallet = () => {
   const { coins, userpass, base, maxdecimal } = this.props.HomeStore;
   const { HomeStore } = this.props;
@@ -82,16 +110,16 @@ class MainPage extends Component {
     })
     wallet.map(o=>{
       HomeStore.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
-       if(res.error){
-        delete HomeStore.coins[o.coin];
-        return false;
-       } 
-       if(res.result == "success"){
-          coins[o.coin].balance = res.balance;
-          if(o.coin == base.coin ) base.balance = res.balance;
-        } 
+         if(res.error){
+          delete HomeStore.coins[o.coin];
+          return false;
+         } 
+         if(res.result == "success"){
+            coins[o.coin].balance = res.balance;
+            if(o.coin == base.coin ) base.balance = res.balance;
+         } 
+      });
         coins[o.coin].orders = 0;
-        
         if(base.coin != o.coin){
             HomeStore.runCommand("pricearray",{base: o.coin, rel: base.coin}).then((res)=>{
               if(res[res.length - 1]){
@@ -101,18 +129,7 @@ class MainPage extends Component {
                 coins[o.coin].change = change;
               }
             });
-          HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
-            if(res.asks && res.asks[0]){
-              coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
-              coins[o.coin].price = res.asks[0].price;
-            }else{
-              coins[o.coin].value = coins[o.coin].balance;
-            }
-            coins[o.coin].orderbook = res;
-          });
         }
-
-      });
     })      
   }
   orderBookDisplay = (buyOrSell) => {

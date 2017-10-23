@@ -21,6 +21,7 @@ class HomeStore{
 	};
 	@observable intervalTimer = null;
 	@observable checkIfRunningTimer = null;
+	@observable intervalTimerBook = null;
 	@observable maxdecimal = 8;
 	@observable indicator = [25,50,75,100];
 	@observable gui = 'gecko';
