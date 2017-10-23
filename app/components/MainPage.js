@@ -33,7 +33,7 @@ class MainPage extends Component {
   componentDidMount = () => {  
     this.resetWallet();
     this.orderBookCall();
-    
+
     clearInterval(this.props.HomeStore.intervalTimer);
     clearInterval(this.props.HomeStore.checkIfRunningTimer);
     clearInterval(this.props.HomeStore.intervalTimerBook);
@@ -41,7 +41,7 @@ class MainPage extends Component {
     this.props.HomeStore.checkIfRunningTimer = null;
     this.props.HomeStore.intervalTimer = null;
     this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
-    this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, 2000);
+    this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, this.props.HomeStore.orderBookRate);
 
     this.checkIfRunning();
   }

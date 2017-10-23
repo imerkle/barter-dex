@@ -29,6 +29,7 @@ class HomeStore{
 	@observable url = 'http://127.0.0.1:7783';
 	@observable host = '127.0.0.1';
 	@observable port = 7783;
+	@observable orderBookRate = 2000;
 
 
   runCommand = (method, data = {}) => {

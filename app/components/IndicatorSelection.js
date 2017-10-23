@@ -18,7 +18,7 @@ import { observer, inject } from 'mobx-react';
   }
   render() {
    const { HomeStore } = this.props;
-   const { indicator } = HomeStore;
+   const { indicator, orderBookRate } = HomeStore;
     return (
        <div className={styles.container2}>
         <HeaderNav />
@@ -32,6 +32,13 @@ import { observer, inject } from 'mobx-react';
            			}
            		}} />)
            )}
+           <Typography type="headline" component="h4">Change OrderBook refresh rate</Typography>
+			<TextField value={orderBookRate} label={`Orderbook Refresh Rate`} placeholder={`Orderbook Refresh Rate`} onChange={(e)=>{
+           			const value = e.target.value;
+           			if(!isNaN(value) && value >0){
+           				HomeStore.orderBookRate = value;
+           			}
+           		}} />           
 		  </div>	
        </div>
     );
