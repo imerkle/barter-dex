@@ -34,6 +34,7 @@ body{
 .volume{ flex: 5% 1;  }
 .change{ flex: 5% 1;  }
 .total{ flex: 5% 1;  }
+.utxos{ flex: 0 1 auto; width: 10%;  }
 .section{
    border-radius: 5px;
    overflow: hidden;

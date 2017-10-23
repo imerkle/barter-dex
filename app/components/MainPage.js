@@ -165,6 +165,7 @@ class MainPage extends Component {
                     <div className={cx(styles.oneDiv,styles.price)}>{`Price(${base.coin})`}</div>
                     <div className={cx(styles.oneDiv,styles.volume)}>{`Amount(${currentCoin.coin})`}</div>
                     <div className={cx(styles.oneDiv,styles.total)}>{`Total(${base.coin})`}</div>
+                    <div className={cx(styles.oneDiv,styles.utxos)}>{`Utxos`}</div>
                   </div> 
                   <FlipMove duration={750} easing="ease-out">
                     {coins[currentCoin.coin].orderbook[prop].map( (o,i) =>{
@@ -173,6 +174,7 @@ class MainPage extends Component {
                       const tooltip_title = o.address; 
                       const price = o.price.toFixed(maxdecimal);
                       const widthPercent = (total/MAX_VOLUME * 100)+"%";
+                      const numutxos = o.numutxos;
                       return (
                       <Tooltip placement={placement} title={tooltip_title} key={o.coin+""+i}>
                         <div className={cx(styles.tr , { [styles.myorder] : o.address == currentCoin.smartaddress } )}  
@@ -186,6 +188,7 @@ class MainPage extends Component {
                           <div className={cx(styles.oneDiv,styles.price)}>{zeroGray(price)}</div>
                           <div className={cx(styles.oneDiv,styles.volume)}>{zeroGray(amt)}</div>
                           <div className={cx(styles.oneDiv,styles.total)}>{zeroGray(total)}</div>
+                          <div className={cx(styles.oneDiv,styles.utxos)}>{numutxos}</div>
                         </div>
                        </Tooltip>
                       )
