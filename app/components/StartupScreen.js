@@ -44,6 +44,8 @@ import { observer, inject } from 'mobx-react';
             const { userpass, mypubkey } = res;
             this.props.HomeStore.userpass = userpass;
             this.props.HomeStore.mypubkey = mypubkey;
+
+            
             this.props.HomeStore.runCommand('electrum',{ coin: "BTC","ipaddr":"136.243.45.140","port":50001 });
             this.props.HomeStore.runCommand('electrum',{ coin: "BTC","ipaddr":"173.212.225.176","port":50001 });
             this.props.HomeStore.runCommand('electrum',{ coin: "KMD","ipaddr":"136.243.45.140","port":50011 });

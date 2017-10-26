@@ -29,6 +29,11 @@ import { stylesY } from '../utils/constants';
               {Object.keys(coins).map((k,v)=>{
                 return(<Button key={k} raised={(base.coin == k)} color="accent" onClick={()=>{
                   this.props.HomeStore.base.coin = k;
+                  
+
+                  const index = HomeStore.enabled_coins.indexOf(base.coin);
+                  HomeStore.enabled_coins.splice(index, 1);
+                  HomeStore.enabled_coins.unshift(base.coin);
                 }}>{k}</Button>)
               })}
             </div>  

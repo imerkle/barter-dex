@@ -45,11 +45,20 @@ class MainPage extends Component {
     this.resetWallet();
     this.checkIfRunning();
 
-    
+
     this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
     this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, this.props.HomeStore.orderBookRate);
 
   }
+  componentWillUnmount = () => {
+
+
+    clearTimeout(this.props.HomeStore.checkIfRunningTimer);
+    clearInterval(this.props.HomeStore.intervalTimer);
+
+    this.props.HomeStore.checkIfRunningTimer = null;
+    this.props.HomeStore.intervalTimer = null;
+  }  
 
   checkIfRunning = () => {
     this.props.HomeStore.isRunning().then((inUse)=>{
@@ -103,7 +112,6 @@ class MainPage extends Component {
     Object.keys(coins).map((k,v)=>{
       const o = coins[k];
       HomeStore.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
-        console.log(res);
          if(res.error){
           delete HomeStore.coins[o.coin];
           return false;
@@ -169,7 +177,7 @@ class MainPage extends Component {
                       const widthPercent = (total/MAX_VOLUME * 100)+"%";
                       const numutxos = o.numutxos;
                       return (
-                      <Tooltip placement={placement} title={tooltip_title} key={o.coin+""+i}>
+                      <Tooltip placement={placement} title={tooltip_title} key={o.coin+""+i+""+numutxos}>
                         <div className={cx(styles.tr , { [styles.myorder] : o.address == currentCoin.smartaddress } )}  
                           onClick={()=>{
                              this.props.HomeStore[BS].price = o.price;
@@ -193,7 +201,7 @@ class MainPage extends Component {
   }
   render() {
     const  { currentCoin } = this.state;
-    const { coins, base, maxdecimal }= this.props.HomeStore; 
+    const { coins, base, maxdecimal, enabled_coins }= this.props.HomeStore; 
     const { classes } = this.props;
 
     return (
@@ -211,7 +219,7 @@ class MainPage extends Component {
               <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
             </tr> 
             {/*<FlipMove duration={750} easing="ease-out">*/}
-              {Object.keys(coins).map( (k,v)=>{
+              {enabled_coins.map( k =>{
                 const o = coins[k];
                 const change = o.change || 0;
                 const price = (o.coin == base.coin) ? 1 : o.price || 0;
@@ -264,7 +272,7 @@ class MainPage extends Component {
         </div>
       : 
       <div className={styles.pad}>
-        <Icon>album</Icon>
+        <Icon>chevron_left</Icon>
         <Typography type="headline" style={{ margin: "0 20px" }}>Select a Trading Pair</Typography>
       </div>
     }

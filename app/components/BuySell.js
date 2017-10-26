@@ -9,6 +9,8 @@ import { inject, observer } from 'mobx-react';
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 
+import AButton from './AButton';
+
 
 
 const decimals = 2;
@@ -24,22 +26,29 @@ class BuySell extends Component {
   _handleBuySell = () => {
   	 const { isBuy, baseCoin, currentCoin, HomeStore, DarkErrorStore } = this.props;
 
+    return new Promise((resolve, reject) => {
       if(isBuy){
           //we buying my current or we buying api base
           //api rel = currency paying with  = my base
           //api base = currency i wanna buy  = my current
-          HomeStore.runCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
-            if(res.error){
-              DarkErrorStore.alert(res.error);
-            }
-          });
-      }else{
-          HomeStore.runCommand("sell",{base: baseCoin.coin, rel: currentCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
-            if(res.error){
-              DarkErrorStore.alert(res.error);
-            }
-          });
-      }
+        setTimeout(resolve, 1000);
+            HomeStore.runCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
+              console.log(res);
+              if(res.error){
+                DarkErrorStore.alert(res.error);
+              }
+                resolve();
+            });
+        }else{
+            HomeStore.runCommand("sell",{base: baseCoin.coin, rel: currentCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
+              console.log(res);
+              if(res.error){
+                DarkErrorStore.alert(res.error);
+              }
+                resolve();
+            });
+        }
+    });          
   }  
   _handleFab = (percent) => {
     const { isBuy, baseCoin, currentCoin, HomeStore } = this.props;
@@ -125,7 +134,7 @@ class BuySell extends Component {
 	         <div className={cx(styles.bs_tr,styles.bs_tr_row)}>
               {indicator.map( (o,i)=><Button key={i} fab color={(i%2 == 0) ?  accent : primary} onClick={()=>{ this._handleFab(o) }}>{o}%</Button>)}
 	         </div>
-	         <div className={cx(styles.bs_tr)}><Button raised color={accent} onClick={this._handleBuySell}>{`${buyTxt} ${currentCoin.coin}`}</Button></div>
+	         <div className={cx(styles.bs_tr)}><AButton raised color={accent} onClick={this._handleBuySell}>{`${buyTxt} ${currentCoin.coin}`}</AButton></div>
 	      </Paper>
     );
   }

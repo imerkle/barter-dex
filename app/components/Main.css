@@ -32,13 +32,16 @@ body{
 }
 
 .draw{ flex: 2 1 auto; width: 15%; }
-.coin{ flex: 5% 1; min-width: 25px; }
-.name{ flex: 5% 1; min-width: 65px; }
-.price{ flex: 5% 1; min-width: 65px; }
+.coin{ flex: 5% 1; }
+.price{ flex: 5% 1; }
 .volume{ flex: 5% 1;  }
-.change{ flex: 5% 1; min-width: 25px; }
 .total{ flex: 5% 1;  }
 .utxos{ flex: 0 1 auto; width: 10%;  }
+
+.r_side_bar .price{ min-width: 65px; }
+.r_side_bar .change{ min-width: 25px; }
+.r_side_bar .name{ min-width: 65px; }
+.r_side_bar .coin{ min-width: 25px; }
 .section{
    border-radius: 5px;
    overflow: hidden;

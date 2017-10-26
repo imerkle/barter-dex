@@ -13,6 +13,7 @@ import { stylesY } from '../utils/constants';
 import { inject, observer } from 'mobx-react';
 import { generateQR } from '../utils/basic';
 import { zeroGray } from '../utils/basic.js';
+import AButton from './AButton';
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore') @observer
@@ -119,24 +120,27 @@ class Wallet extends Component {
             />
           </DialogContent>
           <DialogActions>
-            <Button raised color="accent"
+            <AButton raised color="accent"
               onClick={()=>{
-                HomeStore.runCommand("withdraw",{coin: coin.coin, outputs: [{ [withdrawAddress]: withdrawValue }] }).then((res)=>{                  
-                    if(!res.complete){
-                      DarkErrorStore.alert("Withdrawal not successful");
-                    }else{
-                      const txid = res.txid; 
-                      const txhex = res.hex;
-                      HomeStore.runCommand("sendrawtransaction",{coin: coin.coin, signedtx: txhex }).then((res)=>{
-                        console.log(res);
-                        coin.balance  = coin.balance - withdrawValue;
-                        DarkErrorStore.alert("Withdrawal completed successfully.\nYour Transaction ID: " + txid);
-                      });
-                    }
-                });
+                return new Promise((resolve, reject) => {
+                    HomeStore.runCommand("withdraw",{coin: coin.coin, outputs: [{ [withdrawAddress]: withdrawValue }] }).then((res)=>{                  
+                        if(!res.complete){
+                          DarkErrorStore.alert("Withdrawal not successful");
+                        }else{
+                          const txid = res.txid; 
+                          const txhex = res.hex;
+                          HomeStore.runCommand("sendrawtransaction",{coin: coin.coin, signedtx: txhex }).then((res)=>{
+                            console.log(res);
+                            coin.balance  = coin.balance - withdrawValue;
+                            DarkErrorStore.alert("Withdrawal completed successfully.\nYour Transaction ID: " + txid);
+                          });
+                        }
+                        resolve();
+                    });
+               });
               }}>
               Withdraw {coin.coin}
-            </Button>
+            </AButton>
             <Button raised onClick={this.handleRequestCloseWithdraw} color="primary">
               Close
             </Button>
