@@ -14,7 +14,6 @@ import HeaderNav from './HeaderNav';
 import { makeConfig, coinNameFromTicker, getSorted, zeroGray } from '../utils/basic.js';
 import { stylesY } from '../utils/constants.js';
 import { withStyles } from 'material-ui/styles';
-import * as CryptoIcon from 'react-cryptocoins';
 const MAX_VOLUME = .002;
 
 let toggleState = {};
@@ -64,6 +63,7 @@ class MainPage extends Component {
     this.props.HomeStore.isRunning().then((inUse)=>{
       if(!inUse){
         this.props.DarkErrorStore.alert("Marketmaker Stopped Running! ");
+        this.props.history.push("/");
         return false;
       }
       this.props.HomeStore.checkIfRunningTimer = setTimeout(this.checkIfRunning, 3000);
@@ -204,6 +204,8 @@ class MainPage extends Component {
     const { coins, base, maxdecimal, enabled_coins }= this.props.HomeStore; 
     const { classes } = this.props;
 
+    console.log(enabled_coins);
+    
     return (
       <div className={styles.container, styles.container2}>
       <HeaderNav primary="exchange" />
@@ -219,7 +221,7 @@ class MainPage extends Component {
               <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
             </tr> 
             {/*<FlipMove duration={750} easing="ease-out">*/}
-              {enabled_coins.map( k =>{
+              {enabled_coins.map( (k,i) =>{
                 const o = coins[k];
                 const change = o.change || 0;
                 const price = (o.coin == base.coin) ? 1 : o.price || 0;
@@ -241,7 +243,7 @@ class MainPage extends Component {
                 <tr className={cx(styles.tr,
                     {[styles.selectedtr]: currentCoin.coin == o.coin },
                     {[styles.basetr]: base.coin == o.coin }
-                  )} key={o.coin}
+                  )} key={o.coin+""+i}
                     onClick={()=>{
                       if(o.coin == base.coin){
                         return false;

@@ -54,6 +54,7 @@ class Home extends React.Component {
             if(!err && data){
               const enabled_coins = JSON.parse(data);
               this.props.HomeStore.enabled_coins = enabled_coins.coin;
+              this.props.HomeStore.makeUnique();
             }
           });
   }

@@ -9,6 +9,7 @@ import { inject, observer } from 'mobx-react';
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 
+import * as CryptoIcon from 'react-cryptocoins';
 import AButton from './AButton';
 
 
@@ -119,13 +120,21 @@ class BuySell extends Component {
   	const basetxt = (isBuy) ? `${baseCoin.balance} ${baseCoin.coin}` : `${currentCoin.balance} ${currentCoin.coin}`;
   	const basevalue = (isBuy) ? baseCoin.balance : currentCoin.balance;
 
+    const CryptoSVGLogo = CryptoIcon[capitalize(currentCoin.coin)];
+    let CoinLogo = (<span></span>);
+    if(CryptoSVGLogo){
+      console.log(CryptoSVGLogo);
+        CoinLogo = (<CryptoSVGLogo color="#fbbf40" style={{margin: "0px 10px -6px 0px" }} />);
+    }
     return (
 	      <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
           {[classes.BuySection]: isBuy},
           {[classes.SellSection]: !isBuy},
           )}>
 	         <div className={cx(styles.bs_tr, styles.bs_header,styles.bs_tr_row)}>
-	          <div className={cx(styles.mainHead)}>{`${buyTxt} ${currentCoin.coin}`}</div>
+	          <div className={cx(styles.mainHead)}>
+            {CoinLogo}
+            {`${buyTxt} ${currentCoin.coin}`}</div>
 	          <div className={cx(styles.basevalue)} onClick={()=>{ this._handleFab(100) }} >{basetxt}</div>
 	         </div>
 	         <div className={cx(styles.bs_tr)}><TextField value={price} label="Price" placeholder="Price" onChange={this._putPrice} /></div>
@@ -139,5 +148,7 @@ class BuySell extends Component {
     );
   }
 }
-
+const capitalize = (name) => {
+     return name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
 export default BuySell;

@@ -56,6 +56,19 @@ const getCryptoIcon = (coin) => {
 	return out;
 }
 
+const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
+const electrumPorts = {
+	BTC: 50001,
+	LTC: 50012,
+	DASH: 50098,
+	KMD: 50011,
+	HUSH: 50013,
+	REVS: 50050,
+	CHIPS: 50076,
+	MNZ: 50053,
+};
+
+
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
 @observer
@@ -79,16 +92,19 @@ const getCryptoIcon = (coin) => {
 			DarkErrorStore.alert(res.error);
 			return false;
 		}
-		const c = res.map(o=>{
-			let isEnabled = false;
-			if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
-				isEnabled = true;
+		const c = res.filter(o=>{
+			if(whitelist.indexOf(o.coin) > -1){
+				let isEnabled = false;
+				if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
+					isEnabled = true;
+				}
+				const x = {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance, enabled: isEnabled }
+				if(isEnabled){
+					this.props.HomeStore.coins[o.coin] = x;
+				}
+				console.log(x);
+				return x;
 			}
-			const x = {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance, enabled: isEnabled }
-			if(isEnabled){
-				this.props.HomeStore.coins[o.coin] = x;
-			}
-			return x;
 		});
 		this.setState({ coins: c });
 	})
@@ -128,25 +144,31 @@ const getCryptoIcon = (coin) => {
 								              	if(checked){
 									              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
 									              		if(res.error){
-									              			DarkErrorStore.alert(res.error);
-									              			//return false;
+									              			if(electrumPorts[o.coin]){
+									              				DarkErrorStore.alert("Native Blockchain not available, activating Electrum servers");
+									              				HomeStore.runCommand('electrum',{ coin: o.coin,"ipaddr":"173.212.225.176","port": electrumPorts[o.coin] });
+									              			}else{
+									              				DarkErrorStore.alert("Native Blockchain not available.");
+										              			return false;
+									              			}
 									              		}
 									              		HomeStore.coins[o.coin] = o;
 									              		HomeStore.enabled_coins.push(o.coin);
+									              		HomeStore.makeUnique();
+
 									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })
 									              	});
 								              	}else{
-									              	HomeStore.enabled_coins.remove(o.coin);
-									              	delete HomeStore.coins[o.coin];
-
 									              	HomeStore.runCommand('disable',{coin: o.coin}).then((res)=>{
 									              		if(res.error){
-									              			DarkErrorStore.alert(res.error);
-									              			//return false;
+									              			DarkErrorStore.alert("Native Blockchain not available!");
+									              			return false;
 									              		}
-								              			HomeStore.coins[o.coin] = o;
-									              		HomeStore.enabled_coins.push(o.coin);
+									              		HomeStore.enabled_coins.remove(o.coin);
+									              		delete HomeStore.coins[o.coin];
+									              		HomeStore.makeUnique();
+									              		
 									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })
 									              	});								              		
@@ -166,6 +188,9 @@ const getCryptoIcon = (coin) => {
 							 }
 						 </FormGroup>
 						{/*<Button raised color="primary" onClick={this._handleStartup}>Save</Button>*/}
+						<Button raised color="accent" onClick={()=>{
+							this.props.history.push("/mainPage");
+						}}>Continue to Exchange</Button>
 					</Paper>	
        </div>
     );

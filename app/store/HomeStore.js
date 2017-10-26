@@ -41,6 +41,7 @@ class HomeStore{
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(jsonData),
         };
+        console.log(data);
         return new Promise((resolve, reject) => {
             request(
                 {
@@ -51,6 +52,7 @@ class HomeStore{
                     strictSSL: false,
                     json: true
                 }, (error, response, body) => {
+        		console.log(body);
                 if (error) {
                 	console.log(error,data);
                     return reject(error);
@@ -59,6 +61,12 @@ class HomeStore{
             });
         });
     }	
+	@action makeUnique = () => {
+		const uniqueArray = this.enabled_coins.filter((item, pos) => {
+			return this.enabled_coins.indexOf(item) == pos;
+		})
+		this.enabled_coins = uniqueArray;
+	} 
 	isRunning = () => {
 		return new Promise((resolve, reject) => {
 			tcpPortUsed.check(this.port, this.host).then(function(inUse) {
