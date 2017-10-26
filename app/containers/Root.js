@@ -14,6 +14,7 @@ class BrowserRouter2 extends React.Component {
   }
 }
 
+/*
 const theme = 
   {
     palette: {
@@ -23,8 +24,22 @@ const theme =
     AppSectionBg: "rgba(28, 33, 66, 0.25)",
     AppSectionHeaderBg: "#175d42",
     RootColor: '#FFF',
+    AppBgImageHeight: "750px",
 };
-
+*/
+const theme = 
+  {
+    palette: {
+      type: 'light',
+    },
+    AppBg: '#fbbf40',
+    AppSectionBg: "#FFF",
+    AppSectionHeaderBg: "#175d42",
+    RootColor: '#333',
+    AppBgImageHeight: "660px",
+    AppSectionTypoBg: "#f9f9f9",
+    AppSectionTypoColor: "#868686",
+};
 class Root extends React.Component{
   constructor(props){
     super(props);

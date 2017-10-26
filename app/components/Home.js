@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import styles from './Login.css';
-import { HOME, marketmakerExe, coinsJSON } from '../utils/constants.js';
-import { Icon, Button } from 'material-ui';
+import { HOME, ENABLE_COIN, marketmakerExe, coinsJSON } from '../utils/constants.js';
+import { Paper, Icon, Button } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
@@ -19,8 +19,16 @@ class Home extends React.Component {
       this.afterHomeDir();
     });
     exec(`pkill -15 marketmaker`);
+    
+
+    clearTimeout(this.props.HomeStore.checkIfRunningTimer);
     clearInterval(this.props.HomeStore.intervalTimer);
+    clearInterval(this.props.HomeStore.intervalTimerBook);
+
+    this.props.HomeStore.checkIfRunningTimer = null;
     this.props.HomeStore.intervalTimer = null;
+    this.props.HomeStore.intervalTimerBook = null;
+
   }
   afterHomeDir = () => {
       fs.exists(`${HOME}marketmaker`, (exists) => {
@@ -42,6 +50,12 @@ class Home extends React.Component {
                 this.saveAvailableCoins(coinJSONTarget);
              }
           });    
+          fs.readFile(`${HOME}${ENABLE_COIN}`,'utf8', (err,data) => {
+            if(!err && data){
+              const enabled_coins = JSON.parse(data);
+              this.props.HomeStore.enabled_coins = enabled_coins.coin;
+            }
+          });
   }
   saveAvailableCoins = (coinJSONTarget) => {
         fs.readFile(coinJSONTarget,(err, data)=>{
@@ -54,7 +68,7 @@ class Home extends React.Component {
     return (
       <div className={styles.container}>
         <AppLogo />
-        <div className={styles.homeButtons}>
+        <Paper className={styles.homeButtons}>
             <Button color="accent" raised onClick={()=>{
               this.props.history.push('/login');
             }}
@@ -62,7 +76,7 @@ class Home extends React.Component {
            <Button color="primary" raised onClick={()=>{
               this.props.history.push('/register');
             }}>Register</Button>
-        </div>
+        </Paper>
       </div>
     );
   }

@@ -9,6 +9,10 @@ body{
 	display: flex;
 	flex-flow: column;
 }
+.containerbig{
+    margin: 0px auto;
+    width: 60%;  
+}
 .oneDiv{
 	 margin: 0 5px;
    text-align: right;
@@ -28,11 +32,11 @@ body{
 }
 
 .draw{ flex: 2 1 auto; width: 15%; }
-.coin{ flex: 5% 1;  }
-.name{ flex: 5% 1;  }
-.price{ flex: 5% 1;  }
+.coin{ flex: 5% 1; min-width: 25px; }
+.name{ flex: 5% 1; min-width: 65px; }
+.price{ flex: 5% 1; min-width: 65px; }
 .volume{ flex: 5% 1;  }
-.change{ flex: 5% 1;  }
+.change{ flex: 5% 1; min-width: 25px; }
 .total{ flex: 5% 1;  }
 .utxos{ flex: 0 1 auto; width: 10%;  }
 .section{
@@ -104,6 +108,7 @@ body{
 	overflow: auto;
   */
 	flex-direction: row!important;
+  padding: 40px;
 }
 
 .tr{
@@ -114,6 +119,11 @@ body{
 .tr:hover:not(.basetr),.selectedtr{
   cursor: pointer;
   background: rgba(0, 0, 0, 0.2);
+}
+.basetr{
+  cursor: default;
+  background: rgba(175, 175, 175, 0.1);
+  padding: 30px 10px;
 }
 .bs_order_header{
   background: rgba(0,0,0,.1);
@@ -203,10 +213,12 @@ body{
 .container_buttons button{
   flex: 30% 1;
 }
+  /*
 .right_list{
   flex: 10% 1 !important;
   max-width: 25%;
 }
+  */
 .myorder{
   background: rgba(0,0,0,.1)
 }
@@ -235,4 +247,7 @@ body{
 .loadingText{
     font-size: 14px;
     margin: 10px 0;
+}
+table{
+  box-shadow: 0 0 10px #d2d2d2;
 }

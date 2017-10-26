@@ -155,7 +155,7 @@ class Wallet extends Component {
          {this.depositWalletDialog()}
          {this.withdrawWalletDialog()}
          <div className={cx(styles.section, classes.AppSection, styles.w_bar)}>   
-            <div className={cx(styles.tr, styles.section_header, classes.AppSectionHeader)}>
+            <div className={cx(styles.tr, styles.section_header, classes.AppSectionHeader, classes.AppSectionTypo)}>
               <div className={cx(styles.oneDiv,styles.draw)}>Deposit/Withdraw</div>
               <div className={cx(styles.oneDiv,styles.coin)}>Coin</div>
               <div className={cx(styles.oneDiv,styles.name)}>Name</div>

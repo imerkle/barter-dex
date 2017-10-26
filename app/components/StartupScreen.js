@@ -51,7 +51,19 @@ import { observer, inject } from 'mobx-react';
             this.props.HomeStore.runCommand('electrum',{ coin: "REVS","ipaddr":"173.212.225.176","port":50050 });
             this.props.HomeStore.runCommand('electrum',{ coin: "REVS","ipaddr":"136.243.45.140","port":50050 });
 
-            this.props.history.push("/mainPage");
+
+            if(!this.once && this.props.HomeStore.enabled_coins){
+              this.props.HomeStore.enabled_coins.map(o=>{
+                this.props.HomeStore.runCommand('enable',{ coin: o},(res)=>{
+                   if(res.error){
+                      DarkErrorStore.alert(res.error);
+                   }
+                });
+              });
+              this.once = true;
+            }
+
+            this.props.history.push("/coinSelection");
         }).catch((err) => {
             console.log(err);
             this.userpassTimer = setTimeout(()=>{
@@ -70,9 +82,9 @@ import { observer, inject } from 'mobx-react';
         coins: available_coins,
     });
     exec(`${HOME}marketmaker '${options}'`,{cwd: HOME},(err,std,stde)=>{
-      //console.log(err);
-      //console.log(std);
-      //console.log(stde);
+      console.log(err);
+      console.log(std);
+      console.log(stde);
     });
   }
   render() {

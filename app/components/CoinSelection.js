@@ -4,16 +4,18 @@ import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 
-import { Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
+import { Paper, Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 
 import { observer, inject } from 'mobx-react';
-import { stylesY } from '../utils/constants';
+import { HOME, ENABLE_COIN, stylesY } from '../utils/constants';
 
 import * as CryptoIcon from 'react-cryptocoins';
 import LoadingWaitText from './LoadingWaitText';
 
+import fs from 'fs';
+import cx from 'classnames';
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
@@ -67,7 +69,7 @@ const getCryptoIcon = (coin) => {
   	};
   }
   componentDidMount(){
-	this.getCoins()
+	this.getCoins();
   }
   getCoins = () => {
   	const { HomeStore, DarkErrorStore } = this.props;
@@ -82,10 +84,20 @@ const getCryptoIcon = (coin) => {
 			if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
 				isEnabled = true;
 			}
-			return {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance, enabled: isEnabled }
+			const x = {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance, enabled: isEnabled }
+			if(isEnabled){
+				this.props.HomeStore.coins[o.coin] = x;
+			}
+			return x;
 		});
 		this.setState({ coins: c });
 	})
+  }
+  saveCoinsinJSON = () => {
+  	const new_json = {
+  		coin: this.props.HomeStore.enabled_coins,
+  	};
+  	fs.writeFile(`${HOME}${ENABLE_COIN}`,JSON.stringify(new_json),()=>{})
   }
   render() {
 	const { classes, DarkErrorStore, HomeStore } = this.props;
@@ -93,8 +105,8 @@ const getCryptoIcon = (coin) => {
     return (
        <div className={styles.container2}>
        	<HeaderNav />
-		<div className={styles.container2} style={{margin: "0 auto",padding: "0px 170px"}}>
-			        	<Typography type="headline" component="h4">Select Coins to Trade</Typography>
+		<Paper className={cx(styles.container2,styles.containerbig)}>
+			        	<Typography className={cx(classes.AppSectionTypo)} type="headline" component="h4">Select Coins to Trade</Typography>
 			        	{(this.state.coins.length < 1) ? <LoadingWaitText text="Generating Coin List" /> : ""}
 						 <FormGroup className={styles.switchGroup}>
 							 {
@@ -114,7 +126,6 @@ const getCryptoIcon = (coin) => {
 												   }
 												});
 								              	if(checked){
-
 									              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
 									              		if(res.error){
 									              			DarkErrorStore.alert(res.error);
@@ -122,6 +133,7 @@ const getCryptoIcon = (coin) => {
 									              		}
 									              		HomeStore.coins[o.coin] = o;
 									              		HomeStore.enabled_coins.push(o.coin);
+									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })
 									              	});
 								              	}else{
@@ -135,6 +147,7 @@ const getCryptoIcon = (coin) => {
 									              		}
 								              			HomeStore.coins[o.coin] = o;
 									              		HomeStore.enabled_coins.push(o.coin);
+									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })
 									              	});								              		
 								              	}
@@ -153,7 +166,7 @@ const getCryptoIcon = (coin) => {
 							 }
 						 </FormGroup>
 						{/*<Button raised color="primary" onClick={this._handleStartup}>Save</Button>*/}
-					</div>	
+					</Paper>	
        </div>
     );
   }

@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 
-import { Button, Typography } from 'material-ui';
-
-
+import { Paper, Button, Typography } from 'material-ui';
 import { observer, inject } from 'mobx-react';
 
+import { withStyles } from 'material-ui/styles';
+import { stylesY } from '../utils/constants';
 
+@withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
 @observer
  class BaseSelection extends Component {
@@ -22,16 +23,16 @@ import { observer, inject } from 'mobx-react';
     return (
        <div className={styles.container2}>
         <HeaderNav />
-        <div className={styles.container2} style={{margin: "0 auto",padding: "0px 170px"}}>
-           <Typography type="headline" component="h4">Change Base Coin ( Current {base.coin} )</Typography>
-            <div className={styles.container_buttons}>
+        <Paper className={styles.container2} style={{margin: "0 auto"}}>
+           <Typography className={classes.AppSectionTypo} type="headline" component="h4">Change Base Coin ( Current {base.coin} )</Typography>
+            <div className={styles.container_buttons} style={{padding: "30px 170px"}}>
               {Object.keys(coins).map((k,v)=>{
-                return(<Button raised={(base.coin == k)} color="accent" onClick={()=>{
+                return(<Button key={k} raised={(base.coin == k)} color="accent" onClick={()=>{
                   this.props.HomeStore.base.coin = k;
                 }}>{k}</Button>)
               })}
             </div>  
-					</div>	
+					</Paper>	
        </div>
     );
   }

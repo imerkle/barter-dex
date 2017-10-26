@@ -41,7 +41,6 @@ class HomeStore{
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(jsonData),
         };
-        console.log(data);
         return new Promise((resolve, reject) => {
             request(
                 {
@@ -53,9 +52,9 @@ class HomeStore{
                     json: true
                 }, (error, response, body) => {
                 if (error) {
+                	console.log(error,data);
                     return reject(error);
                 }
-        		console.log(body);
                 return resolve(body);
             });
         });

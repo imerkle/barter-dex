@@ -10,6 +10,8 @@ export const getcoinsscript = 'https://github.com/dsslimshaddy/barter-dex/releas
 export const enable_myscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/enable_my';
 export const marketmakerExe = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/marketmaker';
 export const coinsJSON = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/coins.json';
+export const ENABLE_COIN = 'enabled_coins.json';
+
 export const stylesY = theme => ({
 	  bar: {},
 	  checked: {
@@ -35,6 +37,21 @@ export const stylesY = theme => ({
 	},
 	root: {
 		color: theme.RootColor,
+	},
+	AppBgImage: {
+		height: theme.AppBgImageHeight,
+	},
+	AppSectionTypo: {
+		background: theme.AppSectionTypoBg,
+ 		color: theme.AppSectionTypoColor,
+ 		borderTop: `5px solid ${theme.AppBg}`,
+ 		padding: "11px 20px",
+	},
+	BuySection: {
+		borderTop: `5px solid ${theme.palette.secondary[500]}`,
+	},
+	SellSection: {
+		borderTop: `5px solid ${theme.palette.primary[500]}`,
 	},
 });
 

@@ -6,7 +6,7 @@ import styles from './Main.css';
 import FlipMove from 'react-flip-move';
 import cx from 'classnames';
 
-import { Tooltip, Icon, Typography } from 'material-ui';
+import { Paper, Tooltip, Icon, Typography } from 'material-ui';
 import { observer, inject } from 'mobx-react';
 
 import BuySell from './BuySell';
@@ -30,20 +30,25 @@ class MainPage extends Component {
        config : false,
     };
   }
-  componentDidMount = () => {  
-    this.resetWallet();
-    this.orderBookCall();
+  componentDidMount = () => {
 
+
+    clearTimeout(this.props.HomeStore.checkIfRunningTimer);
     clearInterval(this.props.HomeStore.intervalTimer);
-    clearInterval(this.props.HomeStore.checkIfRunningTimer);
     clearInterval(this.props.HomeStore.intervalTimerBook);
 
     this.props.HomeStore.checkIfRunningTimer = null;
     this.props.HomeStore.intervalTimer = null;
+    this.props.HomeStore.intervalTimerBook = null;
+
+    this.orderBookCall();
+    this.resetWallet();
+    this.checkIfRunning();
+
+    
     this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
     this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, this.props.HomeStore.orderBookRate);
 
-    this.checkIfRunning();
   }
 
   checkIfRunning = () => {
@@ -73,18 +78,12 @@ class MainPage extends Component {
     if(data) this.setState({ data });
   }
   orderBookCall = () => {
-  const { coins, userpass, base, maxdecimal } = this.props.HomeStore;
+    ////coinNameFromTicker
   const { HomeStore } = this.props;
-    const wallet = [];
+  const { coins, base } = HomeStore;
     Object.keys(coins).map((k,v)=>{
       const o = coins[k];
-      if(o.coin != base.coin && v < 2 && this.state.currentCoin.mock){
-        this.setState({ currentCoin: o })
-      }
-      coins[k] = Object.assign(o, {name: coinNameFromTicker(o.coin)});
-      wallet.push({ coin: o.coin, smartaddress: o.smartaddress })
-    })
-    wallet.map(o=>{
+      if(o.coin != base.coin){
         HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
           if(res.asks && res.asks[0]){
             coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
@@ -94,22 +93,17 @@ class MainPage extends Component {
           }
           coins[o.coin].orderbook = res;
         });    
+      }
     });    
   }
   resetWallet = () => {
-  const { coins, userpass, base, maxdecimal } = this.props.HomeStore;
   const { HomeStore } = this.props;
-    const wallet = [];
+  const { coins, base, maxdecimal } = HomeStore;
+
     Object.keys(coins).map((k,v)=>{
       const o = coins[k];
-      if(o.coin != base.coin && v < 2 && this.state.currentCoin.mock){
-        this.setState({ currentCoin: o })
-      }
-      coins[k] = Object.assign(o, {name: coinNameFromTicker(o.coin)});
-      wallet.push({ coin: o.coin, smartaddress: o.smartaddress })
-    })
-    wallet.map(o=>{
       HomeStore.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
+        console.log(res);
          if(res.error){
           delete HomeStore.coins[o.coin];
           return false;
@@ -137,7 +131,6 @@ class MainPage extends Component {
     const { coins, base, maxdecimal }= this.props.HomeStore;
     let prop = "", header="", BS,placement;
     const { classes } = this.props;
-
     switch(buyOrSell){
       case 0:
         prop = "bids";
@@ -153,7 +146,7 @@ class MainPage extends Component {
       break;
     }
     return (
-              <div className={cx(styles.section, classes.AppSection, styles.buysell,
+              <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
                 {[styles.buyBox] : buyOrSell == 0 },
                 {[styles.sellBox] : buyOrSell == 1},
                 )}>
@@ -195,13 +188,14 @@ class MainPage extends Component {
                     })}
                    </FlipMove>
                 </div>       
-           </div>
+           </Paper>
    );    
   }
   render() {
     const  { currentCoin } = this.state;
     const { coins, base, maxdecimal }= this.props.HomeStore; 
     const { classes } = this.props;
+
     return (
       <div className={styles.container, styles.container2}>
       <HeaderNav primary="exchange" />
@@ -209,7 +203,7 @@ class MainPage extends Component {
 
         <div className={cx(styles.container2,styles.right_list)}>
            <table className={cx(styles.section,classes.AppSection,styles.r_side_bar)}>   
-            <tr className={cx(styles.tr, styles.section_header, classes.AppSectionHeader)}>
+            <tr className={cx(styles.tr, styles.section_header, classes.AppSectionHeader, classes.AppSectionTypo)}>
               <th className={cx(styles.oneDiv,styles.coin)} onClick={()=>this.sortBy("coin")}>Coin</th>
               <th className={cx(styles.oneDiv,styles.name)} onClick={()=>this.sortBy("name")}>Name</th>
               <th className={cx(styles.oneDiv,styles.price)} onClick={()=>this.sortBy("price")}>Price</th>
@@ -248,9 +242,8 @@ class MainPage extends Component {
                     }}
                   >
                   <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
-                  <td className={cx(styles.oneDiv,styles.name)}>{o.name}</td>
+                  <td className={cx(styles.oneDiv,styles.name)}>{coinNameFromTicker(o.coin)}</td>
                   <td className={cx(styles.oneDiv,styles.price)}>{ zeroGray((price).toFixed(maxdecimal)) }</td>
-                  {/*<td className={cx(styles.oneDiv,styles.volume)}>{zeroGray(volume)}</td>*/}
                   <td className={cx(styles.oneDiv,styles.change,change_cl)}>{change_pref + change+"%"}</td>
                 </tr>
                 )
@@ -262,7 +255,7 @@ class MainPage extends Component {
  	      <div className={styles.container2} style={{flex: "1 1 auto"}}>           
            <div className={cx(styles.section2, styles.bs_bar)}>
               <BuySell baseCoin={base} currentCoin={currentCoin} isBuy/>
-              <BuySell baseCoin={base} currentCoin={currentCoin} isBuy={false} />           
+            <BuySell baseCoin={base} currentCoin={currentCoin} isBuy={false} />           
            </div>
            <div className={cx(styles.section2, styles.bs_bar)}>
              {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.bids) ? this.orderBookDisplay(0) : ""}

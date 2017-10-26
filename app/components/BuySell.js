@@ -3,11 +3,13 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import cx from 'classnames';
-import { Button, TextField } from 'material-ui';
+import { Paper, Button, TextField } from 'material-ui';
 import { inject, observer } from 'mobx-react';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
+
+
 
 const decimals = 2;
 
@@ -109,7 +111,10 @@ class BuySell extends Component {
   	const basevalue = (isBuy) ? baseCoin.balance : currentCoin.balance;
 
     return (
-	      <div className={cx(styles.section, classes.AppSection, styles.buysell)}>
+	      <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
+          {[classes.BuySection]: isBuy},
+          {[classes.SellSection]: !isBuy},
+          )}>
 	         <div className={cx(styles.bs_tr, styles.bs_header,styles.bs_tr_row)}>
 	          <div className={cx(styles.mainHead)}>{`${buyTxt} ${currentCoin.coin}`}</div>
 	          <div className={cx(styles.basevalue)} onClick={()=>{ this._handleFab(100) }} >{basetxt}</div>
@@ -121,7 +126,7 @@ class BuySell extends Component {
               {indicator.map( (o,i)=><Button key={i} fab color={(i%2 == 0) ?  accent : primary} onClick={()=>{ this._handleFab(o) }}>{o}%</Button>)}
 	         </div>
 	         <div className={cx(styles.bs_tr)}><Button raised color={accent} onClick={this._handleBuySell}>{`${buyTxt} ${currentCoin.coin}`}</Button></div>
-	      </div>
+	      </Paper>
     );
   }
 }

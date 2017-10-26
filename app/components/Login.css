@@ -6,6 +6,7 @@
 }
 .AppLogo{
 	margin: 0px auto;
+    flex: 1 1 auto;
 }
 .AppLogoImg{
 	background-image: url('https://i.imgur.com/KyvVIUf.png');

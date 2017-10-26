@@ -57,7 +57,9 @@ class AppMain extends React.Component {
           <div className={classes.root}>
             <MainRoutes />
             <DarkError />
-            <div className={classes.AppBg}></div>
+            <div className={classes.AppBg}>
+              <img className={classes.AppBgImage} src="https://i.imgur.com/MLOlV1Y.png" />
+            </div>
           </div>
         </Provider>
       );
