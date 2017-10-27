@@ -6,6 +6,7 @@ import HeaderNav from './HeaderNav';
 
 import { Paper, Button, Typography } from 'material-ui';
 import { observer, inject } from 'mobx-react';
+import { action } from 'mobx';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
@@ -16,6 +17,14 @@ import { stylesY } from '../utils/constants';
  class BaseSelection extends Component {
   constructor(props){
   	super(props);
+  }
+  @action setBase = (k) => {
+      this.props.HomeStore.base.coin = k;
+      
+
+      const index = HomeStore.enabled_coins.indexOf(base.coin);
+      HomeStore.enabled_coins.splice(index, 1);
+      HomeStore.enabled_coins.unshift(base.coin);
   }
   render() {
 	 const { classes, HomeStore } = this.props;
@@ -28,12 +37,7 @@ import { stylesY } from '../utils/constants';
             <div className={styles.container_buttons} style={{padding: "30px 170px"}}>
               {Object.keys(coins).map((k,v)=>{
                 return(<Button key={k} raised={(base.coin == k)} color="accent" onClick={()=>{
-                  this.props.HomeStore.base.coin = k;
-                  
-
-                  const index = HomeStore.enabled_coins.indexOf(base.coin);
-                  HomeStore.enabled_coins.splice(index, 1);
-                  HomeStore.enabled_coins.unshift(base.coin);
+                  this.setBase(k)
                 }}>{k}</Button>)
               })}
             </div>  

@@ -168,24 +168,28 @@ body{
   display: flex;
   height: 100%;
   width: 100%;
-  background: rgba(255, 46, 46, 0.9);
 
   justify-content: center;
   align-items: center;
   top: 0;
   left: 0;  
   z-index: 100000;
-  
-
 
   animation-name: showUp;
   animation-duration: .3s;
   flex-direction: column;
 }
-.error_header{
+.error_small{
+    padding: 50px;
+    box-shadow: 0 0 10px #525252;
 
+    background: rgba(255, 46, 46, 0.9);  
+}
+.error_small.no_error{
+  background: rgba(73, 247, 52, 0.9);
+}
+.error_header{
     font-size: 35px;
-    margin: 20px;
     font-weight: bold;
 }
 .error_text{
@@ -254,3 +258,21 @@ body{
 table{
   box-shadow: 0 0 10px #d2d2d2;
 }
+.debugboxcontainer{
+  width:  80%;
+}
+.debugbox{
+  margin: 10px;
+  padding: 10px;
+  background: #f1f1f1;
+  box-shadow: 0 0 5px #a7a7a7;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+.inputbox,.outputbox{
+  background: rgba(0,0,0,.1);
+  padding: 5px;
+  margin: 5px;
+}
+.inputbox{ border-left: 4px solid blue; }
+.outputbox{ border-left: 4px solid red; }

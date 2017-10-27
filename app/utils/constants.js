@@ -58,3 +58,15 @@ export const stylesY = theme => ({
 
 export const maxPinLength = 10;
 export const algorithm = 'aes-256-ctr';
+
+export const electrumPorts = {
+	BTC: 50001,
+	LTC: 50012,
+	DASH: 50098,
+	KMD: 50011,
+	HUSH: 50013,
+	REVS: 50050,
+	CHIPS: 50076,
+	MNZ: 50053,
+};
+export const electrumIP = "173.212.225.176";

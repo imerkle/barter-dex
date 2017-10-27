@@ -6,7 +6,7 @@ import AppLogo from './AppLogo';
 import LoadingWaitText from './LoadingWaitText';
 
 import { exec, } from 'child_process';
-import { HOME, marketmakerExe } from '../utils/constants';
+import { HOME, marketmakerExe, electrumIP, electrumPorts } from '../utils/constants';
 import { observer, inject } from 'mobx-react';
 
 
@@ -39,22 +39,24 @@ import { observer, inject } from 'mobx-react';
     clearTimeout(this.userpassTimer);
     this.userpassTimer = null;
   }
-  saveUserpass = () => {
-        this.props.HomeStore.runCommand('enable',{ coin: "" }).then((res) => {
+   saveUserpass = () => {
+    const { HomeStore } = this.props;
+          HomeStore.runCommand('enable',{ coin: "" }).then((res) => {
             const { userpass, mypubkey } = res;
-            this.props.HomeStore.userpass = userpass;
-            this.props.HomeStore.mypubkey = mypubkey;
-            
-            if(!this.once && this.props.HomeStore.enabled_coins){
-              this.props.HomeStore.enabled_coins.map(o=>{
-                this.props.HomeStore.runCommand('enable',{ coin: o},(res)=>{
+
+            HomeStore.setUserpass(userpass, mypubkey);
+
+              HomeStore.enabled_coins.map(o=>{
+                HomeStore.runCommand('enable',{ coin: o}).then((res)=>{
                    if(res.error){
-                      DarkErrorStore.alert(res.error);
+                      //DarkErrorStore.alert(res.error);
+                      if(electrumPorts[o]){
+                        HomeStore.runCommand('electrum',{ coin: o, ipaddr: electrumIP,port: electrumPorts[o] },(res)=>{
+                        });
+                      }
                    }
                 });
               });
-              this.once = true;
-            }
 
             this.props.history.push("/coinSelection");
         }).catch((err) => {

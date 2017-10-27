@@ -19,6 +19,7 @@ export default class Home extends Component {
             <Link to="/mainPage"><Button raised={(primary == "exchange")} color="accent">Exchange</Button></Link>
             <Link to="/wallet"><Button raised={(primary == "wallet")} color="accent" >Wallet</Button></Link>
             <Button color="accent" raised={(primary == "orders")}>Orders</Button>
+            <Link to="/debug"><Button raised={(primary == "debug")} color="accent">Debug</Button></Link>
             <Link to="/settings"><Button raised={(primary == "settings")} color="accent">Settings</Button></Link>
            </div>
         </div>

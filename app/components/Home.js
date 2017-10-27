@@ -9,26 +9,33 @@ import { inject, observer } from 'mobx-react';
 import fs from 'fs';
 import AppLogo from './AppLogo';
 
-@inject('HomeStore') @observer
+@inject('HomeStore','DarkErrorStore') @observer
 class Home extends React.Component {
   constructor(props){
   	super(props);
+
+
+
+    const { HomeStore } = props;
+    clearTimeout(HomeStore.checkIfRunningTimer);
+    clearInterval(HomeStore.intervalTimer);
+    clearInterval(HomeStore.intervalTimerBook);
+
+    HomeStore.checkIfRunningTimer = null;
+    HomeStore.intervalTimer = null;
+    HomeStore.intervalTimerBook = null;
+
+    HomeStore.debuglist = [];
+    HomeStore.coins = {};
+    HomeStore.enabled_coins = [];
+    HomeStore.userpass = null;
+
   } 
   componentDidMount(){
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       this.afterHomeDir();
     });
     exec(`pkill -15 marketmaker`);
-    
-
-    clearTimeout(this.props.HomeStore.checkIfRunningTimer);
-    clearInterval(this.props.HomeStore.intervalTimer);
-    clearInterval(this.props.HomeStore.intervalTimerBook);
-
-    this.props.HomeStore.checkIfRunningTimer = null;
-    this.props.HomeStore.intervalTimer = null;
-    this.props.HomeStore.intervalTimerBook = null;
-
   }
   afterHomeDir = () => {
       fs.exists(`${HOME}marketmaker`, (exists) => {

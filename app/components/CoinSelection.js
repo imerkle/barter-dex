@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 
-import { Paper, Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
+import { Paper, TextField ,Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 
 import { observer, inject } from 'mobx-react';
-import { HOME, ENABLE_COIN, stylesY } from '../utils/constants';
+import { HOME, ENABLE_COIN, stylesY, electrumIP, electrumPorts } from '../utils/constants';
+import { coinNameFromTicker } from '../utils/basic';
 
 import * as CryptoIcon from 'react-cryptocoins';
 import LoadingWaitText from './LoadingWaitText';
@@ -57,17 +58,6 @@ const getCryptoIcon = (coin) => {
 }
 
 const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
-const electrumPorts = {
-	BTC: 50001,
-	LTC: 50012,
-	DASH: 50098,
-	KMD: 50011,
-	HUSH: 50013,
-	REVS: 50050,
-	CHIPS: 50076,
-	MNZ: 50053,
-};
-
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
@@ -79,6 +69,7 @@ const electrumPorts = {
   	this.state = {
   		checked: {},
   		coins: [],
+  		q: "",
   	};
   }
   componentDidMount(){
@@ -87,27 +78,36 @@ const electrumPorts = {
   getCoins = () => {
   	const { HomeStore, DarkErrorStore } = this.props;
 
-	HomeStore.runCommand('getcoins').then((res)=>{
-		if(res.error){
-			DarkErrorStore.alert(res.error);
-			return false;
-		}
-		const c = res.filter(o=>{
-			if(whitelist.indexOf(o.coin) > -1){
-				let isEnabled = false;
-				if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
-					isEnabled = true;
-				}
-				const x = {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance, enabled: isEnabled }
-				if(isEnabled){
-					this.props.HomeStore.coins[o.coin] = x;
-				}
-				console.log(x);
-				return x;
+  	if(!HomeStore.allCoins || HomeStore.allCoins.length < 1){
+		HomeStore.runCommand('getcoins').then((res)=>{
+			if(res.error){
+				DarkErrorStore.alert(res.error);
+				return false;
 			}
-		});
+			HomeStore.allCoins = res;
+			this.setCoins();
+		})
+	}else{
+		this.setCoins();
+	}
+  }
+  setCoins = () => {
+  	const { HomeStore } = this.props;
+	let c = [];
+	HomeStore.allCoins.map(o=>{
+		if(whitelist.indexOf(o.coin) > -1){
+			let isEnabled = false;
+			if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
+				isEnabled = true;
+			}
+			const x = {coin: o.coin, status: o.status,rpc: o.rpc, smartaddress: o.smartaddress, balance: o.balance,txfee: o.txfee, enabled: isEnabled };
+			if(isEnabled){
+				this.props.HomeStore.coins[o.coin] = x;
+			}
+			c.push(x);
+		}
+	});
 		this.setState({ coins: c });
-	})
   }
   saveCoinsinJSON = () => {
   	const new_json = {
@@ -117,18 +117,32 @@ const electrumPorts = {
   }
   render() {
 	const { classes, DarkErrorStore, HomeStore } = this.props;
-
+	const { q } = this.state;
     return (
        <div className={styles.container2}>
        	<HeaderNav />
 		<Paper className={cx(styles.container2,styles.containerbig)}>
 			        	<Typography className={cx(classes.AppSectionTypo)} type="headline" component="h4">Select Coins to Trade</Typography>
 			        	{(this.state.coins.length < 1) ? <LoadingWaitText text="Generating Coin List" /> : ""}
+
+			        	<TextField value={q} label="Search" placeholder="Search" onChange={(e)=>{
+						 	this.setState({ q: e.target.value.toLowerCase() })
+						 }} style={{ margin: "20px" }}/>
 						 <FormGroup className={styles.switchGroup}>
 							 {
-							 	this.state.coins.map((o,i)=>(
+							 	this.state.coins.map((o,i)=>{
+
+							 	if(q.length > 0){
+							 		let isValid = false;
+							 		if(o.coin.toLowerCase().indexOf(q) > -1 || coinNameFromTicker(o.coin).toLowerCase().indexOf(q) > -1 ){
+							 			isValid = true;
+							 		}
+							 		if(!isValid){
+							 			return (null);
+							 		}
+							 	}
+							 	return(
 							 	<div className={styles.switches} key={i}>
-							 		{/*getCryptoIcon(o.coin)*/}
 								 	<div>
 								        <FormControlLabel
 								          control={
@@ -146,7 +160,7 @@ const electrumPorts = {
 									              		if(res.error){
 									              			if(electrumPorts[o.coin]){
 									              				DarkErrorStore.alert("Native Blockchain not available, activating Electrum servers");
-									              				HomeStore.runCommand('electrum',{ coin: o.coin,"ipaddr":"173.212.225.176","port": electrumPorts[o.coin] });
+									              				HomeStore.runCommand('electrum',{ coin: o.coin, ipaddr: electrumIP,port: electrumPorts[o.coin] });
 									              			}else{
 									              				DarkErrorStore.alert("Native Blockchain not available.");
 										              			return false;
@@ -184,7 +198,7 @@ const electrumPorts = {
 								        /> 
 								      </div>	
 							      </div>	
-							 	))
+							 	)})
 							 }
 						 </FormGroup>
 						{/*<Button raised color="primary" onClick={this._handleStartup}>Save</Button>*/}

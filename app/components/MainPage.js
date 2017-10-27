@@ -8,6 +8,7 @@ import cx from 'classnames';
 
 import { Paper, Tooltip, Icon, Typography } from 'material-ui';
 import { observer, inject } from 'mobx-react';
+import { action } from 'mobx';
 
 import BuySell from './BuySell';
 import HeaderNav from './HeaderNav';
@@ -49,17 +50,7 @@ class MainPage extends Component {
     this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, this.props.HomeStore.orderBookRate);
 
   }
-  componentWillUnmount = () => {
-
-
-    clearTimeout(this.props.HomeStore.checkIfRunningTimer);
-    clearInterval(this.props.HomeStore.intervalTimer);
-
-    this.props.HomeStore.checkIfRunningTimer = null;
-    this.props.HomeStore.intervalTimer = null;
-  }  
-
-  checkIfRunning = () => {
+  @action checkIfRunning = () => {
     this.props.HomeStore.isRunning().then((inUse)=>{
       if(!inUse){
         this.props.DarkErrorStore.alert("Marketmaker Stopped Running! ");
@@ -86,14 +77,21 @@ class MainPage extends Component {
     }
     if(data) this.setState({ data });
   }
-  orderBookCall = () => {
+  @action orderBookCall = () => {
     ////coinNameFromTicker
   const { HomeStore } = this.props;
   const { coins, base } = HomeStore;
-    Object.keys(coins).map((k,v)=>{
-      const o = coins[k];
+  const { currentCoin } = this.state;
+  if(!currentCoin) return false;
+  
+    //Object.keys(coins).map((k,v)=>{
+      const o = currentCoin;
       if(o.coin != base.coin){
         HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
+        HomeStore.runCommand("listunspent",{coin: o.coin, address: res.asks[0].address }).then((res)=>{
+        });     
+        HomeStore.runCommand("inventory",{coin: o.coin }).then((res)=>{
+        });     
           if(res.asks && res.asks[0]){
             coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
             coins[o.coin].price = res.asks[0].price;
@@ -103,9 +101,10 @@ class MainPage extends Component {
           coins[o.coin].orderbook = res;
         });    
       }
-    });    
+
+    //});    
   }
-  resetWallet = () => {
+  @action resetWallet = () => {
   const { HomeStore } = this.props;
   const { coins, base, maxdecimal } = HomeStore;
 
@@ -204,8 +203,6 @@ class MainPage extends Component {
     const { coins, base, maxdecimal, enabled_coins }= this.props.HomeStore; 
     const { classes } = this.props;
 
-    console.log(enabled_coins);
-    
     return (
       <div className={styles.container, styles.container2}>
       <HeaderNav primary="exchange" />
@@ -220,9 +217,11 @@ class MainPage extends Component {
               {/*<th className={cx(styles.oneDiv,styles.volume)} onClick={()=>this.sortBy("volume")}>Volume</th>*/}
               <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
             </tr> 
-            {/*<FlipMove duration={750} easing="ease-out">*/}
               {enabled_coins.map( (k,i) =>{
                 const o = coins[k];
+                if(!o){
+                  return (null);
+                }
                 const change = o.change || 0;
                 const price = (o.coin == base.coin) ? 1 : o.price || 0;
                 const volume = o.volume || 0;
@@ -258,7 +257,6 @@ class MainPage extends Component {
                 </tr>
                 )
               })}
-             {/*</FlipMove>*/}
             </table>
       	</div>
 { (this.state.currentCoin) ?

@@ -29,10 +29,12 @@ class HomeStore{
 	@observable url = 'http://127.0.0.1:7783';
 	@observable host = '127.0.0.1';
 	@observable port = 7783;
-	@observable orderBookRate = 2000;
+	@observable orderBookRate = 20000;
+	@observable allCoins = [];
+	@observable debuglist = [];
 
 
-  runCommand = (method, data = {}) => {
+  @action runCommand = (method, data = {}) => {
   	    data.gui = this.gui;
   	    data.method = method;
   	    data.userpass = this.userpass;
@@ -41,7 +43,6 @@ class HomeStore{
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(jsonData),
         };
-        console.log(data);
         return new Promise((resolve, reject) => {
             request(
                 {
@@ -52,7 +53,10 @@ class HomeStore{
                     strictSSL: false,
                     json: true
                 }, (error, response, body) => {
-        		console.log(body);
+                this.debuglist.push({
+                	input: data,
+                	output: body,
+                });
                 if (error) {
                 	console.log(error,data);
                     return reject(error);
@@ -76,5 +80,12 @@ class HomeStore{
 			});
 		});
 	}    
+	@action setUserpass = (userpass, mypubkey) => {
+		this.userpass = userpass;
+		this.mypubkey = mypubkey;
+	}
+	@action setValue = (k, v) => {
+		this[k] = v;
+	}
 }
 export default new HomeStore;

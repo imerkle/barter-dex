@@ -9,7 +9,6 @@ import { Paper, TextField, Typography } from 'material-ui';
 
 import { observer, inject } from 'mobx-react';
 
-
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 
@@ -40,7 +39,7 @@ import { stylesY } from '../utils/constants';
 			<TextField value={orderBookRate} label={`Orderbook Refresh Rate`} placeholder={`Orderbook Refresh Rate`} onChange={(e)=>{
            			const value = e.target.value;
            			if(!isNaN(value) && value >0){
-           				HomeStore.orderBookRate = value;
+           				HomeStore.setValue("orderBookRate",value);
            			}
            		}} />           
 		  </Paper>	

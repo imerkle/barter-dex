@@ -17,6 +17,7 @@ import Wallet from './components/Wallet';
 import CoinSelection from './components/CoinSelection';
 import BaseSelection from './components/BaseSelection';
 import IndicatorSelection from './components/IndicatorSelection';
+import DebugScreen from './components/DebugScreen';
 
 import HomeStore from './store/HomeStore.js';
 import DarkErrorStore from './store/DarkErrorStore.js';
@@ -32,6 +33,7 @@ const stores = {
 const MainRoutes = () => (
      <main>
       <Switch>
+        <Route path="/debug" component={DebugScreen} />
         <Route path="/indicatorSelection" component={IndicatorSelection} />
         <Route path="/baseSelection" component={BaseSelection} />
         <Route path="/coinSelection" component={CoinSelection} />

@@ -123,7 +123,6 @@ class BuySell extends Component {
     const CryptoSVGLogo = CryptoIcon[capitalize(currentCoin.coin)];
     let CoinLogo = (<span></span>);
     if(CryptoSVGLogo){
-      console.log(CryptoSVGLogo);
         CoinLogo = (<CryptoSVGLogo color="#fbbf40" style={{margin: "0px 10px -6px 0px" }} />);
     }
     return (

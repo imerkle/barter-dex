@@ -6,11 +6,11 @@ import HeaderNav from './HeaderNav';
 import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 
-import { FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
+import { Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
-import { inject, observer } from 'mobx-react';
+import { inject, observer, action } from 'mobx-react';
 import { generateQR } from '../utils/basic';
 import { zeroGray } from '../utils/basic.js';
 import AButton from './AButton';
@@ -29,6 +29,9 @@ class Wallet extends Component {
       withdrawValue: "",
       hideZero: false,
   	};	
+  }
+  componentDidMount(){
+    //const { HomeStore } = this.props;
   }
   handleRequestCloseDeposit = () => {
     this.setState({ openDeposit: false });
@@ -130,9 +133,8 @@ class Wallet extends Component {
                           const txid = res.txid; 
                           const txhex = res.hex;
                           HomeStore.runCommand("sendrawtransaction",{coin: coin.coin, signedtx: txhex }).then((res)=>{
-                            console.log(res);
                             coin.balance  = coin.balance - withdrawValue;
-                            DarkErrorStore.alert("Withdrawal completed successfully.\nYour Transaction ID: " + txid);
+                            DarkErrorStore.alert("Withdrawal completed successfully.\nYour Transaction ID: " + txid, true);
                           });
                         }
                         resolve();
@@ -158,7 +160,7 @@ class Wallet extends Component {
          {this.hideZeroBalance()}
          {this.depositWalletDialog()}
          {this.withdrawWalletDialog()}
-         <div className={cx(styles.section, classes.AppSection, styles.w_bar)}>   
+         <Paper className={cx(styles.section, classes.AppSection, styles.w_bar)}>   
             <div className={cx(styles.tr, styles.section_header, classes.AppSectionHeader, classes.AppSectionTypo)}>
               <div className={cx(styles.oneDiv,styles.draw)}>Deposit/Withdraw</div>
               <div className={cx(styles.oneDiv,styles.coin)}>Coin</div>
@@ -202,7 +204,7 @@ class Wallet extends Component {
                 )
                 })}
              </FlipMove>                     
-        </div>
+        </Paper>
        </div>
     );
   }
