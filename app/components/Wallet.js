@@ -6,13 +6,12 @@ import HeaderNav from './HeaderNav';
 import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 
+import { inject, observer, action } from 'mobx-react';
 import { Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
-import { inject, observer, action } from 'mobx-react';
-import { generateQR } from '../utils/basic';
-import { zeroGray } from '../utils/basic.js';
+import { generateQR, zeroGray, coinNameFromTicker } from '../utils/basic.js';
 import AButton from './AButton';
 
 @withStyles(stylesY)
@@ -31,7 +30,7 @@ class Wallet extends Component {
   	};	
   }
   componentDidMount(){
-    //const { HomeStore } = this.props;
+    const { HomeStore } = this.props;
   }
   handleRequestCloseDeposit = () => {
     this.setState({ openDeposit: false });
@@ -93,7 +92,7 @@ class Wallet extends Component {
   withdrawWalletDialog = () => {
     const { coin, openWithdraw, withdrawAddress, withdrawValue } = this.state;
     const { DarkErrorStore, HomeStore } = this.props;
-    const fee = coin.txfee/1000000;
+    const fee = coin.txfee * 0.00000001;
     const maxbal = (coin.balance - fee).toFixed(HomeStore.maxdecimal);
 
     return(
@@ -140,6 +139,7 @@ class Wallet extends Component {
                           HomeStore.runCommand("sendrawtransaction",{coin: coin.coin, signedtx: txhex }).then((res)=>{
                             coin.balance  = coin.balance - withdrawValue;
                             DarkErrorStore.alert("Withdrawal completed successfully.\nYour Transaction ID: " + txid, true);
+                            this.handleRequestCloseWithdraw();
                           });
                         }
                         resolve();
@@ -156,7 +156,8 @@ class Wallet extends Component {
     );
   }  
   render() {
-    const { base, coins, maxdecimal } = this.props.HomeStore;
+    const { HomeStore } = this.props;
+    const { base, coins, maxdecimal } = HomeStore;
     const { hideZero } = this.state;  
     const { classes } = this.props;
     return (
@@ -180,11 +181,16 @@ class Wallet extends Component {
                 if(hideZero && (!o.balance || o.balance == 0)){
                   return null;
                 }
-                const value = o.value || 0;
                 const orders = o.orders || 0;
                 const balance = o.balance || 0;
+                const value = (o.coin == base.coin ) ? 1 * balance :  o.value || 0;
                 return (
-                  <div className={styles.tr} key={o.coin}>
+                  <div className={styles.tr} key={o.coin} onClick={()=>{
+                    HomeStore.runCommand("listunspent",{coin: o.coin, address: o.smartaddress }).then((res)=>{
+                        console.log("yyy");
+                        console.log(res);
+                    });
+                  }}>
                     <div className={cx(styles.oneDiv,styles.draw)}>
                     	<Button raised color="accent" 
                       onClick={()=>{
@@ -201,7 +207,7 @@ class Wallet extends Component {
                       >Withdraw</Button>
                     </div>
                     <div className={cx(styles.oneDiv,styles.coin)}>{o.coin}</div>
-                    <div className={cx(styles.oneDiv,styles.name)}>{o.name}</div>
+                    <div className={cx(styles.oneDiv,styles.name)}>{coinNameFromTicker(o.coin)}</div>
                     <div className={cx(styles.oneDiv,styles.price)}>{zeroGray((balance).toFixed(maxdecimal))}</div>
                     <div className={cx(styles.oneDiv,styles.volume)}>{zeroGray((orders).toFixed(maxdecimal))}</div>
                     <div className={cx(styles.oneDiv,styles.change)}>{zeroGray((value).toFixed(maxdecimal))}</div>

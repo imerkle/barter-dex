@@ -308,6 +308,9 @@ export const coinNameFromTicker = (coin) => {
     case 'ZAR':
         name = 'South African Rand';
         break;
+    case 'CHIPS':
+        name = 'Chips';
+        break;
 
     }
     return name;

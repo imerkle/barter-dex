@@ -36,12 +36,16 @@ body{
 .price{ flex: 5% 1; }
 .volume{ flex: 5% 1;  }
 .total{ flex: 5% 1;  }
+.change{ flex: 5% 1;  }
 .utxos{ flex: 0 1 auto; width: 10%;  }
 
-.r_side_bar .price{ min-width: 65px; }
-.r_side_bar .change{ min-width: 25px; }
+.r_side_bar .price{ min-width: 105px; }
+.r_side_bar .change{ min-width: 65px; }
 .r_side_bar .name{ min-width: 65px; }
 .r_side_bar .coin{ min-width: 25px; }
+.r_side_bar .section_header{ padding: 10px!important; }
+.r_side_bar .oneDiv{ text-align: left; }
+
 .section{
    border-radius: 5px;
    overflow: hidden;
@@ -126,7 +130,22 @@ body{
 .basetr{
   cursor: default;
   background: rgba(175, 175, 175, 0.1);
-  padding: 30px 10px;
+  padding: 20px 10px;
+  border-bottom: 1px solid #d6d0d0;
+}
+.tr.rsearch,.tr.rsearch:hover{
+  background: none;
+  cursor: default;
+}
+.tr.rsearch.rsearch_hidden{
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+  transition: .15s linear all;  
+}
+.r_side_bar:hover .tr.rsearch.rsearch_hidden{
+  height:auto;
+  padding: 10px;
 }
 .bs_order_header{
   background: rgba(0,0,0,.1);

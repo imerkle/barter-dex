@@ -14,7 +14,6 @@ import AButton from './AButton';
 
 
 
-const decimals = 2;
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
@@ -24,31 +23,55 @@ class BuySell extends Component {
   	super(props);
     this.BS = (props.isBuy) ? "buyState" : "sellState";
   }
+  _inventory = (coin) => {
+    const { HomeStore } = this.props;
+
+      return new Promise((resolve, reject) =>  HomeStore.runCommand("inventory",{ coin: coin }).then((result) => {
+          if (result.alice.length < 3) {
+            const address = result.alice[0].address;
+            HomeStore.runCommand("withdraw",{ outputs: [{ [address]: 0.001 }, { [address]: 0.002 }] , coin: result.alice[0].coin }).then((withdrawResult) => {
+                  HomeStore.runCommand("sendrawtransaction",{ coin, signedtx: withdrawResult.hex }).then(() => {
+                      resolve(result);
+                  })
+              })
+          } else {
+              resolve(result);
+          }
+      }).catch((error) => {
+          console.log(`error inventory ${coin}`)
+          reject(error);
+      }));
+  }
   _handleBuySell = () => {
   	 const { isBuy, baseCoin, currentCoin, HomeStore, DarkErrorStore } = this.props;
 
+    let volume,method; 
     return new Promise((resolve, reject) => {
-      if(isBuy){
+
           //we buying my current or we buying api base
           //api rel = currency paying with  = my base
-          //api base = currency i wanna buy  = my current
-        setTimeout(resolve, 1000);
-            HomeStore.runCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
-              if(res.error){
-                DarkErrorStore.alert(res.error);
-              }
-                resolve();
-            });
+          //api base = currency i wanna buy  = my current      
+      if(isBuy){
+         method = "buy";
+         volume = { relvolume: HomeStore[this.BS].total };
         }else{
-            HomeStore.runCommand("sell",{base: baseCoin.coin, rel: currentCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
-              if(res.error){
-                DarkErrorStore.alert(res.error);
-              }
-                resolve();
-            });
+          method = "sell";
+          volume = { basevolume: HomeStore[this.BS].amount };
         }
+       this._inventory(baseCoin.coin).then(() => {
+          HomeStore.runCommand(method, {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...volume  }).then((res)=>{
+            if(res.error){
+              DarkErrorStore.alert(res.error);
+            }
+              resolve();
+          });
+       });
+
     });          
-  }  
+  }
+    fixDecimal = (n) =>{
+      return +n.toFixed(this.props.HomeStore.maxdecimal)
+    }  
   _handleFab = (percent) => {
     const { isBuy, baseCoin, currentCoin, HomeStore } = this.props;
   	const balance = (isBuy) ? baseCoin.balance : currentCoin.balance;
@@ -58,11 +81,11 @@ class BuySell extends Component {
     let amount,total;
   	if(isNaN(price)) return false;
     if(isBuy){
-      total = (percent / 100  * balance);
-      amount =  (total / price);
+      total = this.fixDecimal(percent / 100  * balance);
+      amount =  this.fixDecimal(total / price);
     }else{
-      amount = (percent / 100  * balance);
-      total =  (amount* price);
+      amount = this.fixDecimal(percent / 100  * balance);
+      total =  this.fixDecimal(amount* price);
     }
     
     HomeStore[this.BS].total = total;
@@ -85,7 +108,7 @@ class BuySell extends Component {
       HomeStore[this.BS].price = price
       return false;
     };
-    const total =  ( amount * price);   
+    const total =  this.fixDecimal( amount * price);   
 
     HomeStore[this.BS].total = total;
     HomeStore[this.BS].price = price;
@@ -100,7 +123,7 @@ class BuySell extends Component {
       //this.setState({ amount })
       return false;
     };
-    const total =  ( amount * price);   
+    const total = this.fixDecimal( amount * price );   
 
     HomeStore[this.BS].total = total;
     HomeStore[this.BS].amount = amount;

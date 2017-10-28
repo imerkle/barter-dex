@@ -53,6 +53,9 @@ class HomeStore{
                     strictSSL: false,
                     json: true
                 }, (error, response, body) => {
+                console.log(data);
+                console.log(body);
+                if(this.debuglist.length > 20) this.debuglist = [];
                 this.debuglist.push({
                 	input: data,
                 	output: body,

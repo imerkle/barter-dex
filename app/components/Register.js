@@ -35,7 +35,7 @@ class Register extends Component {
     //const cmd = 'echo "export userpass=\"`./inv | cut -d \"\\"\" -f 4`\""';
     this.props.HomeStore.passphrase = this.state.passphrase;
 
-    if(this.state.passphrase != this.state.passphrase_rp){
+    if(this.state.passphrase != this.state.passphrase_rp.replace(/^\s+|\s+$/g, '')){
       DarkErrorStore.alert("Repeat Passphrase do not match!");
       return false;
     }else{
@@ -61,6 +61,11 @@ class Register extends Component {
               margin="normal"
                 label="Passphrase Repeat"
                 InputProps={{ placeholder: 'Passphrase Repeat' }}
+                onKeyUp={(e)=>{ 
+                  if (e.key === 'Enter') {
+                    this._handleRegister();
+                  }                  
+                }}
                 onChange={(e)=>{
                   this.setState({ passphrase_rp: e.target.value }); 
                 }}

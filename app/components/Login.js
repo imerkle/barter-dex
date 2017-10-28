@@ -18,7 +18,12 @@ class Login extends Component {
    super(props)
   }
   _handleChange = (e) => {
-  	this.props.HomeStore.passphrase = e.target.value;
+    this.props.HomeStore.passphrase = e.target.value;
+  }
+  _handleKeyUp = (e) => {
+    if (e.key === 'Enter') {
+      this._handleLogin();
+    }    
   }
   _handleLogin = () => {
   	this.props.history.push("/startup");
@@ -36,7 +41,8 @@ class Login extends Component {
         <AppLogo />
 		    <TextField
 		          value={passphrase}
-		          onChange={this._handleChange}
+              onChange={this._handleChange}
+		          onKeyUp={this._handleKeyUp}
 		          margin="normal"
           		  label="Passphrase"
           		  InputProps={{ placeholder: 'Passphrase' }}		          

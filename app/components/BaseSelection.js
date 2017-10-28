@@ -19,12 +19,11 @@ import { stylesY } from '../utils/constants';
   	super(props);
   }
   @action setBase = (k) => {
-      this.props.HomeStore.base.coin = k;
-      
-
-      const index = HomeStore.enabled_coins.indexOf(base.coin);
+      const { HomeStore }   = this.props;
+      HomeStore.base.coin = k;
+      const index = HomeStore.enabled_coins.indexOf(HomeStore.base.coin);
       HomeStore.enabled_coins.splice(index, 1);
-      HomeStore.enabled_coins.unshift(base.coin);
+      HomeStore.enabled_coins.unshift(HomeStore.base.coin);
   }
   render() {
 	 const { classes, HomeStore } = this.props;

@@ -6,7 +6,7 @@ import styles from './Main.css';
 import FlipMove from 'react-flip-move';
 import cx from 'classnames';
 
-import { Paper, Tooltip, Icon, Typography } from 'material-ui';
+import { TextField, Paper, Tooltip, Icon, Typography } from 'material-ui';
 import { observer, inject } from 'mobx-react';
 import { action } from 'mobx';
 
@@ -28,6 +28,7 @@ class MainPage extends Component {
     this.state = {
        currentCoin: false,
        config : false,
+       q: "",
     };
   }
   componentDidMount = () => {
@@ -87,11 +88,8 @@ class MainPage extends Component {
     //Object.keys(coins).map((k,v)=>{
       const o = currentCoin;
       if(o.coin != base.coin){
-        HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
-        HomeStore.runCommand("listunspent",{coin: o.coin, address: res.asks[0].address }).then((res)=>{
-        });     
-        HomeStore.runCommand("inventory",{coin: o.coin }).then((res)=>{
-        });     
+        HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{ 
+          console.log(res);
           if(res.asks && res.asks[0]){
             coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
             coins[o.coin].price = res.asks[0].price;
@@ -136,7 +134,7 @@ class MainPage extends Component {
   orderBookDisplay = (buyOrSell) => {
     const  { currentCoin } = this.state;
     const { coins, base, maxdecimal }= this.props.HomeStore;
-    let prop = "", header="", BS,placement;
+    let prop = "", header="", BS,placement, obook;
     const { classes } = this.props;
     switch(buyOrSell){
       case 0:
@@ -144,12 +142,14 @@ class MainPage extends Component {
         header = "Buy";
         BS = "sellState";
         placement="top";
+        obook = coins[currentCoin.coin].orderbook[prop].slice(0).reverse();
       break;
       case 1:
         prop = "asks";
         header = "Sell";
         BS = "buyState";
         placement="bottom";
+        obook = coins[currentCoin.coin].orderbook[prop];
       break;
     }
     return (
@@ -168,7 +168,7 @@ class MainPage extends Component {
                     <div className={cx(styles.oneDiv,styles.utxos)}>{`Utxos`}</div>
                   </div> 
                   <FlipMove duration={750} easing="ease-out">
-                    {coins[currentCoin.coin].orderbook[prop].map( (o,i) =>{
+                    {obook.map( (o,i) =>{
                       const amt = o.maxvolume.toFixed(maxdecimal);
                       const total = (o.price * amt).toFixed(maxdecimal);
                       const tooltip_title = o.address; 
@@ -199,7 +199,7 @@ class MainPage extends Component {
    );    
   }
   render() {
-    const  { currentCoin } = this.state;
+    const  { currentCoin, q } = this.state;
     const { coins, base, maxdecimal, enabled_coins }= this.props.HomeStore; 
     const { classes } = this.props;
 
@@ -217,15 +217,32 @@ class MainPage extends Component {
               {/*<th className={cx(styles.oneDiv,styles.volume)} onClick={()=>this.sortBy("volume")}>Volume</th>*/}
               <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
             </tr> 
+            <tr className={cx(styles.tr,styles.rsearch,
+              {[styles.rsearch_hidden]: (q.length < 1)})}>
+             <TextField value={q} placeholder="Search" onChange={(e)=>{
+              this.setState({ q: e.target.value.toLowerCase() })
+             }} fullWidth />
+            </tr> 
               {enabled_coins.map( (k,i) =>{
                 const o = coins[k];
                 if(!o){
                   return (null);
                 }
+                const coinname = coinNameFromTicker(o.coin);
+
+                if(q.length > 0){
+                  let isValid = false;
+                  if(o.coin.toLowerCase().indexOf(q) > -1 || coinname.toLowerCase().indexOf(q) > -1 ){
+                    isValid = true;
+                  }
+                  if(!isValid){
+                    return (null);
+                  }
+                }
+
                 const change = o.change || 0;
                 const price = (o.coin == base.coin) ? 1 : o.price || 0;
                 const volume = o.volume || 0;
-
                 let change_cl="",change_pref="";
                 if(change > 0){
                   change_pref = "+";
@@ -236,7 +253,7 @@ class MainPage extends Component {
                 }else{
                   change_pref = "";
                   change_cl = styles.nothing;
-                }
+                } 
 
                 return (
                 <tr className={cx(styles.tr,
@@ -251,7 +268,7 @@ class MainPage extends Component {
                     }}
                   >
                   <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
-                  <td className={cx(styles.oneDiv,styles.name)}>{coinNameFromTicker(o.coin)}</td>
+                  <td className={cx(styles.oneDiv,styles.name)}>{coinname}</td>
                   <td className={cx(styles.oneDiv,styles.price)}>{ zeroGray((price).toFixed(maxdecimal)) }</td>
                   <td className={cx(styles.oneDiv,styles.change,change_cl)}>{change_pref + change+"%"}</td>
                 </tr>
