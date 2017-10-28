@@ -27,7 +27,7 @@ class BuySell extends Component {
     const { HomeStore } = this.props;
 
       return new Promise((resolve, reject) =>  HomeStore.runCommand("inventory",{ coin: coin }).then((result) => {
-          if (result.alice.length < 3) {
+          if (result.alice.length < 3 && result.alice[0]) {
             const address = result.alice[0].address;
             HomeStore.runCommand("withdraw",{ outputs: [{ [address]: 0.001 }, { [address]: 0.002 }] , coin: result.alice[0].coin }).then((withdrawResult) => {
                   HomeStore.runCommand("sendrawtransaction",{ coin, signedtx: withdrawResult.hex }).then(() => {

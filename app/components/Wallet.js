@@ -7,13 +7,22 @@ import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 
 import { inject, observer, action } from 'mobx-react';
-import { Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
+import { Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 import { generateQR, zeroGray, coinNameFromTicker } from '../utils/basic.js';
 import AButton from './AButton';
 
+
+const labelDisp = (label, val) => {
+  return (
+    <div className={styles.tr}>
+      <div className={styles.label}>{label}</div>
+      <div className={styles.labelval}>{val}</div>
+     </div>
+    )
+}
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore') @observer
 class Wallet extends Component {
@@ -27,6 +36,7 @@ class Wallet extends Component {
       withdrawAddress: "",
       withdrawValue: "",
       hideZero: false,
+      isHidden: false,
   	};	
   }
   componentDidMount(){
@@ -154,11 +164,11 @@ class Wallet extends Component {
           </DialogActions>
         </Dialog>  
     );
-  }  
+  }
   render() {
     const { HomeStore } = this.props;
     const { base, coins, maxdecimal } = HomeStore;
-    const { hideZero } = this.state;  
+    const { coin, hideZero, inv,unspent, isHidden } = this.state;  
     const { classes } = this.props;
     return (
        <div className={styles.container2}>
@@ -185,10 +195,17 @@ class Wallet extends Component {
                 const balance = o.balance || 0;
                 const value = (o.coin == base.coin ) ? 1 * balance :  o.value || 0;
                 return (
-                  <div className={styles.tr} key={o.coin} onClick={()=>{
-                    HomeStore.runCommand("listunspent",{coin: o.coin, address: o.smartaddress }).then((res)=>{
-                        console.log("yyy");
-                        console.log(res);
+                <div key={o.coin}>
+                  <div className={styles.tr} onClick={()=>{
+                    if(coin.coin == o.coin) {
+                      this.setState({ isHidden: !isHidden });
+                      return false;
+                    }
+
+                    HomeStore.runCommand("listunspent",{coin: o.coin, address: o.smartaddress }).then((unspentres)=>{
+                      HomeStore.runCommand("inventory",{coin: o.coin }).then((invres)=>{
+                        this.setState({ inv: invres, unspent: unspentres, coin: o })
+                      });
                     });
                   }}>
                     <div className={cx(styles.oneDiv,styles.draw)}>
@@ -211,6 +228,40 @@ class Wallet extends Component {
                     <div className={cx(styles.oneDiv,styles.price)}>{zeroGray((balance).toFixed(maxdecimal))}</div>
                     <div className={cx(styles.oneDiv,styles.volume)}>{zeroGray((orders).toFixed(maxdecimal))}</div>
                     <div className={cx(styles.oneDiv,styles.change)}>{zeroGray((value).toFixed(maxdecimal))}</div>
+                  </div>
+                    { (o.coin == coin.coin && inv && unspent) ? 
+                      <div className={cx(styles.container, {
+                        [styles.noHeight] : isHidden,
+                      })}>
+                      <div className={styles.col}>
+                        <Typography className={cx(classes.AppSectionTypo)}>Inventory</Typography>
+                        {inv.alice.map(o=>{
+                          return (
+                          <div className={styles.invdisp}>
+                            {labelDisp("Address",o.address)}
+                            {labelDisp("Value 1",o.value  * 0.00000001  + " " + coin.coin)}
+                            {labelDisp("Value 2",o.value2 * 0.00000001  + " " + coin.coin)}
+                            {labelDisp("Txid",o.txid)}
+                            {labelDisp("Txid2",o.txid2)}
+                          </div>
+                          )
+                        })}
+                      </div>
+                      <div className={styles.col}>
+                        <Typography className={cx(classes.AppSectionTypo)}>Unspent Transactions {unspent.length} </Typography>
+                        {unspent.map(o=>{
+                          return (
+                          <div className={styles.invdisp}>
+                            {labelDisp("Tx Hash",o.tx_hash)}
+                            {labelDisp("value", (parseFloat(o.value) * 0.00000001) +" "+coin.coin)}
+                          </div>
+                          )
+                        })}
+                      </div>
+
+                      </div>
+                      : ""
+                    }
                   </div>
                 )
                 })}
