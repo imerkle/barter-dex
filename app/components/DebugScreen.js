@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 
-import { Paper, Typography } from 'material-ui';
+import { Paper, Typography, Button } from 'material-ui';
 import { observer, inject } from 'mobx-react';
 
 import { withStyles } from 'material-ui/styles';
@@ -24,7 +24,11 @@ import { stylesY } from '../utils/constants';
        <div className={styles.container2}>
         <HeaderNav primary="debug" />
         <Paper className={styles.container2} style={{margin: "0 auto"}}>
-           <Typography className={classes.AppSectionTypo} type="headline" component="h4">Console Debug</Typography>
+           <Typography className={classes.AppSectionTypo} type="headline" component="h4">Console Debug
+           <Button color="accent" onClick={()=>{
+            this.props.HomeStore.setValue("debuglist",[]);
+           }}>Clear</Button>
+           </Typography>
             <div className={styles.debugboxcontainer}> 
               {debuglist.map( (o,i)=>{
                   return(

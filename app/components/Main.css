@@ -273,6 +273,8 @@ table{
   background: rgba(0,0,0,.1);
   padding: 5px;
   margin: 5px;
+  max-height: 250px;
+  overflow: auto;
 }
 .inputbox{ border-left: 4px solid blue; }
 .outputbox{ border-left: 4px solid red; }

@@ -68,6 +68,8 @@ class Wallet extends Component {
           <DialogContent>
             <DialogContentText>
               Deposit only {coin.coin} to this Address.
+              <br />
+              Note: You must have atleast two deposits in order to trade.
             </DialogContentText>
             <canvas id="QRW" className={styles.canvas}></canvas>                          
             <TextField
@@ -91,13 +93,16 @@ class Wallet extends Component {
   withdrawWalletDialog = () => {
     const { coin, openWithdraw, withdrawAddress, withdrawValue } = this.state;
     const { DarkErrorStore, HomeStore } = this.props;
+    const fee = coin.txfee/1000000;
+    const maxbal = (coin.balance - fee).toFixed(HomeStore.maxdecimal);
+
     return(
         <Dialog open={openWithdraw} onRequestClose={this.handleRequestCloseWithdraw}>
           <DialogTitle>Withdraw</DialogTitle>
           <DialogContent>
             <DialogContentText>
               Withdraw {coin.coin} to this Address 
-              <span className={styles.hint} onClick={()=>{ this.setState({ withdrawValue: coin.balance  }) }}> ( Max: {coin.balance}) </span>
+              <span className={styles.hint} onClick={()=>{ this.setState({ withdrawValue: maxbal  }) }}> ( Max: { maxbal }) </span>
             </DialogContentText>
             <TextField
               autoFocus

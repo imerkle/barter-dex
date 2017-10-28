@@ -34,7 +34,6 @@ class BuySell extends Component {
           //api base = currency i wanna buy  = my current
         setTimeout(resolve, 1000);
             HomeStore.runCommand("buy",{base: currentCoin.coin, rel: baseCoin.coin, relvolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
-              console.log(res);
               if(res.error){
                 DarkErrorStore.alert(res.error);
               }
@@ -42,7 +41,6 @@ class BuySell extends Component {
             });
         }else{
             HomeStore.runCommand("sell",{base: baseCoin.coin, rel: currentCoin.coin, basevolume: HomeStore[this.BS].total, price: HomeStore[this.BS].price  }).then((res)=>{
-              console.log(res);
               if(res.error){
                 DarkErrorStore.alert(res.error);
               }

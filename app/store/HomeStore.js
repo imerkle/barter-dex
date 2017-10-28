@@ -29,7 +29,7 @@ class HomeStore{
 	@observable url = 'http://127.0.0.1:7783';
 	@observable host = '127.0.0.1';
 	@observable port = 7783;
-	@observable orderBookRate = 20000;
+	@observable orderBookRate = 5000;
 	@observable allCoins = [];
 	@observable debuglist = [];
 
