@@ -203,6 +203,9 @@ class Wallet extends Component {
                     }
 
                     HomeStore.runCommand("listunspent",{coin: o.coin, address: o.smartaddress }).then((unspentres)=>{
+                      HomeStore.runCommand("getutxos",{coin: o.coin }).then((utxores)=>{
+                        console.log(utxores)
+                      });
                       HomeStore.runCommand("inventory",{coin: o.coin }).then((invres)=>{
                         this.setState({ inv: invres, unspent: unspentres, coin: o })
                       });

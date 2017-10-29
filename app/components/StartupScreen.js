@@ -6,7 +6,7 @@ import AppLogo from './AppLogo';
 import LoadingWaitText from './LoadingWaitText';
 
 import { exec, } from 'child_process';
-import { HOME, marketmakerExe, electrumIP, electrumPorts } from '../utils/constants';
+import { UHOME,HOME, marketmakerExe, electrumIP, electrumPorts } from '../utils/constants';
 import { observer, inject } from 'mobx-react';
 
 
@@ -57,6 +57,10 @@ import { observer, inject } from 'mobx-react';
                    }
                 });
               });
+              if(HomeStore.enabled_coins[0]){
+                HomeStore.base = {coin: HomeStore.enabled_coins[0]};
+              }
+              
 
             this.props.history.push("/coinSelection");
         }).catch((err) => {
@@ -72,7 +76,7 @@ import { observer, inject } from 'mobx-react';
     const options = JSON.stringify({
         gui: gui,
         client: 1,
-        userhome: HOME,
+        userhome: UHOME,
         passphrase: passphrase,
         coins: available_coins,
     });

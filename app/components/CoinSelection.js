@@ -170,6 +170,10 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 									              		HomeStore.enabled_coins.push(o.coin);
 									              		HomeStore.makeUnique();
 
+            											if(HomeStore.enabled_coins[0]){
+										                	HomeStore.base = {coin: HomeStore.enabled_coins[0]};
+										              	}									              		
+
 									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })
 									              	});
@@ -182,10 +186,14 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 									              		HomeStore.enabled_coins.remove(o.coin);
 									              		delete HomeStore.coins[o.coin];
 									              		HomeStore.makeUnique();
+
+             											if(HomeStore.enabled_coins[0]){
+										                	HomeStore.base = {coin: HomeStore.enabled_coins[0]};
+										              	}
 									              		
 									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })
-									              	});								              		
+									              	});									              	
 								              	}
 								          	  }}
 									         classes={{

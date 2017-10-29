@@ -26,30 +26,34 @@ class MainPage extends Component {
     super(props);
 
     this.state = {
-       currentCoin: false,
        config : false,
        q: "",
     };
   }
   componentDidMount = () => {
 
+    const { HomeStore }  = this.props;
 
-    clearTimeout(this.props.HomeStore.checkIfRunningTimer);
-    clearInterval(this.props.HomeStore.intervalTimer);
-    clearInterval(this.props.HomeStore.intervalTimerBook);
+    clearTimeout(HomeStore.checkIfRunningTimer);
+    clearInterval(HomeStore.intervalTimer);
+    clearInterval(HomeStore.intervalTimerBook);
 
-    this.props.HomeStore.checkIfRunningTimer = null;
-    this.props.HomeStore.intervalTimer = null;
-    this.props.HomeStore.intervalTimerBook = null;
+    HomeStore.checkIfRunningTimer = null;
+    HomeStore.intervalTimer = null;
+    HomeStore.intervalTimerBook = null;
 
-    this.orderBookCall();
+    this.myorderbook();
     this.resetWallet();
     this.checkIfRunning();
 
 
-    this.props.HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
-    this.props.HomeStore.intervalTimerBook = setInterval(this.orderBookCall, this.props.HomeStore.orderBookRate);
-
+    HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
+  }
+  myorderbook =  () => {
+    const { HomeStore }  = this.props;
+    
+    HomeStore.orderBookCall();
+    HomeStore.intervalTimerBook = setInterval(HomeStore.orderBookCall, HomeStore.orderBookRate);
   }
   @action checkIfRunning = () => {
     this.props.HomeStore.isRunning().then((inUse)=>{
@@ -77,30 +81,6 @@ class MainPage extends Component {
       break;
     }
     if(data) this.setState({ data });
-  }
-  @action orderBookCall = () => {
-    ////coinNameFromTicker
-  const { HomeStore } = this.props;
-  const { coins, base } = HomeStore;
-  const { currentCoin } = this.state;
-  if(!currentCoin) return false;
-  
-    //Object.keys(coins).map((k,v)=>{
-      const o = currentCoin;
-      if(o.coin != base.coin){
-        HomeStore.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{ 
-          console.log(res);
-          if(res.asks && res.asks[0]){
-            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
-            coins[o.coin].price = res.asks[0].price;
-          }else{
-            coins[o.coin].value = coins[o.coin].balance;
-          }
-          coins[o.coin].orderbook = res;
-        });    
-      }
-
-    //});    
   }
   @action resetWallet = () => {
   const { HomeStore } = this.props;
@@ -132,9 +112,8 @@ class MainPage extends Component {
     })      
   }
   orderBookDisplay = (buyOrSell) => {
-    const  { currentCoin } = this.state;
-    const { coins, base, maxdecimal }= this.props.HomeStore;
-    let prop = "", header="", BS,placement, obook;
+    const { coins, base, maxdecimal, obook, currentCoin }= this.props.HomeStore;
+    let prop = "", header="", BS,placement,orbook;
     const { classes } = this.props;
     switch(buyOrSell){
       case 0:
@@ -142,14 +121,14 @@ class MainPage extends Component {
         header = "Buy";
         BS = "sellState";
         placement="top";
-        obook = coins[currentCoin.coin].orderbook[prop].slice(0).reverse();
+        orbook = obook[prop].slice(0).reverse();
       break;
       case 1:
         prop = "asks";
         header = "Sell";
         BS = "buyState";
         placement="bottom";
-        obook = coins[currentCoin.coin].orderbook[prop];
+        orbook = obook[prop];
       break;
     }
     return (
@@ -168,7 +147,7 @@ class MainPage extends Component {
                     <div className={cx(styles.oneDiv,styles.utxos)}>{`Utxos`}</div>
                   </div> 
                   <FlipMove duration={750} easing="ease-out">
-                    {obook.map( (o,i) =>{
+                    {orbook.map( (o,i) =>{
                       const amt = o.maxvolume.toFixed(maxdecimal);
                       const total = (o.price * amt).toFixed(maxdecimal);
                       const tooltip_title = o.address; 
@@ -199,8 +178,8 @@ class MainPage extends Component {
    );    
   }
   render() {
-    const  { currentCoin, q } = this.state;
-    const { coins, base, maxdecimal, enabled_coins }= this.props.HomeStore; 
+    const  { q } = this.state;
+    const { coins, base, maxdecimal, enabled_coins, obook, currentCoin }= this.props.HomeStore; 
     const { classes } = this.props;
 
     return (
@@ -264,7 +243,7 @@ class MainPage extends Component {
                       if(o.coin == base.coin){
                         return false;
                       }
-                      this.setState({ currentCoin: o });
+                      this.props.HomeStore.setValue("currentCoin",o);
                     }}
                   >
                   <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
@@ -276,15 +255,15 @@ class MainPage extends Component {
               })}
             </table>
       	</div>
-{ (this.state.currentCoin) ?
+{ (currentCoin) ?
  	      <div className={styles.container2} style={{flex: "1 1 auto"}}>           
            <div className={cx(styles.section2, styles.bs_bar)}>
               <BuySell baseCoin={base} currentCoin={currentCoin} isBuy/>
             <BuySell baseCoin={base} currentCoin={currentCoin} isBuy={false} />           
            </div>
            <div className={cx(styles.section2, styles.bs_bar)}>
-             {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.bids) ? this.orderBookDisplay(0) : ""}
-             {(coins[currentCoin.coin] && coins[currentCoin.coin].orderbook && coins[currentCoin.coin].orderbook.asks) ? this.orderBookDisplay(1) : ""}
+             {(coins[currentCoin.coin] && obook && obook.bids) ? this.orderBookDisplay(0) : ""}
+             {(coins[currentCoin.coin] && obook && obook.asks) ? this.orderBookDisplay(1) : ""}
            </div>
         </div>
       : 

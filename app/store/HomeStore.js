@@ -9,6 +9,7 @@ class HomeStore{
 	@observable enabled_coins = [];
 	@observable coins = {};
 	@observable base = { coin: "BTC", balance: 0, };
+	@observable currentCoin = false;
 	@observable buyState = {
 		price: "",
 		amount: "",
@@ -29,9 +30,10 @@ class HomeStore{
 	@observable url = 'http://127.0.0.1:7783';
 	@observable host = '127.0.0.1';
 	@observable port = 7783;
-	@observable orderBookRate = 5000;
+	@observable orderBookRate = 6000;
 	@observable allCoins = [];
 	@observable debuglist = [];
+	@observable obook = [];
 
 
   @action runCommand = (method, data = {}) => {
@@ -74,6 +76,29 @@ class HomeStore{
 		})
 		this.enabled_coins = uniqueArray;
 	} 
+	  @action orderBookCall = () => {
+
+		  const { coins, base , currentCoin} = this;
+		  if(!currentCoin) return false;
+
+	      const o = currentCoin;
+	      if(o.coin != base.coin){
+	        this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
+	          if(res.asks && res.asks[0]){
+	            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
+	            coins[o.coin].price = res.asks[0].price;
+	          }else{
+	            coins[o.coin].value = coins[o.coin].balance;
+	          }
+	          const obook = res;
+	          obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
+	          obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
+	          
+	          this.obook = obook;
+	        });    
+	      }
+	  }
+
 	isRunning = () => {
 		return new Promise((resolve, reject) => {
 			tcpPortUsed.check(this.port, this.host).then(function(inUse) {

@@ -35,7 +35,10 @@ class Home extends React.Component {
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       this.afterHomeDir();
     });
-    exec(`pkill -15 marketmaker`);
+  }
+  stopMarketmaker = () => {
+    exec(`pkill -15 marketmaker`);    
+    this.props.DarkErrorStore.alert("Marketmaker Killed",true);
   }
   afterHomeDir = () => {
       fs.exists(`${HOME}marketmaker`, (exists) => {
@@ -85,6 +88,9 @@ class Home extends React.Component {
               this.props.history.push('/register');
             }}>Register</Button>
         </Paper>
+           <Button color="accent" onClick={()=>{
+              this.stopMarketmaker();
+            }}>Stop Marketmaker</Button>
       </div>
     );
   }
