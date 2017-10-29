@@ -91,8 +91,8 @@ class HomeStore{
 	            coins[o.coin].value = coins[o.coin].balance;
 	          }
 	          const obook = res;
-	          obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
-	          obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
+	          //obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
+	          //obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
 	          
 	          this.obook = obook;
 	        });    
