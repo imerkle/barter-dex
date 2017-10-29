@@ -30,7 +30,7 @@ class HomeStore{
 	@observable url = 'http://127.0.0.1:7783';
 	@observable host = '127.0.0.1';
 	@observable port = 7783;
-	@observable orderBookRate = 6000;
+	@observable orderBookRate = 4000;
 	@observable allCoins = [];
 	@observable debuglist = [];
 	@observable obook = [];
@@ -55,8 +55,8 @@ class HomeStore{
                     strictSSL: false,
                     json: true
                 }, (error, response, body) => {
-                console.log(data);
-                console.log(body);
+                //console.log(data);
+                //console.log(body);
                 if(this.debuglist.length > 20) this.debuglist = [];
                 this.debuglist.push({
                 	input: data,
@@ -84,6 +84,16 @@ class HomeStore{
 	      const o = currentCoin;
 	      if(o.coin != base.coin){
 	        this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
+
+
+	          res.bids.map(o=>{
+	          	this.runCommand("listunspent",{coin: o.coin,address: o.address}).then((res)=>{
+	          	});
+	          })
+	          res.asks.map(o=>{
+	          	this.runCommand("listunspent",{coin: o.coin,address: o.address}).then((res)=>{
+	          	});
+	          })
 	          if(res.asks && res.asks[0]){
 	            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
 	            coins[o.coin].price = res.asks[0].price;

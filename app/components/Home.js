@@ -85,7 +85,6 @@ class Home extends React.Component {
         });    
   }
   _onDownload = (path, resolve) => {
-      console.log(this.state.downloadComplete);
       if(this.state.downloadComplete){
         resolve();
         this.props.history.push('/'+path);
