@@ -8,7 +8,7 @@ import { exec } from 'child_process';
 import { inject, observer } from 'mobx-react';
 import fs from 'fs';
 import AppLogo from './AppLogo';
-
+import AButton from './AButton.js';
 @inject('HomeStore','DarkErrorStore') @observer
 class Home extends React.Component {
   constructor(props){
@@ -30,11 +30,16 @@ class Home extends React.Component {
     HomeStore.enabled_coins = [];
     HomeStore.userpass = null;
 
+    this.state = {
+      downloadComplete: false,
+    }
+
   } 
   componentDidMount(){
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       this.afterHomeDir();
     });
+    exec(`pkill -15 marketmaker`);    
   }
   stopMarketmaker = () => {
     exec(`pkill -15 marketmaker`);    
@@ -45,8 +50,12 @@ class Home extends React.Component {
              if(!exists){
                 const download = wget.download(marketmakerExe, HOME+'marketmaker');
                 download.on('end', (output) => {
-                  exec(`chmod +x ${HOME}marketmaker`);
+                  exec(`chmod +x ${HOME}marketmaker`,(err,stdout,stderr) => {
+                    this.setState({ downloadComplete: true });
+                  });
                 });
+             }else{
+                 this.setState({ downloadComplete: true });
              }
           });
           const coinJSONTarget =  HOME+'coins.json';
@@ -75,22 +84,37 @@ class Home extends React.Component {
           }
         });    
   }
+  _onDownload = (path, resolve) => {
+      console.log(this.state.downloadComplete);
+      if(this.state.downloadComplete){
+        resolve();
+        this.props.history.push('/'+path);
+      }else{
+        setTimeout(()=>{ this._onDownload(path, resolve) },1000);
+      }
+  }
   render() {
     return (
       <div className={styles.container}>
         <AppLogo />
         <Paper className={styles.homeButtons}>
-            <Button color="accent" raised onClick={()=>{
-              this.props.history.push('/login');
+            <AButton color="accent" raised onClick={()=>{
+              return new Promise((resolve, reject) => {
+                 setTimeout(()=>{ this._onDownload("login",resolve) },500)
+              })
             }}
-            >Login</Button>
-           <Button color="primary" raised onClick={()=>{
-              this.props.history.push('/register');
-            }}>Register</Button>
+            >Login</AButton>
+           <AButton color="primary" raised onClick={()=>{
+              return new Promise((resolve, reject) => {
+                setTimeout(()=>{ this._onDownload("register",resolve) },500)
+              })
+            }}>Register</AButton>
         </Paper>
+        {/*
            <Button color="accent" onClick={()=>{
               this.stopMarketmaker();
             }}>Stop Marketmaker</Button>
+          */}
       </div>
     );
   }
