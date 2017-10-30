@@ -155,28 +155,31 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 													ox.enabled = !ox.enabled;
 												   }
 												});
+													
 								              	if(checked){
-									              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
-									              		if(res.error){
-									              			if(electrumPorts[o.coin]){
-									              				DarkErrorStore.alert("Native Blockchain not available, activating Electrum servers");
-									              				HomeStore.runCommand('electrum',{ coin: o.coin, ipaddr: electrumIP,port: electrumPorts[o.coin] });
-									              			}else{
-									              				DarkErrorStore.alert("Native Blockchain not available.");
-										              			return false;
-									              			}
-									              		}
-									              		HomeStore.coins[o.coin] = o;
-									              		HomeStore.enabled_coins.push(o.coin);
-									              		HomeStore.makeUnique();
+								              		const method = (electrumPorts[o.coin]) ? "electrum" : "";
+									              	HomeStore.runCommand(method,{coin: o.coin, ipaddr: electrumIP,port: electrumPorts[o.coin] }).then(()=>{
+										              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
+										              		if(res.error){
+										              			if(electrumPorts[o.coin]){
+										              				DarkErrorStore.alert("Native Blockchain not available, activating Electrum servers");
+										              			}else{
+										              				DarkErrorStore.alert("Native Blockchain not available.");
+											              			return false;
+										              			}
+										              		}
+										              		HomeStore.coins[o.coin] = o;
+										              		HomeStore.enabled_coins.push(o.coin);
+										              		HomeStore.makeUnique();
 
-            											if(HomeStore.enabled_coins[0]){
-										                	HomeStore.base = {coin: HomeStore.enabled_coins[0]};
-										              	}									              		
+	            											if(HomeStore.enabled_coins[0]){
+											                	HomeStore.base = {coin: HomeStore.enabled_coins[0]};
+											              	}									              		
 
-									              		this.saveCoinsinJSON();
-									              		this.setState({ checked: c })
-									              	});
+										              		this.saveCoinsinJSON();
+										              		this.setState({ checked: c })
+										              	});
+									              });
 								              	}else{
 									              	HomeStore.runCommand('disable',{coin: o.coin}).then((res)=>{
 									              		if(res.error){

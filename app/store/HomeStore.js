@@ -46,6 +46,9 @@ class HomeStore{
             'Content-Length': Buffer.byteLength(jsonData),
         };
         return new Promise((resolve, reject) => {
+        	if(!method){
+        		resolve();
+        	}
             request(
                 {
                     method: 'post',
@@ -84,16 +87,8 @@ class HomeStore{
 	      const o = currentCoin;
 	      if(o.coin != base.coin){
 	        this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
-
-
-	          res.bids.map(o=>{
-	          	this.runCommand("listunspent",{coin: o.coin,address: o.address}).then((res)=>{
-	          	});
-	          })
-	          res.asks.map(o=>{
-	          	this.runCommand("listunspent",{coin: o.coin,address: o.address}).then((res)=>{
-	          	});
-	          })
+	        	this._zeroVolumeFix(res);	
+	          
 	          if(res.asks && res.asks[0]){
 	            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
 	            coins[o.coin].price = res.asks[0].price;
@@ -105,10 +100,56 @@ class HomeStore{
 	          //obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
 	          
 	          this.obook = obook;
-	        });    
+	        }).catch(err => {});
+
 	      }
 	  }
+	  _zeroVolumeFix = (res) => {
+		if(res.bids && res.asks){
+			for(let i=0;i<res.bids.length;i++){
+			  const o = res.bids[i];
+	          if(o.numutxos == 0){
+	          	this.runCommand("listunspent",{coin: o.coin,address: o.address}).then(res=>{}).catch(err => {});
+	          	break;
+	          }
+	  		}
+	        for(let i=0;i<res.bids.length;i++){
+			  const o = res.bids[i];
+	          if(o.numutxos == 0){
+	          	this.runCommand("listunspent",{coin: o.coin,address: o.address}).then(res=>{}).catch(err => {});
+	          	break;
+	          }
+	        }
+	     }	  	
+	  }
+	 @action resetWallet = () => {
+	  const { coins, base, maxdecimal } = this;
 
+	    Object.keys(coins).map((k,v)=>{
+	      const o = coins[k];
+	      this.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
+	         if(res.error){
+	          delete HomeStore.coins[o.coin];
+	          return false;
+	         } 
+	         if(res.result == "success"){
+	            coins[o.coin].balance = res.balance;
+	            if(o.coin == base.coin ) base.balance = res.balance;
+	         } 
+	      }).catch(err => {});
+	        coins[o.coin].orders = 0;
+	        if(base.coin != o.coin){
+	            this.runCommand("pricearray",{base: o.coin, rel: base.coin}).then((res)=>{
+	              if(res[res.length - 1]){
+	                const today = res[res.length - 1][1];
+	                const yesterday = res[0][1];
+	                const change = ((today - yesterday)/yesterday * 100).toFixed(2);
+	                coins[o.coin].change = change;
+	              }
+	            }).catch(err => {});
+	        }
+	    })      
+	  }
 	isRunning = () => {
 		return new Promise((resolve, reject) => {
 			tcpPortUsed.check(this.port, this.host).then(function(inUse) {

@@ -27,6 +27,7 @@ class BuySell extends Component {
     const { HomeStore } = this.props;
 
       return new Promise((resolve, reject) =>  HomeStore.runCommand("inventory",{ coin: coin }).then((result) => {
+        console.log(result);
           if (result.alice.length < 3 && result.alice[0]) {
             const address = result.alice[0].address;
             HomeStore.runCommand("withdraw",{ outputs: [{ [address]: 0.001 }, { [address]: 0.002 }] , coin: result.alice[0].coin }).then((withdrawResult) => {
@@ -58,8 +59,15 @@ class BuySell extends Component {
           method = "sell";
           volume = { basevolume: HomeStore[this.BS].amount };
         }
+        console.log(currentCoin.coin);
+        console.log(baseCoin.coin);
+        console.log(HomeStore[this.BS].price);
+        console.log(volume);        
        this._inventory(baseCoin.coin).then(() => {
+
+            console.log('sell/buying');
           HomeStore.runCommand(method, {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...volume  }).then((res)=>{
+            console.log(res);
             if(res.error){
               DarkErrorStore.alert(res.error);
             }

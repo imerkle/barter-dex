@@ -47,15 +47,11 @@ import { observer, inject } from 'mobx-react';
             HomeStore.setUserpass(userpass, mypubkey);
 
               HomeStore.enabled_coins.map(o=>{
-                HomeStore.runCommand('enable',{ coin: o}).then((res)=>{
-                   if(res.error){
-                      //DarkErrorStore.alert(res.error);
-                      if(electrumPorts[o]){
-                        HomeStore.runCommand('electrum',{ coin: o, ipaddr: electrumIP,port: electrumPorts[o] },(res)=>{
-                        });
-                      }
-                   }
-                });
+                const method = ( electrumPorts[o] ) ? "electrum" : "";
+                HomeStore.runCommand(method,{ coin: o, ipaddr: electrumIP,port: electrumPorts[o] },(res)=>{
+                  HomeStore.runCommand('enable',{ coin: o}).then((res)=>{
+                  });
+                });   
               });
               if(HomeStore.enabled_coins[0]){
                 HomeStore.base = {coin: HomeStore.enabled_coins[0]};
@@ -64,7 +60,6 @@ import { observer, inject } from 'mobx-react';
 
             this.props.history.push("/coinSelection");
         }).catch((err) => {
-            console.log(err);
             this.userpassTimer = setTimeout(()=>{
               this.saveUserpass();
             },5000)
@@ -81,9 +76,9 @@ import { observer, inject } from 'mobx-react';
         coins: available_coins,
     });
     exec(`${HOME}marketmaker '${options}'`,{cwd: HOME},(err,std,stde)=>{
-      console.log(err);
-      console.log(std);
-      console.log(stde);
+      //console.log(err);
+      //console.log(std);
+      //console.log(stde);
     });
   }
   render() {

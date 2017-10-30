@@ -71,4 +71,4 @@ export const electrumPorts = {
 	CHIPS: 50076,
 	MNZ: 50053,
 };
-export const electrumIP = "173.212.225.176";
+export const electrumIP = "136.243.45.140";

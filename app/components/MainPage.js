@@ -43,11 +43,11 @@ class MainPage extends Component {
     HomeStore.intervalTimerBook = null;
 
     this.myorderbook();
-    this.resetWallet();
+    HomeStore.resetWallet();
     this.checkIfRunning();
 
 
-    HomeStore.intervalTimer = setInterval(this.resetWallet, 20000);
+    HomeStore.intervalTimer = setInterval(HomeStore.resetWallet, 20000);
   }
   myorderbook =  () => {
     const { HomeStore }  = this.props;
@@ -82,35 +82,7 @@ class MainPage extends Component {
     }
     if(data) this.setState({ data });
   }
-  @action resetWallet = () => {
-  const { HomeStore } = this.props;
-  const { coins, base, maxdecimal } = HomeStore;
-
-    Object.keys(coins).map((k,v)=>{
-      const o = coins[k];
-      HomeStore.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
-         if(res.error){
-          delete HomeStore.coins[o.coin];
-          return false;
-         } 
-         if(res.result == "success"){
-            coins[o.coin].balance = res.balance;
-            if(o.coin == base.coin ) base.balance = res.balance;
-         } 
-      });
-        coins[o.coin].orders = 0;
-        if(base.coin != o.coin){
-            HomeStore.runCommand("pricearray",{base: o.coin, rel: base.coin}).then((res)=>{
-              if(res[res.length - 1]){
-                const today = res[res.length - 1][1];
-                const yesterday = res[0][1];
-                const change = ((today - yesterday)/yesterday * 100).toFixed(2);
-                coins[o.coin].change = change;
-              }
-            });
-        }
-    })      
-  }
+ 
   orderBookDisplay = (buyOrSell) => {
     const { coins, base, maxdecimal, obook, currentCoin }= this.props.HomeStore;
     let prop = "", header="", BS,placement,orbook;
@@ -121,7 +93,7 @@ class MainPage extends Component {
         header = "Buy";
         BS = "sellState";
         placement="top";
-        orbook = obook[prop].slice(0).reverse();
+        orbook = obook[prop];
       break;
       case 1:
         prop = "asks";
@@ -148,8 +120,10 @@ class MainPage extends Component {
                   </div> 
                   <FlipMove duration={750} easing="ease-out">
                     {orbook.map( (o,i) =>{
-                      const amt = o.maxvolume.toFixed(maxdecimal);
-                      const total = (o.price * amt).toFixed(maxdecimal);
+                      const total = o.maxvolume.toFixed(maxdecimal);
+                      const amt = (total/ o.price).toFixed(maxdecimal);
+
+
                       const tooltip_title = o.address; 
                       const price = o.price.toFixed(maxdecimal);
                       const widthPercent = (total/MAX_VOLUME * 100)+"%";
