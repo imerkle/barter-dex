@@ -61,7 +61,7 @@ class HomeStore{
                 //console.log(data);
                 //console.log(body);
                 if(this.debuglist.length > 20) this.debuglist = [];
-                this.debuglist.push({
+                this.debuglist.unshift({
                 	input: data,
                 	output: body,
                 });
