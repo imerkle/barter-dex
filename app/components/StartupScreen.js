@@ -76,9 +76,9 @@ import { observer, inject } from 'mobx-react';
         coins: available_coins,
     });
     exec(`${HOME}marketmaker '${options}'`,{cwd: HOME},(err,std,stde)=>{
-      console.log(err);
-      console.log(std);
-      console.log(stde);
+      //console.log(err);
+      //console.log(std);
+      //console.log(stde);
     });
   }
   render() {

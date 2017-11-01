@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styles from './Login.css';
-import { HOME, ENABLE_COIN, marketmakerExe, coinsJSON } from '../utils/constants.js';
+import { HOME, ENABLE_COIN, marketmakerExe, coinsJSON, platform } from '../utils/constants.js';
 import { Paper, Icon, Button } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
@@ -9,6 +9,7 @@ import { inject, observer } from 'mobx-react';
 import fs from 'fs';
 import AppLogo from './AppLogo';
 import AButton from './AButton.js';
+
 @inject('HomeStore','DarkErrorStore') @observer
 class Home extends React.Component {
   constructor(props){
@@ -39,7 +40,11 @@ class Home extends React.Component {
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       this.afterHomeDir();
     });
-    exec(`pkill -15 marketmaker`);    
+    this.killMarketMaker();
+  }
+  killMarketMaker = () => {
+    const cmd = platform === 'win32' ? 'taskkill /f /im marketmaker.exe' : 'pkill -15 marketmaker';    
+    exec(cmd);
   }
   stopMarketmaker = () => {
     exec(`pkill -15 marketmaker`);    
@@ -105,7 +110,7 @@ class Home extends React.Component {
             >Login</AButton>
            <AButton color="primary" raised onClick={()=>{
               return new Promise((resolve, reject) => {
-                setTimeout(()=>{ this._onDownload("register",resolve) },500)
+                setTimeout(()=>{ this._onDownload("debug",resolve) },500)
               })
             }}>Register</AButton>
         </Paper>

@@ -175,7 +175,8 @@ class MainPage extends Component {
        <div className={styles.container}>
 
         <div className={cx(styles.container2,styles.right_list)}>
-           <table className={cx(styles.section,classes.AppSection,styles.r_side_bar)}>   
+           <table className={cx(styles.section,classes.AppSection,styles.r_side_bar)}>
+            <thead>   
             <tr className={cx(styles.tr, styles.section_header, classes.AppSectionHeader, classes.AppSectionTypo)}>
               <th className={cx(styles.oneDiv,styles.coin)} onClick={()=>this.sortBy("coin")}>Coin</th>
               <th className={cx(styles.oneDiv,styles.name)} onClick={()=>this.sortBy("name")}>Name</th>
@@ -183,6 +184,8 @@ class MainPage extends Component {
               {/*<th className={cx(styles.oneDiv,styles.volume)} onClick={()=>this.sortBy("volume")}>Volume</th>*/}
               <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
             </tr> 
+            </thead>   
+            <tbody>   
             <tr className={cx(styles.tr,styles.rsearch,
               {[styles.rsearch_hidden]: (q.length < 1)})}>
              <TextField value={q} placeholder="Search" onChange={(e)=>{
@@ -241,6 +244,7 @@ class MainPage extends Component {
                 </tr>
                 )
               })}
+            </tbody>
             </table>
       	</div>
 { (currentCoin) ?

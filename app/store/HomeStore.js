@@ -35,6 +35,7 @@ class HomeStore{
 	@observable debuglist = [];
 	@observable obook = [];
 	@observable tradeHistory = [];
+	@observable curlMain = null;
 
 
   @action runCommand = (method, data = {}) => {
@@ -61,11 +62,11 @@ class HomeStore{
                 }, (error, response, body) => {
                 //console.log(data);
                 //console.log(body);
-                if(this.debuglist.length > 20) this.debuglist = [];
-                this.debuglist.unshift({
+                if(this.debuglist.length > 40) this.debuglist = [];
+                this.debuglist.push({
                 	input: data,
                 	output: body,
-                });
+                });  
                 if (error) {
                 	console.log(error,data);
                     return reject(error);
@@ -87,7 +88,8 @@ class HomeStore{
       const o = currentCoin;
       if(o.coin != base.coin){
         this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
-        	//this._zeroVolumeFix(res);	 already happening in core
+        	this._zeroVolumeFix(res);
+        	//already happening in core
           
           if(res.asks && res.asks[0]){
             coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
@@ -121,6 +123,32 @@ class HomeStore{
 	        }
 	     }	  	
 	  }
+	 @action doMainRequest = (method, params, resolveMain) => {
+	 	
+	 	const actual_params = {};
+	 	params.map(o=>{
+	 		if(o.key && o.value){
+				actual_params[o.key] = o.value;
+	 		}
+	 	})
+
+	 	const input  = actual_params;
+  	    input.gui = this.gui;
+  	    input.method = method;
+  	    input.userpass = this.userpass;
+
+     return new Promise((resolve, reject) => {
+	 	this.runCommand(method,actual_params).then((res)=>{
+			this.curlMain = {input, output: res};
+			resolve();
+			resolveMain();
+	 	}).catch(err => {
+			this.curlMain = {input, output: {error: "Critical Request Error!"}};
+			resolve();
+			resolveMain();
+	 	});
+	 });
+ }
 	 @action resetWallet = () => {
 	  const { coins, base, maxdecimal, currentCoin } = this;
 

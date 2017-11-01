@@ -340,3 +340,8 @@ table{
     font-size: 14px;
     font-weight: bold;
 }
+.padbox{
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+}
