@@ -15,9 +15,12 @@ body{
     width: 60%;  
 }
 .oneDiv{
-	 margin: 0 5px;
+   margin: 0 5px;
    text-align: right;
    z-index: 2;
+}
+.leftAlg .oneDiv{
+   text-align: left;
 }
 .profit{
   color: #40ff40;
@@ -38,6 +41,7 @@ body{
 .volume{ flex: 5% 1;  }
 .total{ flex: 5% 1;  }
 .change{ flex: 5% 1;  }
+.name{ flex: 5% 1;  }
 .utxos{ flex: 0 1 auto; width: 10%;  }
 
 .r_side_bar .price{ min-width: 105px; }
@@ -319,4 +323,20 @@ table{
 .col{
   flex: 49% 1; 
   border-right: 1px solid rgba(0,0,0,.1);
+}
+.info{
+  font-size: 18px;
+  color: #a7a7a7;
+  padding: 24px;
+}
+
+.customLogo{
+    background: #fbbf40;
+    margin-right: 5px;
+    border-radius: 100%;
+    padding: 7px;
+    color: #FFF;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: bold;
 }

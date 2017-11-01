@@ -13,7 +13,7 @@ import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 import { generateQR, zeroGray, coinNameFromTicker } from '../utils/basic.js';
 import AButton from './AButton';
-
+import LoadingWaitText from './LoadingWaitText';
 
 const labelDisp = (label, val) => {
   return (
@@ -168,7 +168,7 @@ class Wallet extends Component {
   render() {
     const { HomeStore } = this.props;
     const { base, coins, maxdecimal } = HomeStore;
-    const { coin, hideZero, inv,unspent, isHidden } = this.state;  
+    const { coin, hideZero, isHidden } = this.state;  
     const { classes } = this.props;
     return (
        <div className={styles.container2}>
@@ -182,7 +182,7 @@ class Wallet extends Component {
               <div className={cx(styles.oneDiv,styles.coin)}>Coin</div>
               <div className={cx(styles.oneDiv,styles.name)}>Name</div>
               <div className={cx(styles.oneDiv,styles.price)}>Balance</div>
-              <div className={cx(styles.oneDiv,styles.volume)}>On Orders</div>
+              {/*<div className={cx(styles.oneDiv,styles.volume)}>On Orders</div>*/}
               <div className={cx(styles.oneDiv,styles.change)}>{base.coin} Value</div>
             </div>
             <FlipMove duration={750} easing="ease-out">
@@ -191,7 +191,7 @@ class Wallet extends Component {
                 if(hideZero && (!o.balance || o.balance == 0)){
                   return null;
                 }
-                const orders = o.orders || 0;
+                //const orders = o.orders || 0;
                 const balance = o.balance || 0;
                 const value = (o.coin == base.coin ) ? 1 * balance :  o.value || 0;
                 return (
@@ -201,12 +201,10 @@ class Wallet extends Component {
                       this.setState({ isHidden: !isHidden });
                       return false;
                     }
+                    HomeStore.setInventory(o.coin);
+                    HomeStore.setListUnspent(o.coin, o.smartaddress); 
+                    this.setState({coin: o }); 
 
-                    HomeStore.runCommand("listunspent",{coin: o.coin, address: o.smartaddress }).then((unspentres)=>{
-                      HomeStore.runCommand("inventory",{coin: o.coin }).then((invres)=>{
-                        this.setState({ inv: invres, unspent: unspentres, coin: o })
-                      });
-                    });
                   }}>
                     <div className={cx(styles.oneDiv,styles.draw)}>
                     	<Button raised color="accent" 
@@ -226,18 +224,18 @@ class Wallet extends Component {
                     <div className={cx(styles.oneDiv,styles.coin)}>{o.coin}</div>
                     <div className={cx(styles.oneDiv,styles.name)}>{coinNameFromTicker(o.coin)}</div>
                     <div className={cx(styles.oneDiv,styles.price)}>{zeroGray((balance).toFixed(maxdecimal))}</div>
-                    <div className={cx(styles.oneDiv,styles.volume)}>{zeroGray((orders).toFixed(maxdecimal))}</div>
+                    {/*<div className={cx(styles.oneDiv,styles.volume)}>{zeroGray((orders).toFixed(maxdecimal))}</div>*/}
                     <div className={cx(styles.oneDiv,styles.change)}>{zeroGray((value).toFixed(maxdecimal))}</div>
                   </div>
-                    { (o.coin == coin.coin && inv && unspent) ? 
+                    { (o.coin == coin.coin ) ? 
                       <div className={cx(styles.container, {
                         [styles.noHeight] : isHidden,
                       })}>
                       <div className={styles.col}>
                         <Typography className={cx(classes.AppSectionTypo)}>Inventory</Typography>
-                        {inv.alice.map(o=>{
+                        {(o.inventory) ? o.inventory.alice.map((o,i)=>{
                           return (
-                          <div className={styles.invdisp}>
+                          <div className={styles.invdisp} key={i}>
                             {labelDisp("Address",o.address)}
                             {labelDisp("Value 1",o.value  * 0.00000001  + " " + coin.coin)}
                             {labelDisp("Value 2",o.value2 * 0.00000001  + " " + coin.coin)}
@@ -245,18 +243,18 @@ class Wallet extends Component {
                             {labelDisp("Txid2",o.txid2)}
                           </div>
                           )
-                        })}
+                        }) : <LoadingWaitText text={"Generating Inventory"} />}
                       </div>
                       <div className={styles.col}>
-                        <Typography className={cx(classes.AppSectionTypo)}>Unspent Transactions {unspent.length} </Typography>
-                        {unspent.map(o=>{
+                        <Typography className={cx(classes.AppSectionTypo)}>Unspent Transactions {(o.listunspent) ? o.listunspent.length : ""} </Typography>
+                        {(o.listunspent) ? o.listunspent.map((o,i)=>{
                           return (
-                          <div className={styles.invdisp}>
+                          <div className={styles.invdisp} key={i}>
                             {labelDisp("Tx Hash",o.tx_hash)}
                             {labelDisp("value", (parseFloat(o.value) * 0.00000001) +" "+coin.coin)}
                           </div>
                           )
-                        })}
+                        }) : <LoadingWaitText text={"Generating Unspent Transactions"} /> }
                       </div>
 
                       </div>

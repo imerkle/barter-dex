@@ -18,7 +18,7 @@ export default class Home extends Component {
            <div className={cx(styles.nav)}>
             <Link to="/mainPage"><Button raised={(primary == "exchange")} color="accent">Exchange</Button></Link>
             <Link to="/wallet"><Button raised={(primary == "wallet")} color="accent" >Wallet</Button></Link>
-            <Button color="accent" raised={(primary == "orders")}>Orders</Button>
+            <Link to="/orders"><Button raised={(primary == "orders")} color="accent">Orders</Button></Link>
             <Link to="/debug"><Button raised={(primary == "debug")} color="accent">Debug</Button></Link>
             <Link to="/settings"><Button raised={(primary == "settings")} color="accent">Settings</Button></Link>
            </div>

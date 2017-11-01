@@ -34,6 +34,7 @@ class HomeStore{
 	@observable allCoins = [];
 	@observable debuglist = [];
 	@observable obook = [];
+	@observable tradeHistory = [];
 
 
   @action runCommand = (method, data = {}) => {
@@ -79,30 +80,28 @@ class HomeStore{
 		})
 		this.enabled_coins = uniqueArray;
 	} 
-	  @action orderBookCall = () => {
+	@action orderBookCall = () => {
+	  const { coins, base , currentCoin} = this;
+	  if(!currentCoin) return false;
 
-		  const { coins, base , currentCoin} = this;
-		  if(!currentCoin) return false;
-
-	      const o = currentCoin;
-	      if(o.coin != base.coin){
-	        this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
-	        	this._zeroVolumeFix(res);	
-	          
-	          if(res.asks && res.asks[0]){
-	            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
-	            coins[o.coin].price = res.asks[0].price;
-	          }else{
-	            coins[o.coin].value = coins[o.coin].balance;
-	          }
-	          const obook = res;
-	          //obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
-	          //obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
-	          
-	          this.obook = obook;
-	        }).catch(err => {});
-
-	      }
+      const o = currentCoin;
+      if(o.coin != base.coin){
+        this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
+        	//this._zeroVolumeFix(res);	 already happening in core
+          
+          if(res.asks && res.asks[0]){
+            coins[o.coin].value = res.asks[0].price * coins[o.coin].balance; 
+            coins[o.coin].price = res.asks[0].price;
+          }else{
+            coins[o.coin].value = coins[o.coin].balance;
+          }
+          const obook = res;
+          //obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
+          //obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
+          
+          this.obook = obook;
+        }).catch(err => {});
+      }
 	  }
 	  _zeroVolumeFix = (res) => {
 		if(res.bids && res.asks){
@@ -123,7 +122,7 @@ class HomeStore{
 	     }	  	
 	  }
 	 @action resetWallet = () => {
-	  const { coins, base, maxdecimal } = this;
+	  const { coins, base, maxdecimal, currentCoin } = this;
 
 	    Object.keys(coins).map((k,v)=>{
 	      const o = coins[k];
@@ -135,9 +134,10 @@ class HomeStore{
 	         if(res.result == "success"){
 	            coins[o.coin].balance = res.balance;
 	            if(o.coin == base.coin ) base.balance = res.balance;
+	            if(o.coin == currentCoin.coin ) currentCoin.balance = res.balance;
 	         } 
 	      }).catch(err => {});
-	        coins[o.coin].orders = 0;
+	        //coins[o.coin].orders = 0;
 	        if(base.coin != o.coin){
 	            this.runCommand("pricearray",{base: o.coin, rel: base.coin}).then((res)=>{
 	              if(res[res.length - 1]){
@@ -150,6 +150,30 @@ class HomeStore{
 	        }
 	    })      
 	  }
+		@action setListUnspent(coin, smartaddress){
+		    this.runCommand("listunspent",{coin: coin, address: smartaddress }).then((res)=>{
+		       	this.coins[coin].listunspent = res;
+		    });
+		}	  
+		@action setInventory(coin){
+		    this.runCommand("inventory",{coin: coin }).then((res)=>{
+		      	this.coins[coin].inventory = res;
+		    });	
+		}
+	  @action getTradeHistory = () => {
+		this.runCommand("swapstatus").then(res=>{
+			if(res.swaps){
+				this.tradeHistory = [];
+				res.swaps.map(o=>{
+					this.runCommand("swapstatus",{requestid: o.requestid, quoteid: o.quoteid}).then(res=>{
+						if(res.srcamount){
+							this.tradeHistory.push(res); 
+						}
+					});
+				});
+			}
+		})  	
+	  }	  
 	isRunning = () => {
 		return new Promise((resolve, reject) => {
 			tcpPortUsed.check(this.port, this.host).then(function(inUse) {

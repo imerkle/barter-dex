@@ -9,11 +9,8 @@ import { inject, observer } from 'mobx-react';
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 
-import * as CryptoIcon from 'react-cryptocoins';
 import AButton from './AButton';
-
-
-
+import { coinLogoFromTicker } from '../utils/basic.js';
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
@@ -61,7 +58,7 @@ class BuySell extends Component {
         }        
        const opts = {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...volume  };
        console.log(`checking inventory wait ${JSON.stringify(opts)} `);
-       this._inventory(baseCoin.coin).then(() => {
+       //this._inventory(baseCoin.coin).then(() => {
           console.log(`${method} executing now wait ${JSON.stringify(opts)} `);
           HomeStore.runCommand(method, opts).then((res)=>{
             console.log(res);
@@ -72,7 +69,7 @@ class BuySell extends Component {
             }
               resolve();
           });
-       });
+       //});
 
     });          
   }
@@ -148,11 +145,6 @@ class BuySell extends Component {
   	const basetxt = (isBuy) ? `${baseCoin.balance} ${baseCoin.coin}` : `${currentCoin.balance} ${currentCoin.coin}`;
   	const basevalue = (isBuy) ? baseCoin.balance : currentCoin.balance;
 
-    const CryptoSVGLogo = CryptoIcon[capitalize(currentCoin.coin)];
-    let CoinLogo = (<span></span>);
-    if(CryptoSVGLogo){
-        CoinLogo = (<CryptoSVGLogo color="#fbbf40" style={{margin: "0px 10px -6px 0px" }} />);
-    }
     return (
 	      <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
           {[classes.BuySection]: isBuy},
@@ -160,7 +152,7 @@ class BuySell extends Component {
           )}>
 	         <div className={cx(styles.bs_tr, styles.bs_header,styles.bs_tr_row)}>
 	          <div className={cx(styles.mainHead)}>
-            {CoinLogo}
+            {coinLogoFromTicker(currentCoin.coin)}
             {`${buyTxt} ${currentCoin.coin}`}</div>
 	          <div className={cx(styles.basevalue)} onClick={()=>{ this._handleFab(100) }} >{basetxt}</div>
 	         </div>
@@ -175,7 +167,5 @@ class BuySell extends Component {
     );
   }
 }
-const capitalize = (name) => {
-     return name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
+
 export default BuySell;

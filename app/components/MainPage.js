@@ -15,6 +15,8 @@ import HeaderNav from './HeaderNav';
 import { makeConfig, coinNameFromTicker, getSorted, zeroGray } from '../utils/basic.js';
 import { stylesY } from '../utils/constants.js';
 import { withStyles } from 'material-ui/styles';
+import LoadingWaitText from './LoadingWaitText';
+
 const MAX_VOLUME = .002;
 
 let toggleState = {};
@@ -102,6 +104,17 @@ class MainPage extends Component {
         placement="bottom";
         orbook = obook[prop];
       break;
+    }
+    if(!obook || !obook[prop]){
+      return (
+              <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
+                {[styles.buyBox] : buyOrSell == 0 },
+                {[styles.sellBox] : buyOrSell == 1},
+                )}>        
+                  <LoadingWaitText text={`Generating ${prop}`} />
+              </Paper>
+        );
+
     }
     return (
               <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
@@ -214,10 +227,11 @@ class MainPage extends Component {
                     {[styles.basetr]: base.coin == o.coin }
                   )} key={o.coin+""+i}
                     onClick={()=>{
-                      if(o.coin == base.coin){
+                      if(o.coin == base.coin || o.coin == currentCoin.coin){
                         return false;
                       }
                       this.props.HomeStore.setValue("currentCoin",o);
+                      this.props.HomeStore.setValue("obook",[]);
                     }}
                   >
                   <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
@@ -236,8 +250,8 @@ class MainPage extends Component {
             <BuySell baseCoin={base} currentCoin={currentCoin} isBuy={false} />           
            </div>
            <div className={cx(styles.section2, styles.bs_bar)}>
-             {(coins[currentCoin.coin] && obook && obook.bids) ? this.orderBookDisplay(0) : ""}
-             {(coins[currentCoin.coin] && obook && obook.asks) ? this.orderBookDisplay(1) : ""}
+             {(coins[currentCoin.coin] ) ? this.orderBookDisplay(0) : ""}
+             {(coins[currentCoin.coin] ) ? this.orderBookDisplay(1) : ""}
            </div>
         </div>
       : 

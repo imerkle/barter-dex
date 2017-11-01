@@ -6,12 +6,27 @@ import fs from 'fs';
 import { HOME } from './constants';
 import qrcode from "qrcode";
 import styles from '../components/Main.css';
+import * as CryptoIcon from 'react-cryptocoins';
+
 export { coinNameFromTicker } from './coinList.js';
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
+
+export const capitalize = (name) => {
+     return name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}    
+export const coinLogoFromTicker = (ticker) => {
+    const capTicker = capitalize(ticker);
+    const CryptoSVGLogo = CryptoIcon[capTicker];
+      let CoinLogo = (<span className={styles.customLogo}>{capTicker.charAt(0)}</span>);
+      if(CryptoSVGLogo){
+          CoinLogo = (<CryptoSVGLogo color="#fbbf40" style={{margin: "0px 10px -6px 0px" }} />);
+      }
+      return CoinLogo;
+}
 
 export const makeConfig = (data, ticker, maxdecimal) => {
 const new_data = [];
