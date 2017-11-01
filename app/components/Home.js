@@ -110,7 +110,7 @@ class Home extends React.Component {
             >Login</AButton>
            <AButton color="primary" raised onClick={()=>{
               return new Promise((resolve, reject) => {
-                setTimeout(()=>{ this._onDownload("debug",resolve) },500)
+                setTimeout(()=>{ this._onDownload("register",resolve) },500)
               })
             }}>Register</AButton>
         </Paper>

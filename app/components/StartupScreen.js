@@ -84,11 +84,10 @@ import { observer, inject } from 'mobx-react';
         options = JSON.stringify(options);
         options = options.replace(/"/g, '\\"')
     }
-
-    exec(`${HOME}marketmaker '${options}'`,{cwd: HOME},(err,std,stde)=>{
-      //console.log(err);
-      //console.log(std);
-      //console.log(stde);
+    exec(`${HOME}marketmaker ${options}`,{cwd: HOME},(err,std,stde)=>{
+      console.log(err);
+      console.log(std);
+      console.log(stde);
     });
   }
   render() {
