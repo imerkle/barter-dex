@@ -48,10 +48,11 @@ import { observer, inject } from 'mobx-react';
 
               HomeStore.enabled_coins.map(o=>{
                 const method = ( electrumPorts[o] ) ? "electrum" : "";
-                HomeStore.runCommand(method,{ coin: o, ipaddr: electrumIP,port: electrumPorts[o] },(res)=>{
                   HomeStore.runCommand('enable',{ coin: o}).then((res)=>{
+                    if(res.error){
+                        HomeStore.runCommand(method,{ coin: o, ipaddr: electrumIP, port: electrumPorts[o] });
+                      }
                   });
-                });   
               });
               if(HomeStore.enabled_coins[0]){
                 HomeStore.base = {coin: HomeStore.enabled_coins[0]};
@@ -68,13 +69,22 @@ import { observer, inject } from 'mobx-react';
   startMarketmaker = () => {
     const { available_coins, passphrase, gui } = this.props.HomeStore;
 
-    const options = JSON.stringify({
+    let options = {
         gui: gui,
         client: 1,
         userhome: UHOME,
         passphrase: passphrase,
-        coins: available_coins,
-    });
+    };
+
+    if (platform !== 'win32') {
+        options.coins = available_coins;
+        options = JSON.stringify(options);
+        options = `'${options}'`;
+    } else {
+        options = JSON.stringify(options);
+        options = options.replace(/"/g, '\\"')
+    }
+
     exec(`${HOME}marketmaker '${options}'`,{cwd: HOME},(err,std,stde)=>{
       //console.log(err);
       //console.log(std);

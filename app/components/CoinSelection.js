@@ -158,10 +158,10 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 													
 								              	if(checked){
 								              		const method = (electrumPorts[o.coin]) ? "electrum" : "";
-									              	HomeStore.runCommand(method,{coin: o.coin, ipaddr: electrumIP,port: electrumPorts[o.coin] }).then(()=>{
 										              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
 										              		if(res.error){
 										              			if(electrumPorts[o.coin]){
+									              					HomeStore.runCommand(method,{coin: o.coin, ipaddr: electrumIP,port: electrumPorts[o.coin] });
 										              				DarkErrorStore.alert("Native Blockchain not available, activating Electrum servers");
 										              			}else{
 										              				DarkErrorStore.alert("Native Blockchain not available.");
@@ -178,7 +178,6 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 
 										              		this.saveCoinsinJSON();
 										              		this.setState({ checked: c })
-										              	});
 									              });
 								              	}else{
 									              	HomeStore.runCommand('disable',{coin: o.coin}).then((res)=>{
