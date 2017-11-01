@@ -6,7 +6,7 @@ import AppLogo from './AppLogo';
 import LoadingWaitText from './LoadingWaitText';
 
 import { exec, } from 'child_process';
-import { UHOME,HOME, marketmakerExe, electrumIP, electrumPorts } from '../utils/constants';
+import { UHOME,HOME, marketmakerExe, electrumIP, electrumPorts, platform } from '../utils/constants';
 import { observer, inject } from 'mobx-react';
 
 
