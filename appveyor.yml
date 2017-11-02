@@ -13,8 +13,6 @@ cache:
 matrix:
   fast_finish: true
 
-build: off
-
 version: '{build}'
 
 shallow_clone: true
@@ -27,7 +25,9 @@ install:
   - yarn
   - cd app && yarn
 
+build_script:
+  - yarn package
+
 test_script:
   - node --version
-  - yarn package
   - yarn test
