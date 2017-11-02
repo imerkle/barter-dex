@@ -6,7 +6,7 @@ import AppLogo from './AppLogo';
 import LoadingWaitText from './LoadingWaitText';
 
 import { exec, } from 'child_process';
-import { UHOME,HOME, marketmakerExe, electrumIP, electrumPorts, platform } from '../utils/constants';
+import { UHOME,HOME, marketmakerName, marketmakerExe, electrumIP, electrumPorts, platform } from '../utils/constants';
 import { observer, inject } from 'mobx-react';
 
 
@@ -84,10 +84,10 @@ import { observer, inject } from 'mobx-react';
         options = JSON.stringify(options);
         options = options.replace(/"/g, '\\"')
     }
-    exec(`${HOME}marketmaker ${options}`,{cwd: HOME},(err,std,stde)=>{
-      console.log(err);
-      console.log(std);
-      console.log(stde);
+    exec(`${HOME}${marketmakerName} ${options}`,{cwd: HOME},(err,std,stde)=>{
+      //console.log(err);
+      //console.log(std);
+      //console.log(stde);
     });
   }
   render() {

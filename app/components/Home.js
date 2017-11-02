@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styles from './Login.css';
-import { HOME, ENABLE_COIN, marketmakerExe, coinsJSON, platform } from '../utils/constants.js';
+import { HOME, ENABLE_COIN, marketmakerName,marketmakerExe, coinsJSON, platform } from '../utils/constants.js';
 import { Paper, Icon, Button } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
@@ -40,22 +40,18 @@ class Home extends React.Component {
     exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
       this.afterHomeDir();
     });
-    this.killMarketMaker();
+    this.stopMarketMaker();
   }
-  killMarketMaker = () => {
-    const cmd = platform === 'win32' ? 'taskkill /f /im marketmaker.exe' : 'pkill -15 marketmaker';    
+  stopMarketMaker = () => {
+    const cmd = platform === 'win32' ? `taskkill /f /im ${marketmakerName}` : `pkill -15 ${marketmakerName}`;
     exec(cmd);
   }
-  stopMarketmaker = () => {
-    exec(`pkill -15 marketmaker`);    
-    this.props.DarkErrorStore.alert("Marketmaker Killed",true);
-  }
   afterHomeDir = () => {
-      fs.exists(`${HOME}marketmaker`, (exists) => {
+      fs.exists(`${HOME}${marketmakerName}`, (exists) => {
              if(!exists){
-                const download = wget.download(marketmakerExe, HOME+'marketmaker');
+                const download = wget.download(marketmakerExe, HOME+marketmakerName);
                 download.on('end', (output) => {
-                  exec(`chmod +x ${HOME}marketmaker`,(err,stdout,stderr) => {
+                  exec(`chmod +x ${HOME}${marketmakerName}`,(err,stdout,stderr) => {
                     this.setState({ downloadComplete: true });
                   });
                 });

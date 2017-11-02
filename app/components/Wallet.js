@@ -7,13 +7,14 @@ import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 
 import { inject, observer, action } from 'mobx-react';
-import { Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
+import { IconButton, Icon, Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
 import { generateQR, zeroGray, coinNameFromTicker } from '../utils/basic.js';
 import AButton from './AButton';
 import LoadingWaitText from './LoadingWaitText';
+import {  CopyToClipboard } from 'react-copy-to-clipboard';
 
 const labelDisp = (label, val) => {
   return (
@@ -37,10 +38,33 @@ class Wallet extends Component {
       withdrawValue: "",
       hideZero: false,
       isHidden: false,
+      inventory: {},
+      listunspent: [],
   	};	
   }
   componentDidMount(){
     const { HomeStore } = this.props;
+  }
+  componentWillUnmount(){
+    this.stopTimer();
+  }
+  startTimer = () => {
+    const { coins } = this.props.HomeStore;
+    const coinTicker = this.state.coin.coin;
+
+    this.thetimer = setTimeout(()=>{
+      if(coinTicker && coins[coinTicker].inventory){
+        this.setState({ inventory: coins[coinTicker].inventory })
+      }else if(coinTicker && coins[coinTicker].listunspent){
+        this.setState({ listunspent: coins[coinTicker].listunspent })
+      }else{ 
+        this.startTimer();
+      }
+    },1000);
+  }
+  stopTimer = () => {
+    clearTimeout(this.thetimer);
+    this.thetimer = null;
   }
   handleRequestCloseDeposit = () => {
     this.setState({ openDeposit: false });
@@ -80,7 +104,8 @@ class Wallet extends Component {
               <br />
               Note: You must have atleast two deposits in order to trade.
             </DialogContentText>
-            <canvas id="QRW" className={styles.canvas}></canvas>                          
+            <canvas id="QRW" className={styles.canvas}></canvas>
+            <div className={styles.container}>
             <TextField
               autoFocus
               disabled
@@ -90,6 +115,18 @@ class Wallet extends Component {
               fullWidth
               value={coin.smartaddress}
             />
+
+
+
+        <CopyToClipboard text={coin.smartaddress} >
+            <IconButton onClick={(e)=>{
+              
+            }}><Icon>content_copy</Icon></IconButton>
+        </CopyToClipboard>
+
+
+            </div>
+
           </DialogContent>
           <DialogActions>
             <Button raised onClick={this.handleRequestCloseDeposit} color="primary">
@@ -168,7 +205,7 @@ class Wallet extends Component {
   render() {
     const { HomeStore } = this.props;
     const { base, coins, maxdecimal } = HomeStore;
-    const { coin, hideZero, isHidden } = this.state;  
+    const { coin, hideZero, isHidden, inventory, listunspent } = this.state;  
     const { classes } = this.props;
     return (
        <div className={styles.container2}>
@@ -203,6 +240,7 @@ class Wallet extends Component {
                     }
                     HomeStore.setInventory(o.coin);
                     HomeStore.setListUnspent(o.coin, o.smartaddress); 
+                    this.startTimer();
                     this.setState({coin: o }); 
 
                   }}>
@@ -233,7 +271,7 @@ class Wallet extends Component {
                       })}>
                       <div className={styles.col}>
                         <Typography className={cx(classes.AppSectionTypo)}>Inventory</Typography>
-                        {(o.inventory) ? o.inventory.alice.map((o,i)=>{
+                        {(inventory && inventory.alice) ? inventory.alice.map((o,i)=>{
                           return (
                           <div className={styles.invdisp} key={i}>
                             {labelDisp("Address",o.address)}
@@ -246,8 +284,8 @@ class Wallet extends Component {
                         }) : <LoadingWaitText text={"Generating Inventory"} />}
                       </div>
                       <div className={styles.col}>
-                        <Typography className={cx(classes.AppSectionTypo)}>Unspent Transactions {(o.listunspent) ? o.listunspent.length : ""} </Typography>
-                        {(o.listunspent) ? o.listunspent.map((o,i)=>{
+                        <Typography className={cx(classes.AppSectionTypo)}>Unspent Transactions {(listunspent) ? listunspent.length : ""} </Typography>
+                        {(listunspent) ? listunspent.map((o,i)=>{
                           return (
                           <div className={styles.invdisp} key={i}>
                             {labelDisp("Tx Hash",o.tx_hash)}

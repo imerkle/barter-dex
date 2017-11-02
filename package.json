@@ -203,6 +203,7 @@
     "react-cryptocoins": "^1.0.9",
     "react-dom": "^15.6.1",
     "react-flip-move": "^2.9.15",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-hot-loader": "3.0.0-beta.6",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",

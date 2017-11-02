@@ -57,7 +57,7 @@ const getCryptoIcon = (coin) => {
 	return out;
 }
 
-const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
+//const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
@@ -95,7 +95,7 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
   	const { HomeStore } = this.props;
 	let c = [];
 	HomeStore.allCoins.map(o=>{
-		if(whitelist.indexOf(o.coin) > -1){
+		//if(whitelist.indexOf(o.coin) > -1){
 			let isEnabled = false;
 			if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
 				isEnabled = true;
@@ -105,7 +105,7 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 				this.props.HomeStore.coins[o.coin] = x;
 			}
 			c.push(x);
-		}
+		//}
 	});
 		this.setState({ coins: c });
   }
@@ -149,13 +149,7 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 								            <Switch
 								              checked={o.enabled || false}
 								              onChange={(event, checked) => {
-								              	const c = this.state.coins;
-												c.map(ox=> {
-												  if(o.coin == ox.coin){
-													ox.enabled = !ox.enabled;
-												   }
-												});
-													
+								              	const c = this.state.coins;								              	
 								              	if(checked){
 								              		const method = (electrumPorts[o.coin]) ? "electrum" : "";
 										              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
@@ -174,7 +168,13 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 
 	            											if(HomeStore.enabled_coins[0]){
 											                	HomeStore.base = {coin: HomeStore.enabled_coins[0]};
-											              	}									              		
+											              	}									              	
+
+															c.map(ox=> {
+															  if(o.coin == ox.coin){
+																ox.enabled = !ox.enabled;
+															   }
+															});											              		
 
 										              		this.saveCoinsinJSON();
 										              		this.setState({ checked: c })
@@ -188,10 +188,14 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 									              		HomeStore.enabled_coins.remove(o.coin);
 									              		delete HomeStore.coins[o.coin];
 									              		HomeStore.makeUnique();
-
              											if(HomeStore.enabled_coins[0]){
 										                	HomeStore.base = {coin: HomeStore.enabled_coins[0]};
 										              	}
+														c.map(ox=> {
+														  if(o.coin == ox.coin){
+															ox.enabled = !ox.enabled;
+														   }
+														});										              	
 									              		
 									              		this.saveCoinsinJSON();
 									              		this.setState({ checked: c })

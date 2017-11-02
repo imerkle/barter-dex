@@ -57,11 +57,10 @@ class BuySell extends Component {
           volume = { basevolume: HomeStore[this.BS].amount };
         }        
        const opts = {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...volume  };
-       console.log(`checking inventory wait ${JSON.stringify(opts)} `);
+       //console.log(`checking inventory wait ${JSON.stringify(opts)} `);
        //this._inventory(baseCoin.coin).then(() => {
-          console.log(`${method} executing now wait ${JSON.stringify(opts)} `);
+          //console.log(`${method} executing now wait ${JSON.stringify(opts)} `);
           HomeStore.runCommand(method, opts).then((res)=>{
-            console.log(res);
             if(res.error){
               DarkErrorStore.alert(res.error);
             }else{

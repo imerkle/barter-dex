@@ -10,10 +10,12 @@ export const __URL__ = 'http://127.0.0.1:7783';
 export const clientscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/client';
 export const getcoinsscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/getcoins';
 export const enable_myscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/enable_my';
-export const marketmakerExe = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/marketmaker';
 export const coinsJSON = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/coins.json';
 export const ENABLE_COIN = 'enabled_coins.json';
 export const platform = os.platform();
+export const marketmakerExe = (platform == 'win32') ? 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/marketmaker.exe' : 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/marketmaker';
+export const marketmakerName = (platform == 'win32') ? 'marketmaker.exe' : 'marketmaker';
+
 export const stylesY = theme => ({
 	  bar: {},
 	  checked: {
