@@ -31,4 +31,3 @@ test_script:
   - node --version
   - yarn package
   - yarn test
-  - yarn test-e2e
