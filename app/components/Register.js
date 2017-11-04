@@ -3,13 +3,16 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import AppLogo  from './AppLogo';
 import styles from './Login.css';
+import styles2 from './Main.css';
 
-import { Button, TextField } from 'material-ui';
+import { Paper, IconButton, Icon, Button, TextField } from 'material-ui';
 
 import bip39 from 'bip39';
 
 import { inject, observer } from 'mobx-react';
 import { generateQR } from '../utils/basic.js';
+import {  CopyToClipboard } from 'react-copy-to-clipboard';
+import cx from 'classnames';
 
 @inject('HomeStore','DarkErrorStore')
 @observer
@@ -47,14 +50,20 @@ class Register extends Component {
     return (
       <div className={styles.container}>
          <AppLogo />
-         <TextField
-              value={this.state.passphrase}
-              disabled
-              multiline
-              margin="normal"
+         <div className={styles2.container} style={{alignItems: "center"}}>
+           <TextField
+                value={this.state.passphrase}
+                disabled
+                multiline
+                margin="normal"
                 label="Passphrase"
                 InputProps={{ placeholder: 'Passphrase' }}
-            />
+                style={{flex: "1 1 auto"}}
+              />
+            <CopyToClipboard text={this.state.passphrase} >
+              <IconButton><Icon>content_copy</Icon></IconButton>
+            </CopyToClipboard>
+          </div>
          <TextField
               value={this.state.passphrase_rp}
               multiline
@@ -72,7 +81,7 @@ class Register extends Component {
             />            
             <canvas id="QR" className={styles.canvas}></canvas>
             <Button color="accent" onClick={this.generatePassPhrase} >Regenerate</Button>
-            <Button raised color="primary" onClick={this._handleRegister}>Create Wallet</Button>      
+            <Button raised color="primary" onClick={this._handleRegister}>Create Wallet</Button>
       </div>
     );
   }

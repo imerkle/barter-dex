@@ -28,39 +28,127 @@ export const coinLogoFromTicker = (ticker) => {
       return CoinLogo;
 }
 
-export const makeConfig = (data, ticker, maxdecimal) => {
-const new_data = [];
-	  data.map(o=>{
-	    new_data.push([o[0]*1000,+(o[1]).toFixed(maxdecimal || 8)]);
-	  });
-return {
-        rangeSelector: {
-            //selected: 1
-            inputEnabled: false,
+export const makeConfig = (data, ticker, maxdecimal, change, baseticker) => {
+    const new_data = [];
+
+    let tmp = 0;
+    const len = data.length;
+    for(let i=0;i<len;i++){
+        const o = data[i];
+        if(tmp < o[0]){
+            new_data.push([o[0]*1000,+(o[1]).toFixed(maxdecimal || 8)]);
+        }
+        tmp = o[0];
+    }
+
+let colorKey = "yellow";
+if(change > 0){
+    colorKey = "blue";
+}
+if(change > 10){
+    colorKey = "green";
+}
+if(change < 0){
+    colorKey = "yellow";
+}
+if(change < 10){
+    colorKey = "red";
+}
+
+let color = "", colorArea="";
+switch(colorKey){
+    case 'red':
+        color= '#f1c79c';
+        colorArea = '#fcf2e8';
+    break;
+    case 'blue':
+        color= '#a1c3ef';
+        colorArea = '#eaf2fc';
+    break;
+    case 'yellow':
+        color= '#F3E181';
+        colorArea = '#fdf9e4';
+    break;
+    case 'green':
+        color= '#9CE5D3';
+        colorArea = '#e8f9f5';
+    break;
+}
+const config =  {
+        chart: {
+            margin: [0,0,0,0],
+            spacing: [0,0,0,0],
+            padding: 0,
+            height: "120px",
         },
-        scrollbar: {
+        title:{
+            text: null
+        },        
+        xAxis: {
+            type: 'datetime',
+            title: {
+                enabled: false
+            },
+                    labels: {
+                    enabled: false
+                    },
+            lineWidth: 0,
+            minPadding:0,
+            maxPadding:0,            
+        },
+        yAxis: {
+            title: {
+                enabled: false
+            },
+            gridLineWidth: 0,
+            minorGridLineWidth: 0,
+            labels: {
+                enabled: false
+            },            
+            lineWidth: 0,
+        },
+        legend: {
             enabled: false
         },
+        tooltip: {
+            formatter: function () {
+                return `${baseticker} Value: ${this.y}`;
+            }
+        },        
+        plotOptions: {
+            area: {
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, colorArea],
+                        [1, colorArea]
+                    ],
+                },
+                marker: {
+                    radius: 2
+                },
+                lineWidth: 1,
+                threshold: null
+            }
+        },
+
         series: [{
-        	name: `${ticker} Price`,
-            //type: 'area',
+            type: 'area',
             data: new_data,
-            /*
-            dataGrouping: {
-                units: [
-                    [
-                        'week', // unit name
-                        [1] // allowed multiples
-                    ], [
-                        'month',
-                        [1, 2, 3, 4, 6]
-                    ]
-                ]
-            }*/
+            color: color
         }]
-    };  
-}    
+};  
+return config;
+}
 export const zeroGray = (number) => {
+    if(!number){
+        number = "0.0";
+    }
 	number = number + "";
 	const num_arr = number.split(".");
 	const dec = num_arr[1];

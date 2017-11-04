@@ -311,6 +311,9 @@ export const coinNameFromTicker = (coin) => {
     case 'CHIPS':
         name = 'Chips';
         break;
+    case 'MNZ':
+        name = 'Monaize';
+        break;
 
     }
     return name;

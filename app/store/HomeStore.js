@@ -37,7 +37,7 @@ class HomeStore{
 	@observable tradeHistory = [];
 	@observable curlMain = null;
 
-
+	
   @action runCommand = (method, data = {}) => {
   	    data.gui = this.gui;
   	    data.method = method;
@@ -167,12 +167,13 @@ class HomeStore{
 	      }).catch(err => {});
 	        //coins[o.coin].orders = 0;
 	        if(base.coin != o.coin){
-	            this.runCommand("pricearray",{base: o.coin, rel: base.coin}).then((res)=>{
+	            this.runCommand("pricearray",{base: o.coin, rel: base.coin, timescale: 10}).then((res)=>{
 	              if(res[res.length - 1]){
 	                const today = res[res.length - 1][1];
 	                const yesterday = res[0][1];
 	                const change = ((today - yesterday)/yesterday * 100).toFixed(2);
 	                coins[o.coin].change = change;
+	                coins[o.coin].priceHistory = res;
 	              }
 	            }).catch(err => {});
 	        }

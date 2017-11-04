@@ -14,10 +14,22 @@ import AButton from './AButton.js';
 class Home extends React.Component {
   constructor(props){
   	super(props);
+    this.state = {
+      downloadComplete: false,
+    }
+  } 
+  componentDidMount(){
+    this.clearTimeouts();
 
+    exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
+      this.afterHomeDir();
+    });
+    this.stopMarketMaker();
+  }
+  clearTimeouts = () => {
 
+    const { HomeStore } = this.props;
 
-    const { HomeStore } = props;
     clearTimeout(HomeStore.checkIfRunningTimer);
     clearInterval(HomeStore.intervalTimer);
     clearInterval(HomeStore.intervalTimerBook);
@@ -30,17 +42,6 @@ class Home extends React.Component {
     HomeStore.coins = {};
     HomeStore.enabled_coins = [];
     HomeStore.userpass = null;
-
-    this.state = {
-      downloadComplete: false,
-    }
-
-  } 
-  componentDidMount(){
-    exec(`mkdir ${HOME}`,(err,stdout,stderr)=>{
-      this.afterHomeDir();
-    });
-    this.stopMarketMaker();
   }
   stopMarketMaker = () => {
     const cmd = platform === 'win32' ? `taskkill /f /im ${marketmakerName}` : `pkill -15 ${marketmakerName}`;

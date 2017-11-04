@@ -16,10 +16,13 @@ import { makeConfig, coinNameFromTicker, getSorted, zeroGray } from '../utils/ba
 import { stylesY } from '../utils/constants.js';
 import { withStyles } from 'material-ui/styles';
 import LoadingWaitText from './LoadingWaitText';
+import Chart from './Chart.js';
+
 
 const MAX_VOLUME = .002;
 
 let toggleState = {};
+const priceCheckRate = 20000;
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore') @observer
@@ -28,7 +31,6 @@ class MainPage extends Component {
     super(props);
 
     this.state = {
-       config : false,
        q: "",
     };
   }
@@ -49,7 +51,12 @@ class MainPage extends Component {
     this.checkIfRunning();
 
 
-    HomeStore.intervalTimer = setInterval(HomeStore.resetWallet, 20000);
+    HomeStore.intervalTimer = setInterval(HomeStore.resetWallet, priceCheckRate);
+    
+  }
+  componentWillUnmount(){
+    clearInterval(this.intervalTimerPrice);
+    this.intervalTimerPrice = null;
   }
   myorderbook =  () => {
     const { HomeStore }  = this.props;
@@ -165,10 +172,9 @@ class MainPage extends Component {
    );    
   }
   render() {
-    const  { q } = this.state;
+    const  { q, config } = this.state;
     const { coins, base, maxdecimal, enabled_coins, obook, currentCoin }= this.props.HomeStore; 
     const { classes } = this.props;
-
     return (
       <div className={styles.container, styles.container2}>
       <HeaderNav primary="exchange" />
@@ -235,6 +241,7 @@ class MainPage extends Component {
                       }
                       this.props.HomeStore.setValue("currentCoin",o);
                       this.props.HomeStore.setValue("obook",[]);
+                      this.setState({ config: {} });
                     }}
                   >
                   <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
@@ -248,7 +255,8 @@ class MainPage extends Component {
             </table>
       	</div>
 { (currentCoin) ?
- 	      <div className={styles.container2} style={{flex: "1 1 auto"}}>           
+        <div className={styles.container2} style={{flex: "1 1 auto"}}>
+          <Chart />
            <div className={cx(styles.section2, styles.bs_bar)}>
               <BuySell baseCoin={base} currentCoin={currentCoin} isBuy/>
             <BuySell baseCoin={base} currentCoin={currentCoin} isBuy={false} />           
