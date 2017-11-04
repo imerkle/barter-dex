@@ -1,7 +1,7 @@
 import green from 'material-ui/colors/red';
 import os from 'os';
 export const ROOT_DEX = '/home/slim/gitRepos/sprnt/SuperNET/iguana/dexscripts/';
-export const HOME = require('os').homedir()+"/.barterdex/";
+export const HOME = require('os').homedir()+"/barterdex/";
 export const UHOME = require('os').homedir()
 
 export const userpassscript = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/userpassscript.sh';
