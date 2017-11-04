@@ -31,3 +31,7 @@ build_script:
 test_script:
   - node --version
   - yarn test
+
+artifacts:
+  - path: release
+    name: package
