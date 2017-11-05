@@ -43,20 +43,21 @@ class BuySell extends Component {
   _handleBuySell = () => {
   	 const { isBuy, baseCoin, currentCoin, HomeStore, DarkErrorStore } = this.props;
 
-    let volume,method; 
+    let opts_extra,method; 
     return new Promise((resolve, reject) => {
+
 
           //we buying my current or we buying api base
           //api rel = currency paying with  = my base
           //api base = currency i wanna buy  = my current      
       if(isBuy){
-         method = "buy";
-         volume = { relvolume: HomeStore[this.BS].total };
-        }else{
-          method = "sell";
-          volume = { basevolume: HomeStore[this.BS].amount };
-        }        
-       const opts = {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...volume  };
+        method = "bot_buy";
+        opts_extra = { relvolume: HomeStore[this.BS].total , maxprice: HomeStore[this.BS].price  };
+      }else{
+        method = "bot_sell";
+        opts_extra = { basevolume: HomeStore[this.BS].amount, minprice: HomeStore[this.BS].price };
+      }        
+       const opts = {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...opts_extra  };
        //console.log(`checking inventory wait ${JSON.stringify(opts)} `);
        //this._inventory(baseCoin.coin).then(() => {
           //console.log(`${method} executing now wait ${JSON.stringify(opts)} `);
@@ -69,6 +70,7 @@ class BuySell extends Component {
               resolve();
           });
        //});
+
 
     });          
   }
