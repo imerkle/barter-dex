@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styles from './Login.css';
-import { HOME, ENABLE_COIN, marketmakerName,marketmakerExe, coinsJSON, platform } from '../utils/constants.js';
+import { GIT_URL, HOME, ENABLE_COIN, marketmakerName,marketmakerExe, coinsJSON, platform } from '../utils/constants.js';
 import { Paper, Icon, Button } from 'material-ui';
 import wget from 'wget-improved';
 import { exec } from 'child_process';
@@ -53,7 +53,14 @@ class Home extends React.Component {
                 const download = wget.download(marketmakerExe, HOME+marketmakerName);
                 download.on('end', (output) => {
                   exec(`chmod +x ${HOME}${marketmakerName}`,(err,stdout,stderr) => {
-                    this.setState({ downloadComplete: true });
+					  if(platform == 'win32'){
+						const download = wget.download(GIT_URL+'curl.exe', HOME+"curl.exe");
+						wget.download(GIT_URL+'libcurl.dll', HOME+"libcurl.dll");
+						wget.download(GIT_URL+'nanomsg.dll', HOME+"nanomsg.dll");
+						download.on('end', (output) => {
+							this.setState({ downloadComplete: true });
+						});
+					  }
                   });
                 });
              }else{
