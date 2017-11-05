@@ -1,7 +1,9 @@
 import {observable,action,computed} from 'mobx';
-import { ROOT_DEX } from '../utils/constants.js';
+import { HOME, ROOT_DEX, DEBUG_LOG } from '../utils/constants.js';
 import request from 'request';
 import tcpPortUsed from 'tcp-port-used';
+import fs from 'fs';
+
 class HomeStore{
 	@observable ROOT_DEX = ROOT_DEX;
 	@observable passphrase ="";
@@ -62,7 +64,20 @@ class HomeStore{
                 }, (error, response, body) => {
                 //console.log(data);
                 //console.log(body);
-                if(this.debuglist.length > 40) this.debuglist = [];
+                if(this.debuglist.length > 20) {
+					const p = `${HOME}${DEBUG_LOG}`;
+					fs.access(p,(err)=>{
+						if(!err){
+							fs.appendFile(p,JSON.stringify(this.debuglist)+"\n",()=>{
+								this.debuglist = [];
+							});	
+						}else{
+							fs.writeFile(p,JSON.stringify(this.debuglist)+"\n",()=>{
+								this.debuglist = [];
+							});
+						}
+					})
+				}
                 this.debuglist.push({
                 	input: data,
                 	output: body,
@@ -87,7 +102,7 @@ class HomeStore{
 
       const o = currentCoin;
       if(o.coin != base.coin){
-        this.runCommand("orderbook",{base: o.coin, rel: base.coin,duration: 360000}).then((res)=>{
+        this.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
         	this._zeroVolumeFix(res);
         	//already happening in core
           
