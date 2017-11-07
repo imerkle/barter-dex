@@ -10,6 +10,7 @@ import { action } from 'mobx';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
+import { coinLogoFromTicker } from '../utils/basic';
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
@@ -32,7 +33,7 @@ import { stylesY } from '../utils/constants';
        <div className={styles.container2}>
         <HeaderNav />
         <Paper className={styles.container2} style={{margin: "0 auto"}}>
-           <Typography className={classes.AppSectionTypo} type="headline" component="h4">Change Base Coin ( Current {base.coin} )</Typography>
+           <Typography className={classes.AppSectionTypo} type="headline" component="h4">Select Base Coin</Typography>
             <div className={styles.container_buttons} style={{padding: "30px 170px"}}>
               {Object.keys(coins).map((k,v)=>{
                 return(<Button key={k} raised={(base.coin == k)} color="accent" onClick={()=>{

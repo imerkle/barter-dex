@@ -4,15 +4,14 @@ import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import HeaderNav from './HeaderNav';
 
-import { Paper, TextField ,Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
+import { Icon, Paper, TextField ,Button, FormGroup, FormControlLabel, Typography, Switch } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 
 import { observer, inject } from 'mobx-react';
 import { HOME, ENABLE_COIN, stylesY, electrumIP, electrumPorts } from '../utils/constants';
-import { coinNameFromTicker } from '../utils/basic';
+import { coinNameFromTicker, coinLogoFromTicker } from '../utils/basic';
 
-import * as CryptoIcon from 'react-cryptocoins';
 import LoadingWaitText from './LoadingWaitText';
 
 import fs from 'fs';
@@ -37,25 +36,6 @@ Array.prototype.remove = function() {
     }
     return this;
 };
-const getCryptoIcon = (coin) => {
-	let out = (null);
-	switch (coin) {
-		case 'KMD':
-		    out = (<CryptoIcon.KmdAlt size={42} />);
-		break;
-		case 'NEO':
-		    out = (<CryptoIcon.Neos size={42} />);
-		break;
-		default:
-		    const Icon = CryptoIcon[capitalize(coin)];
-		    if(!Icon){
-		    	return (null);
-		    }
-		    out = (<Icon size={42} />);
-		break;
-	}
-	return out;
-}
 
 //const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 
@@ -155,7 +135,9 @@ const getCryptoIcon = (coin) => {
 										              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
 										              		if(res.error){
 										              			if(electrumPorts[o.coin]){
-									              					HomeStore.runCommand(method,{coin: o.coin, ipaddr: electrumIP,port: electrumPorts[o.coin] });
+										              				electrumIP.map(ox=>{
+									              						HomeStore.runCommand(method,{coin: o.coin, ipaddr: ox,port: electrumPorts[o.coin] });
+										              				});
 										              				DarkErrorStore.alert("Native Blockchain not available, activating Electrum servers");
 										              			}else{
 										              				DarkErrorStore.alert("Native Blockchain not available.");
@@ -208,7 +190,7 @@ const getCryptoIcon = (coin) => {
 									          }}					          	  
 								            />
 								          }
-								          label={o.coin}
+								          label={logoAndName(o.coin)}
 								        /> 
 								      </div>	
 							      </div>	
@@ -218,12 +200,24 @@ const getCryptoIcon = (coin) => {
 						{/*<Button raised color="primary" onClick={this._handleStartup}>Save</Button>*/}
 						<Button raised color="accent" onClick={()=>{
 							this.props.history.push("/mainPage");
-						}}>Continue to Exchange</Button>
+						}}>
+				             <div className={styles.bflex}>
+				                  <div className={styles.bflextxt}>Continue to Exchange</div>
+				                  <Icon className={styles.bflexicon}>exit_to_app</Icon>
+				               </div>
+						</Button>
 					</Paper>	
        </div>
     );
   }
 }
-
+const logoAndName = (coin) => {
+	return (
+		<span>
+			{coinLogoFromTicker(coin)}
+			{coin}
+		</span>
+		);
+}
 export default CoinSelection;
 

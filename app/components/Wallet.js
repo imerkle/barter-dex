@@ -7,23 +7,15 @@ import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 
 import { inject, observer, action } from 'mobx-react';
-import { IconButton, Icon, Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
+import { Tooltip, IconButton, Icon, Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
-import { generateQR, zeroGray, coinNameFromTicker } from '../utils/basic.js';
+import { labelDisp, generateQR, zeroGray, coinNameFromTicker, coinLogoFromTicker, makeButton } from '../utils/basic.js';
 import AButton from './AButton';
 import LoadingWaitText from './LoadingWaitText';
 import {  CopyToClipboard } from 'react-copy-to-clipboard';
 
-const labelDisp = (label, val) => {
-  return (
-    <div className={styles.tr}>
-      <div className={styles.label}>{label}</div>
-      <div className={styles.labelval}>{val}</div>
-     </div>
-    )
-}
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore') @observer
 class Wallet extends Component {
@@ -44,6 +36,7 @@ class Wallet extends Component {
   }
   componentDidMount(){
     const { HomeStore } = this.props;
+    HomeStore.runCommand("portfolio");
   }
   componentWillUnmount(){
     this.stopTimer();
@@ -120,7 +113,7 @@ class Wallet extends Component {
 
         <CopyToClipboard text={coin.smartaddress} >
             <IconButton onClick={(e)=>{
-              
+              this.props.DarkErrorStore.alert("Copied!", true);
             }}><Icon>content_copy</Icon></IconButton>
         </CopyToClipboard>
 
@@ -130,7 +123,7 @@ class Wallet extends Component {
           </DialogContent>
           <DialogActions>
             <Button raised onClick={this.handleRequestCloseDeposit} color="primary">
-              Close
+              {makeButton("Close","cancel", true)}
             </Button>
           </DialogActions>
         </Dialog>  
@@ -193,10 +186,10 @@ class Wallet extends Component {
                     });
                });
               }}>
-              Withdraw {coin.coin}
+              {makeButton(`Withdraw ${coin.coin}`,"remove_circle_outline", true)}
             </AButton>
             <Button raised onClick={this.handleRequestCloseWithdraw} color="primary">
-              Close
+              {makeButton("Close","cancel", true)}
             </Button>
           </DialogActions>
         </Dialog>  
@@ -238,13 +231,35 @@ class Wallet extends Component {
                       this.setState({ isHidden: !isHidden });
                       return false;
                     }
+                    this.setState({coin: o, inventory:{},listunspent: [] });
+
                     HomeStore.setInventory(o.coin);
                     HomeStore.setListUnspent(o.coin, o.smartaddress); 
                     this.startTimer();
-                    this.setState({coin: o }); 
 
                   }}>
                     <div className={cx(styles.oneDiv,styles.draw)}>
+                      <AButton style={{minWidth: 0}} color="accent" 
+                      onClick={()=>{
+                        return new Promise((resolve, reject) => {
+                        if(o.coin.balance == 0 ){
+                          DarkErrorStore.alert("No Balance to Split!");
+                          resolve();
+                        }else{
+                          const split = o.balance/10;
+                          HomeStore.splitAmounts(o.coin,[split,split]).then((result) => {
+                            if(result.error){
+                               DarkErrorStore.alert(res.error);
+                            }else{
+                               DarkErrorStore.alert("UTXOs Split Created", true);
+                            }
+                            resolve();
+                          });
+                        }
+                      });
+                   }}
+                      >{makeButton("Split","call_split", true)}</AButton>
+
                     	<Button raised color="accent" 
                       onClick={()=>{
                         setTimeout(()=>{
@@ -252,14 +267,14 @@ class Wallet extends Component {
                         },500);
                         this.setState({ openDeposit:true, coin: o }); 
                       }}
-                      >Deposit</Button>
+                      >{makeButton("Deposit","add_circle_outline", true)}</Button>
                     	<Button raised color="primary"
                       onClick={()=>{
                         this.setState({ openWithdraw:true, coin: o, withdrawAddress: "" }); 
                       }}                      
-                      >Withdraw</Button>
+                      >{makeButton("Withdraw","remove_circle_outline", true)}</Button>
                     </div>
-                    <div className={cx(styles.oneDiv,styles.coin)}>{o.coin}</div>
+                    <div className={cx(styles.oneDiv,styles.coin)}>{coinLogoFromTicker(o.coin)}</div>
                     <div className={cx(styles.oneDiv,styles.name)}>{coinNameFromTicker(o.coin)}</div>
                     <div className={cx(styles.oneDiv,styles.price)}>{zeroGray((balance).toFixed(maxdecimal))}</div>
                     {/*<div className={cx(styles.oneDiv,styles.volume)}>{zeroGray((orders).toFixed(maxdecimal))}</div>*/}

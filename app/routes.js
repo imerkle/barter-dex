@@ -26,13 +26,21 @@ import DarkErrorStore from './store/DarkErrorStore.js';
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from './utils/constants';
 
+import styles from './components/Main.css';
+import cx from 'classnames';
+import { inject, observer } from 'mobx-react';
 const stores = { 
   HomeStore,
   DarkErrorStore,
 };
 
-const MainRoutes = () => (
-     <main>
+@withRouter
+@inject('DarkErrorStore') @observer
+class MainRoutes extends React.Component {
+  render(){
+  const { DarkErrorStore } = this.props;
+  return(
+     <main className={cx({[styles.isBlur]: DarkErrorStore.visible})}>
       <Switch>
         <Route path="/orders" component={Orders} />
         <Route path="/debug" component={DebugScreen} />
@@ -49,8 +57,10 @@ const MainRoutes = () => (
         <Route path="/login" component={Login} />
         <Route path="/" component={Home} />
       </Switch>
-    </main>  
-);
+    </main> 
+  );
+}
+}
 
 @withStyles(stylesY)
 class AppMain extends React.Component {
@@ -62,7 +72,7 @@ class AppMain extends React.Component {
             <MainRoutes />
             <DarkError />
             <div className={classes.AppBg}>
-              <img className={classes.AppBgImage} src="https://i.imgur.com/MLOlV1Y.png" />
+              {/*<img className={classes.AppBgImage} src="https://i.imgur.com/MLOlV1Y.png" />*/}
             </div>
           </div>
         </Provider>

@@ -12,7 +12,7 @@ import { action } from 'mobx';
 
 import BuySell from './BuySell';
 import HeaderNav from './HeaderNav';
-import { makeConfig, coinNameFromTicker, getSorted, zeroGray } from '../utils/basic.js';
+import { coinLogoFromTicker, makeConfig, coinNameFromTicker, getSorted, zeroGray } from '../utils/basic.js';
 import { stylesY } from '../utils/constants.js';
 import { withStyles } from 'material-ui/styles';
 import LoadingWaitText from './LoadingWaitText';
@@ -112,7 +112,7 @@ class MainPage extends Component {
         orbook = obook[prop];
       break;
     }
-    if(!obook || !obook[prop]){
+    if(!obook || !obook[prop] || obook[prop].length < 1){
       return (
               <Paper className={cx(styles.section, classes.AppSection, styles.buysell,
                 {[styles.buyBox] : buyOrSell == 0 },
@@ -182,15 +182,16 @@ class MainPage extends Component {
 
         <div className={cx(styles.container2,styles.right_list)}>
            <table className={cx(styles.section,classes.AppSection,styles.r_side_bar)}>
+            {/*
             <thead>   
             <tr className={cx(styles.tr, styles.section_header, classes.AppSectionHeader, classes.AppSectionTypo)}>
               <th className={cx(styles.oneDiv,styles.coin)} onClick={()=>this.sortBy("coin")}>Coin</th>
               <th className={cx(styles.oneDiv,styles.name)} onClick={()=>this.sortBy("name")}>Name</th>
               <th className={cx(styles.oneDiv,styles.price)} onClick={()=>this.sortBy("price")}>Price</th>
-              {/*<th className={cx(styles.oneDiv,styles.volume)} onClick={()=>this.sortBy("volume")}>Volume</th>*/}
               <th className={cx(styles.oneDiv,styles.change)} onClick={()=>this.sortBy("change")}>Change</th>
             </tr> 
-            </thead>   
+            </thead>
+            */}   
             <tbody>   
             <tr className={cx(styles.tr,styles.rsearch,
               {[styles.rsearch_hidden]: (q.length < 1)})}>
@@ -203,7 +204,10 @@ class MainPage extends Component {
                 if(!o){
                   return (null);
                 }
-                const coinname = coinNameFromTicker(o.coin);
+                let coinname = coinNameFromTicker(o.coin);
+                if(o.coin != base.coin){
+                  coinname = `${o.coin}/${base.coin}`
+                }
 
                 if(q.length > 0){
                   let isValid = false;
@@ -244,7 +248,7 @@ class MainPage extends Component {
                       this.setState({ config: {} });
                     }}
                   >
-                  <td className={cx(styles.oneDiv,styles.coin)}>{o.coin}</td>
+                  <td className={cx(styles.oneDiv,styles.coin)}>{coinLogoFromTicker(o.coin)}</td>
                   <td className={cx(styles.oneDiv,styles.name)}>{coinname}</td>
                   <td className={cx(styles.oneDiv,styles.price)}>{ zeroGray((price).toFixed(maxdecimal)) }</td>
                   <td className={cx(styles.oneDiv,styles.change,change_cl)}>{change_pref + change+"%"}</td>

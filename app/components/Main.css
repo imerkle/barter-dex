@@ -23,15 +23,15 @@ body{
    text-align: left;
 }
 .profit{
-  color: #40ff40;
+  color: #18ff6d;
   font-weight: bold;
 }
 .loss{
-  color: #ff2992;
+  color: #ec5300;
   font-weight: bold;  
 }
 .nothing{
-  color: #f3d42c;
+  color: #888888;
   font-weight: bold;  
 }
 
@@ -46,7 +46,7 @@ body{
 
 .r_side_bar .price{ min-width: 105px; }
 .r_side_bar .change{ min-width: 65px; }
-.r_side_bar .name{ min-width: 65px; }
+.r_side_bar .name{ min-width: 95px; }
 .r_side_bar .coin{ min-width: 25px; }
 .r_side_bar .section_header{ padding: 10px!important; }
 .r_side_bar .oneDiv{ text-align: left; }
@@ -60,14 +60,14 @@ body{
    padding: 10px;
    font-weight: bold;
    cursor: pointer;
-   opacity: .7;
+   /*opacity: .7;*/
    text-align: center;
 }
 .section_header .oneDiv:hover{
    opacity: 1;
 }
-.r_side_bar{ min-height: 500px; font-size: 14px;}
-.w_bar{ min-height: 400px; flex: 1 1 auto; }
+.r_side_bar{ font-size: 14px;}
+.w_bar{ flex: 1 1 auto; }
 .graph_bar{
   background: none;
 }
@@ -128,15 +128,15 @@ body{
   padding: 10px;
   position: relative;
 }
-.tr:hover:not(.basetr),.selectedtr{
+.r_side_bar .tr:hover:not(.basetr),.r_side_bar .selectedtr,.buysell .tr:hover:not(.basetr),.buysell .selectedtr{
   cursor: pointer;
   background: rgba(0, 0, 0, 0.2);
 }
 .basetr{
   cursor: default;
-  background: rgba(175, 175, 175, 0.1);
+  background: rgba(0, 0, 0, 0.1);
   padding: 20px 10px;
-  border-bottom: 1px solid #d6d0d0;
+  box-shadow: 19px 3px 10px #3c3c3c;  
 }
 .tr.rsearch,.tr.rsearch:hover{
   background: none;
@@ -205,8 +205,7 @@ body{
 }
 .error_small{
     padding: 50px;
-    box-shadow: 0 0 10px #525252;
-
+    box-shadow: 18px 13px 10px #585858;
     background: rgba(255, 46, 46, 0.9);  
 }
 .error_small.no_error{
@@ -280,7 +279,7 @@ body{
     margin: 10px 0;
 }
 table{
-  box-shadow: 0 0 10px #d2d2d2;
+  /*box-shadow: 0 0 10px #d2d2d2;*/
 }
 .debugboxcontainer{
   width:  80%;
@@ -288,8 +287,8 @@ table{
 .debugbox{
   margin: 10px;
   padding: 10px;
-  background: #f1f1f1;
-  box-shadow: 0 0 5px #a7a7a7;
+  background: #272727;
+  box-shadow: 0 0 5px #333;
   font-size: 14px;
   word-wrap: break-word;
 }
@@ -300,7 +299,7 @@ table{
   max-height: 250px;
   overflow: auto;
 }
-.inputbox{ border-left: 4px solid blue; }
+.inputbox{ border-left: 4px solid green; }
 .outputbox{ border-left: 4px solid red; }
 
 .noHeight{
@@ -331,7 +330,7 @@ table{
 }
 
 .customLogo{
-    background: #fbbf40;
+    background: #18ff6d;
     margin-right: 5px;
     border-radius: 100%;
     padding: 7px;
@@ -339,9 +338,96 @@ table{
     display: inline-block;
     font-size: 14px;
     font-weight: bold;
+    height: 12px;
+    width: 12px;
+    text-align: center;
+    line-height: 15px;
+    box-shadow: 2px 3px 5px #424242;
 }
 .padbox{
   padding: 30px;
   display: flex;
   flex-direction: column;
+}
+
+.isBlur{
+  filter: blur(4px);
+}
+
+
+.bflex{
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.bflextxt{
+    flex: 1 1 auto;
+}
+.bflexicon{
+    flex: 0 1 auto;
+    padding: 10px;    
+    background: rgba(0,0,0,.1);
+    transition: .15s linear background, .5s linear transform;
+    border-radius: 0;
+}
+.bflex:hover .bflexicon{
+    background: rgba(0,0,0,.4);
+    transform: rotateY(180deg);
+    color: #FFF;
+    border-radius: 50%;
+}
+.bflexiconthin{
+    padding: 0;
+    margin: 0 5px;
+    background: none!important;
+}
+
+
+@media screen and (max-width: 900px) {
+  .container{
+     flex-direction: column;
+  }
+  table{
+    width:  90%;
+  }
+}
+@media screen and (max-width: 860px) {
+  .section2{
+     flex-direction: column;
+  }
+}
+@media screen and (max-width: 800px) {
+  .nav{
+    height: auto;
+    flex-direction: column;
+  }
+}
+.trflex{
+  align-items: center;
+}
+.widthauto{
+  width: auto;
+}
+.botpercentageholder{
+    width: 50%;
+    background: rgba(0,0,0,.1);
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 10px;
+    flex: 0 1 auto;
+    border: 1px solid rgba(0, 0, 0, 0.27);
+    margin: 0 10px;
+}
+.botpercentage{
+    background: #8fffa2;
+    height: 100%;
+    transition: .15s linear;  
+}
+.col{
+  display: flex;
+  flex-direction: column;
+}
+.bigbot{
+    font-size: 65px;
 }

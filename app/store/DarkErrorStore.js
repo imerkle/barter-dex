@@ -8,7 +8,7 @@ class DarkErrorStore{
 		this.visible = true;
 		this.good = good;
 
-		setTimeout(this.disable, 3000);
+		//setTimeout(this.disable, 3000);
 	}
 	@action disable = () => {
 		this.visible = false;

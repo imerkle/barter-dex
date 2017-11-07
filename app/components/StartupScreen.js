@@ -50,7 +50,9 @@ import { observer, inject } from 'mobx-react';
                 const method = ( electrumPorts[o] ) ? "electrum" : "";
                   HomeStore.runCommand('enable',{ coin: o}).then((res)=>{
                     if(res.error){
-                        HomeStore.runCommand(method,{ coin: o, ipaddr: electrumIP, port: electrumPorts[o] });
+                        electrumIP.map(ox=>{
+                          HomeStore.runCommand(method,{ coin: o, ipaddr: ox, port: electrumPorts[o] });
+                        })
                       }
                   });
               });

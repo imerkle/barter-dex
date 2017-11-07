@@ -3,12 +3,13 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Login.css';
 
-import { Button, TextField} from 'material-ui';
+import { Icon, Button, TextField} from 'material-ui';
 
 import AppLogo from './AppLogo';
 
 import { exec } from 'child_process';
 import { observer, inject } from 'mobx-react';
+import { makeButton } from '../utils/basic.js';
 
 
 @inject('HomeStore','DarkErrorStore')
@@ -56,7 +57,13 @@ class Login extends Component {
 			
             
           
-		        <Button disabled={(passphrase.length==0)} raised color="primary" onClick={this._handleLogin}>Login</Button>
+		        <Button disabled={(passphrase.length==0)} raised color="primary" onClick={this._handleLogin}>
+              {makeButton("Login","call_missed_outgoing")}
+            </Button>
+
+            <div className={styles.shinelink}>
+              <Link to={"/register"}>Don't have a passphrase ?</Link>
+            </div>
         </div>
     );
   }

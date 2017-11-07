@@ -31,15 +31,55 @@ const theme =
   {
     palette: {
       type: 'light',
+      type: 'dark',
+      secondary:{
+        50: '#e2f7ea',
+        100: '#b8ebca',
+        200: '#88dda7',
+        300: '#58cf84',
+        400: '#35c569',
+        500: '#11bb4f',
+        600: '#0fb548',
+        700: '#0cac3f',
+        800: '#0aa436',
+        900: '#059626',
+        A100: '#c2ffcc',
+        A200: '#8fffa2',
+        A400: '#5cff77',
+        A700: '#42ff62',
+        'contrastDefaultColor': 'light',
+      },
+      primary: {
+        50: '#fdeae0',
+        100: '#f9cbb3',
+        200: '#f6a980',
+        300: '#f2874d',
+        400: '#ef6d26',
+        500: '#ec5300',
+        600: '#ea4c00',
+        700: '#e74200',
+        800: '#e43900',
+        900: '#df2900',
+        A100: '#ffffff',
+        A200: '#ffd8d3',
+        A400: '#ffaca0',
+        A700: '#ff9586',
+        'contrastDefaultColor': 'light',    
+      }
     },
     AppBg: '#fbbf40',
-    AppSectionBg: "#FFF",
+    AppBg: '#6b6b6b',
+    /*AppSectionBg: "#FFF",*/
     AppSectionHeaderBg: "#175d42",
     RootColor: '#333',
+    RootColor: '#FFF',
     AppBgImageHeight: "660px",
     AppSectionTypoBg: "#f9f9f9",
     AppSectionTypoColor: "#868686",
+    AppSectionTypoBg: "rgba(0, 0, 0, 0.2)",
+    AppSectionTypoColor: "#FFF",
 };
+
 class Root extends React.Component{
   constructor(props){
     super(props);

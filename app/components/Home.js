@@ -9,6 +9,7 @@ import { inject, observer } from 'mobx-react';
 import fs from 'fs';
 import AppLogo from './AppLogo';
 import AButton from './AButton.js';
+import { makeButton } from '../utils/basic.js';
 
 @inject('HomeStore','DarkErrorStore') @observer
 class Home extends React.Component {
@@ -105,19 +106,19 @@ class Home extends React.Component {
     return (
       <div className={styles.container}>
         <AppLogo />
-        <Paper className={styles.homeButtons}>
             <AButton color="accent" raised onClick={()=>{
               return new Promise((resolve, reject) => {
                  setTimeout(()=>{ this._onDownload("login",resolve) },500)
               })
             }}
-            >Login</AButton>
+            >{makeButton("Get Started","arrow_forward")}</AButton>
+         {/* 
            <AButton color="primary" raised onClick={()=>{
               return new Promise((resolve, reject) => {
                 setTimeout(()=>{ this._onDownload("register",resolve) },500)
               })
             }}>Register</AButton>
-        </Paper>
+         */}
         {/*
            <Button color="accent" onClick={()=>{
               this.stopMarketmaker();

@@ -33,7 +33,7 @@ class Chart extends Component {
     }
   	  return (
            <Paper className={cx(styles.section2, styles.container2)} style={{width: "95%",margin: "0 auto"}}>
-              	<div className={styles.container} style={{ padding: "30px" }}>
+              	<div className={styles.container} style={{ padding: "30px",alignItems: "center", }}>
               		{coinLogoFromTicker(coin)}
               		{coinNameFromTicker(coin)}
               		<span style={{margin: "0 10px"}}>{zeroGray(price)}{HomeStore.base.coin}</span>

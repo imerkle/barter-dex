@@ -37,6 +37,7 @@ class HomeStore{
 	@observable debuglist = [];
 	@observable obook = [];
 	@observable tradeHistory = [];
+	@observable bots = [];
 	@observable curlMain = null;
 
 	
@@ -103,7 +104,7 @@ class HomeStore{
       const o = currentCoin;
       if(o.coin != base.coin){
         this.runCommand("orderbook",{base: o.coin, rel: base.coin}).then((res)=>{
-        	this._zeroVolumeFix(res);
+        	//this._zeroVolumeFix(res);
         	//already happening in core
           
           if(res.asks && res.asks[0]){
@@ -113,8 +114,8 @@ class HomeStore{
             coins[o.coin].value = coins[o.coin].balance;
           }
           const obook = res;
-          //obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
-          //obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
+          obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
+          obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
           
           this.obook = obook;
         }).catch(err => {});
@@ -138,6 +139,40 @@ class HomeStore{
 	        }
 	     }	  	
 	  }
+
+
+splitAmounts = (coin, amounts, force = false) => {
+      return new Promise((resolve, reject) =>  this.runCommand("inventory",{ coin: coin }).then((result) => {
+          if (result.alice[0] && (result.alice.length < 3 ||  force) ){
+            const address = result.alice[0].address;
+
+            let outputs = [];
+            amounts.map(o=>{ outputs.push({ [address]: o }) })
+            this.runCommand("withdraw",{ outputs , coin: result.alice[0].coin }).then((withdrawResult) => {
+                  this.runCommand("sendrawtransaction",{ coin, signedtx: withdrawResult.hex }).then(() => {
+                      resolve(result);
+                  })
+              })
+          } else {
+              resolve(result);
+          }
+      }).catch((error) => {
+          console.log(`error inventory ${coin}`)
+          reject(error);
+      }));
+  }	  
+ @action getBotList = () => {
+    this.runCommand("bot_list").then((res)=>{
+      this.bots = [];
+      res.map((o,i)=>{
+        this.runCommand("bot_status",{botid: o}).then((res)=>{
+          if(!res.error){
+            this.bots.push(res);
+          }
+        });
+      })
+    });    
+  }	  
 	 @action doMainRequest = (method, params, resolveMain) => {
 	 	
 	 	const actual_params = {};

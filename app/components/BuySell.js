@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Main.css';
 import cx from 'classnames';
-import { Paper, Button, TextField } from 'material-ui';
+import { Icon, Paper, Button, TextField } from 'material-ui';
 import { inject, observer } from 'mobx-react';
 
 import { withStyles } from 'material-ui/styles';
@@ -20,26 +20,6 @@ class BuySell extends Component {
   	super(props);
     this.BS = (props.isBuy) ? "buyState" : "sellState";
   }
-  _inventory = (coin) => {
-    const { HomeStore } = this.props;
-
-      return new Promise((resolve, reject) =>  HomeStore.runCommand("inventory",{ coin: coin }).then((result) => {
-        console.log(result);
-          if (result.alice.length < 3 && result.alice[0]) {
-            const address = result.alice[0].address;
-            HomeStore.runCommand("withdraw",{ outputs: [{ [address]: 0.001 }, { [address]: 0.002 }] , coin: result.alice[0].coin }).then((withdrawResult) => {
-                  HomeStore.runCommand("sendrawtransaction",{ coin, signedtx: withdrawResult.hex }).then(() => {
-                      resolve(result);
-                  })
-              })
-          } else {
-              resolve(result);
-          }
-      }).catch((error) => {
-          console.log(`error inventory ${coin}`)
-          reject(error);
-      }));
-  }
   _handleBuySell = () => {
   	 const { isBuy, baseCoin, currentCoin, HomeStore, DarkErrorStore } = this.props;
 
@@ -50,33 +30,38 @@ class BuySell extends Component {
           //we buying my current or we buying api base
           //api rel = currency paying with  = my base
           //api base = currency i wanna buy  = my current      
+      let volume; 
       if(isBuy){
         method = "bot_buy";
-        opts_extra = { relvolume: HomeStore[this.BS].total , maxprice: HomeStore[this.BS].price  };
+        volume = HomeStore[this.BS].total;
+        opts_extra = { relvolume:  volume, maxprice: HomeStore[this.BS].price  };
       }else{
         method = "bot_sell";
-        opts_extra = { basevolume: HomeStore[this.BS].amount, minprice: HomeStore[this.BS].price };
+        volume = HomeStore[this.BS].amount;
+        opts_extra = { basevolume: volume, minprice: HomeStore[this.BS].price };
       }        
        const opts = {base: currentCoin.coin, rel: baseCoin.coin, price: HomeStore[this.BS].price, ...opts_extra  };
-       //console.log(`checking inventory wait ${JSON.stringify(opts)} `);
-       //this._inventory(baseCoin.coin).then(() => {
-          //console.log(`${method} executing now wait ${JSON.stringify(opts)} `);
+
+      const txfee = (volume / 3 + (2 * (volume / 100)));
+      const split = volume + (5 * txfee);
+
+       HomeStore.splitAmounts(baseCoin.coin,[txfee,txfee,txfee,split,split,split]).then(() => {
           HomeStore.runCommand(method, opts).then((res)=>{
             if(res.error){
               DarkErrorStore.alert(res.error);
             }else{
-              DarkErrorStore.alert("Done!", true);
+              DarkErrorStore.alert("Order Logged!", true);
             }
-              resolve();
+            resolve();
           });
-       //});
+       });
 
 
     });          
   }
-    fixDecimal = (n) =>{
-      return +n.toFixed(this.props.HomeStore.maxdecimal)
-    }  
+  fixDecimal = (n) =>{
+    return +n.toFixed(this.props.HomeStore.maxdecimal)
+  }  
   _handleFab = (percent) => {
     const { isBuy, baseCoin, currentCoin, HomeStore } = this.props;
   	const balance = (isBuy) ? baseCoin.balance : currentCoin.balance;
@@ -163,7 +148,13 @@ class BuySell extends Component {
 	         <div className={cx(styles.bs_tr,styles.bs_tr_row)}>
               {indicator.map( (o,i)=><Button key={i} fab color={(i%2 == 0) ?  accent : primary} onClick={()=>{ this._handleFab(o) }}>{o}%</Button>)}
 	         </div>
-	         <div className={cx(styles.bs_tr)}><AButton raised color={accent} onClick={this._handleBuySell}>{`${buyTxt} ${currentCoin.coin}`}</AButton></div>
+	         <div className={cx(styles.bs_tr)}><AButton raised color={accent} onClick={this._handleBuySell}>
+
+              <div className={styles.bflex}>
+                  <div className={styles.bflextxt}>{`${buyTxt} ${currentCoin.coin}`}</div>
+                  <Icon className={styles.bflexicon}>swap_vertical_circle</Icon>
+               </div>            
+           </AButton></div>
 	      </Paper>
     );
   }

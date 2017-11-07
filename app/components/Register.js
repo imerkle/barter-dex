@@ -10,7 +10,7 @@ import { Paper, IconButton, Icon, Button, TextField } from 'material-ui';
 import bip39 from 'bip39';
 
 import { inject, observer } from 'mobx-react';
-import { generateQR } from '../utils/basic.js';
+import { generateQR, makeButton } from '../utils/basic.js';
 import {  CopyToClipboard } from 'react-copy-to-clipboard';
 import cx from 'classnames';
 
@@ -80,8 +80,8 @@ class Register extends Component {
                 }}
             />            
             <canvas id="QR" className={styles.canvas}></canvas>
-            <Button color="accent" onClick={this.generatePassPhrase} >Regenerate</Button>
-            <Button raised color="primary" onClick={this._handleRegister}>Create Wallet</Button>
+            <Button color="accent" onClick={this.generatePassPhrase} >{makeButton("Regenerate","loop")}</Button>
+            <Button raised color="primary" onClick={this._handleRegister}>{makeButton("Create Wallet","create_new_folder")}</Button>
       </div>
     );
   }

@@ -3,11 +3,13 @@ import React from 'react';
 import { exec } from 'child_process';
 import shell from 'shelljs';
 import fs from 'fs';
-import { HOME } from './constants';
+import { HOME, logoColors } from './constants';
 import qrcode from "qrcode";
 import styles from '../components/Main.css';
 import * as CryptoIcon from 'react-cryptocoins';
-
+import { Icon, Tooltip } from 'material-ui';
+import cx from 'classnames';
+import { coinNameFromTicker } from './coinList.js'; 
 export { coinNameFromTicker } from './coinList.js';
 
 String.prototype.replaceAll = function(search, replacement) {
@@ -15,17 +17,45 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+export const makeButton = (txt, icon, isthin = false) => {
+return(
+      <div className={styles.bflex}>
+          <div className={styles.bflextxt}>{txt}</div>
+          <Icon className={cx(styles.bflexicon,{[styles.bflexiconthin]: isthin} )}>{icon}</Icon>
+       </div>  
+  );  
+}
+
+export const labelDisp = (label, val) => {
+  return (
+    <div className={styles.tr}>
+      <div className={styles.label}>{label}</div>
+      <div className={styles.labelval}>{val}</div>
+     </div>
+    )
+}
 export const capitalize = (name) => {
      return name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }    
-export const coinLogoFromTicker = (ticker) => {
+export const coinLogoFromTicker = (ticker, no_margin) => {
     const capTicker = capitalize(ticker);
+    //const color = (logoColors[ticker] || "#fbbf40");
+    const color = "#18ff6d";
+
     const CryptoSVGLogo = CryptoIcon[capTicker];
       let CoinLogo = (<span className={styles.customLogo}>{capTicker.charAt(0)}</span>);
       if(CryptoSVGLogo){
-          CoinLogo = (<CryptoSVGLogo color="#fbbf40" style={{margin: "0px 10px -6px 0px" }} />);
+            let opts = {};
+            if(!no_margin){
+                opts = {style: {margin: "0px 6px -6px 0px" } };
+            }
+          CoinLogo = (<CryptoSVGLogo color={color} {...opts}/>);
       }
-      return CoinLogo;
+      return (
+        <Tooltip placement="top" title={coinNameFromTicker(ticker)}>
+            {CoinLogo}
+        </Tooltip>
+      );
 }
 
 export const makeConfig = (data, ticker, maxdecimal, change, baseticker) => {

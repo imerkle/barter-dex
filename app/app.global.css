@@ -31,7 +31,7 @@ li {
 
 a {
   color: white;
-  opacity: 0.75;
+  /*opacity: 0.75;*/
   text-decoration: none;
 }
 
@@ -39,4 +39,11 @@ a:hover {
   opacity: 1;
   text-decoration: none;
   cursor: pointer;
+}
+button{
+  transition: .15s linear all;
+}
+button:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 7px 14px rgba(50,50,93,.1), 0 3px 6px rgba(0,0,0,.08);  
 }
