@@ -61,30 +61,6 @@ export const stylesY = theme => ({
 
 export const maxPinLength = 10;
 export const algorithm = 'aes-256-ctr';
-
-export const electrumPorts = {
-	BTC: 50001,
-	LTC: 50012,
-	DASH: 50098,
-	KMD: 50011,
-	HUSH: 50013,
-	REVS: 50050,
-	CHIPS: 50076,
-	MNZ: 50053,
-	ARG: 50081,
-	CRW: 50076,
-	DGB: 50022,
-	DOGE: 50015,
-	EMC2: 50079,
-	HUSH: 50013,
-	JUMBLR: 50051,
-	LTC: 50012,
-	NMC: 50036,
-	VIA: 50033,
-	VTC: 50088,
-	WLC: 50052,
-	ZEC: 50032,
-};
 export const logoColors = {
         KMD: '#326464',
         BTC: '#F7931A',
@@ -231,4 +207,35 @@ export const logoColors = {
         ZEIT: '#ACACAC',
         REVS: '#FF6600'
     };
-export const electrumIP = ["18.216.195.109","136.243.45.140","173.212.225.176"];
+/*
+export const electrumPorts = {
+	BTC: 50001,
+	LTC: 50012,
+	DASH: 50098,
+	KMD: 50011,
+	HUSH: 50013,
+	REVS: 50050,
+	CHIPS: 50076,
+	MNZ: 50053,
+	ARG: 50081,
+	CRW: 50076,
+	DGB: 50022,
+	DOGE: 50015,
+	EMC2: 50079,
+	HUSH: 50013,
+	JUMBLR: 50051,
+	LTC: 50012,
+	NMC: 50036,
+	VIA: 50033,
+	VTC: 50088,
+	WLC: 50052,
+	ZEC: 50032,
+};  
+*/  
+export const electrumPorts = {
+	BTC: 10000,
+	KMD: 10001,
+	MNZ: 10002,
+};
+//export const electrumIP = ["18.216.195.109","136.243.45.140","173.212.225.176"];
+export const electrumIP = ["18.216.195.109"];

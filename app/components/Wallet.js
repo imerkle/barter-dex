@@ -7,7 +7,7 @@ import cx from 'classnames';
 import FlipMove from 'react-flip-move';
 
 import { inject, observer, action } from 'mobx-react';
-import { Tooltip, IconButton, Icon, Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
+import { IconButton, Icon, Typography, Paper, FormControlLabel ,Switch ,Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from 'material-ui';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
@@ -218,11 +218,11 @@ class Wallet extends Component {
             <FlipMove duration={750} easing="ease-out">
               {Object.keys(coins).map((k,v)=>{
                 const o = coins[k];
-                if(hideZero && (!o.balance || o.balance == 0)){
+                if(hideZero && (!coins[o.coin] || coins[o.coin].balance == 0)){
                   return null;
                 }
                 //const orders = o.orders || 0;
-                const balance = o.balance || 0;
+                const balance = coins[o.coin].balance || 0;
                 const value = (o.coin == base.coin ) ? 1 * balance :  o.value || 0;
                 return (
                 <div key={o.coin}>

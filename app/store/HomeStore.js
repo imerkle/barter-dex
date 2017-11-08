@@ -201,7 +201,6 @@ splitAmounts = (coin, amounts, force = false) => {
  }
 	 @action resetWallet = () => {
 	  const { coins, base, maxdecimal, currentCoin } = this;
-
 	    Object.keys(coins).map((k,v)=>{
 	      const o = coins[k];
 	      this.runCommand("balance",{coin: o.coin, address: o.smartaddress}).then((res)=>{
@@ -215,7 +214,12 @@ splitAmounts = (coin, amounts, force = false) => {
 	            if(o.coin == currentCoin.coin ) currentCoin.balance = res.balance;
 	         } 
 	      }).catch(err => {});
-	        //coins[o.coin].orders = 0;
+	    })      
+	  }
+	  @action getWalletPriceHistory = () => {
+	  	const { coins, base, maxdecimal, currentCoin } = this;
+	  	Object.keys(coins).map((k,v)=>{
+	  		const o = coins[k];
 	        if(base.coin != o.coin){
 	            this.runCommand("pricearray",{base: o.coin, rel: base.coin, timescale: 10}).then((res)=>{
 	              if(res[res.length - 1]){
@@ -227,7 +231,7 @@ splitAmounts = (coin, amounts, force = false) => {
 	              }
 	            }).catch(err => {});
 	        }
-	    })      
+	     });	
 	  }
 		@action setListUnspent(coin, smartaddress){
 		    this.runCommand("listunspent",{coin: coin, address: smartaddress }).then((res)=>{

@@ -22,7 +22,8 @@ import Chart from './Chart.js';
 const MAX_VOLUME = .002;
 
 let toggleState = {};
-const priceCheckRate = 20000;
+const priceCheckRate = 2000;
+const priceHistoryRate = 20000;
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore') @observer
@@ -41,10 +42,12 @@ class MainPage extends Component {
     clearTimeout(HomeStore.checkIfRunningTimer);
     clearInterval(HomeStore.intervalTimer);
     clearInterval(HomeStore.intervalTimerBook);
+    clearInterval(HomeStore.intervalTimerHistory);
 
     HomeStore.checkIfRunningTimer = null;
     HomeStore.intervalTimer = null;
     HomeStore.intervalTimerBook = null;
+    HomeStore.intervalTimerHistory = null;
 
     this.myorderbook();
     HomeStore.resetWallet();
@@ -52,13 +55,13 @@ class MainPage extends Component {
 
 
     HomeStore.intervalTimer = setInterval(HomeStore.resetWallet, priceCheckRate);
-    
+    HomeStore.intervalTimer = setInterval(HomeStore.getWalletPriceHistory, priceHistoryRate);
   }
   componentWillUnmount(){
     clearInterval(this.intervalTimerPrice);
     this.intervalTimerPrice = null;
   }
-  myorderbook =  () => {
+  myorderbook = () => {
     const { HomeStore }  = this.props;
     
     HomeStore.orderBookCall();

@@ -423,6 +423,7 @@ table{
     background: #8fffa2;
     height: 100%;
     transition: .15s linear;  
+    width: 0%;
 }
 .col{
   display: flex;

@@ -65,6 +65,7 @@ Array.prototype.remove = function() {
 				return false;
 			}
 			HomeStore.allCoins = res;
+			HomeStore.allCoins.push({coin: "MNZ"});
 			this.setCoins();
 		})
 	}else{
@@ -131,7 +132,7 @@ Array.prototype.remove = function() {
 								              onChange={(event, checked) => {
 								              	const c = this.state.coins;								              	
 								              	if(checked){
-								              		const method = (electrumPorts[o.coin]) ? "electrum" : "";
+								              		const method = (electrumPorts[o.coin]) ? "electrum" : "electrum";
 										              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
 										              		if(res.error){
 										              			if(electrumPorts[o.coin]){
