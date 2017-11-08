@@ -231,4 +231,4 @@ export const logoColors = {
         ZEIT: '#ACACAC',
         REVS: '#FF6600'
     };
-export const electrumIP = ["136.243.45.140","173.212.225.176"];
+export const electrumIP = ["18.216.195.109","136.243.45.140","173.212.225.176"];
