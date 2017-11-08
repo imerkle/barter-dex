@@ -7,9 +7,11 @@ export const UHOME = require('os').homedir()
 export const GIT_URL = 'https://github.com/dsslimshaddy/barter-dex/releases/download/0.0.1/';
 export const SCRIPT_NAME = 'userpassscript.sh';
 export const __URL__ = 'http://127.0.0.1:7783';
-export const coinsJSON = GIT_URL + 'coins.json';
+//export const coinsJSON = GIT_URL + 'coins.json';
+export const coinsJSON = 'https://cdn.rawgit.com/buildog/BarterDEX/0a8ec4bb/config/coins.json';
 export const ENABLE_COIN = 'enabled_coins.json';
-export const marketmakerExe = (platform == 'win32') ? GIT_URL + 'marketmaker.exe' : GIT_URL + 'marketmaker';
+//export const marketmakerExe = (platform == 'win32') ? GIT_URL + 'marketmaker.exe' : GIT_URL + 'marketmaker';
+export const marketmakerExe = (platform == 'win32') ? 'https://cdn.rawgit.com/buildog/marketmaker/b2e361c0/bin/win32/x64/marketmaker.exe' : 'https://cdn.rawgit.com/buildog/marketmaker/b2e361c0/bin/linux/x64/marketmaker';
 export const marketmakerName = (platform == 'win32') ? 'marketmaker.exe' : 'marketmaker';
 export const DEBUG_LOG = 'debug.log';
 

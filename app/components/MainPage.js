@@ -18,11 +18,10 @@ import { withStyles } from 'material-ui/styles';
 import LoadingWaitText from './LoadingWaitText';
 import Chart from './Chart.js';
 
-
 const MAX_VOLUME = .002;
 
 let toggleState = {};
-const priceCheckRate = 2000;
+const priceCheckRate = 8000;
 const priceHistoryRate = 20000;
 
 @withStyles(stylesY)

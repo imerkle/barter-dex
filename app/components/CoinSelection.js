@@ -37,7 +37,7 @@ Array.prototype.remove = function() {
     return this;
 };
 
-//const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
+const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 
 @withStyles(stylesY)
 @inject('HomeStore','DarkErrorStore')
@@ -65,7 +65,6 @@ Array.prototype.remove = function() {
 				return false;
 			}
 			HomeStore.allCoins = res;
-			HomeStore.allCoins.push({coin: "MNZ"});
 			this.setCoins();
 		})
 	}else{
@@ -76,7 +75,7 @@ Array.prototype.remove = function() {
   	const { HomeStore } = this.props;
 	let c = [];
 	HomeStore.allCoins.map(o=>{
-		//if(whitelist.indexOf(o.coin) > -1){
+		if(whitelist.indexOf(o.coin) > -1){
 			let isEnabled = false;
 			if((HomeStore.enabled_coins && HomeStore.enabled_coins.indexOf(o.coin) > -1) ){
 				isEnabled = true;
@@ -86,7 +85,7 @@ Array.prototype.remove = function() {
 				this.props.HomeStore.coins[o.coin] = x;
 			}
 			c.push(x);
-		//}
+		}
 	});
 		this.setState({ coins: c });
   }
@@ -132,7 +131,7 @@ Array.prototype.remove = function() {
 								              onChange={(event, checked) => {
 								              	const c = this.state.coins;								              	
 								              	if(checked){
-								              		const method = (electrumPorts[o.coin]) ? "electrum" : "electrum";
+								              		const method = (electrumPorts[o.coin]) ? "electrum" : "";
 										              	HomeStore.runCommand('enable',{coin: o.coin}).then((res)=>{
 										              		if(res.error){
 										              			if(electrumPorts[o.coin]){

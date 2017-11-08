@@ -48,9 +48,9 @@ class Home extends React.Component {
     const cmd = platform === 'win32' ? `taskkill /f /im ${marketmakerName}` : `pkill -15 ${marketmakerName}`;
     exec(cmd);
   }
-  afterHomeDir = () => {
+  afterHomeDir = (force = false, resolve = false) => {
       fs.exists(`${HOME}${marketmakerName}`, (exists) => {
-             if(!exists){
+             if(!exists || force){
                 const download = wget.download(marketmakerExe, HOME+marketmakerName);
                 download.on('end', (output) => {
                   exec(`chmod +x ${HOME}${marketmakerName}`,(err,stdout,stderr) => {
@@ -60,18 +60,21 @@ class Home extends React.Component {
                 						wget.download(GIT_URL+'nanomsg.dll', HOME+"nanomsg.dll");
                 						download.on('end', (output) => {
                               this.setState({ downloadComplete: true });
+                              if(resolve) resolve();
                             });
                       }
+                      if(resolve) resolve();
                 			this.setState({ downloadComplete: true });
                   });
                 });
              }else{
                  this.setState({ downloadComplete: true });
+                 if(resolve) resolve();
              }
           });
           const coinJSONTarget =  HOME+'coins.json';
           fs.exists(coinJSONTarget, (exists) => {
-             if(!exists){
+             if(!exists || force){
                 const download = wget.download(coinsJSON, coinJSONTarget);
                 download.on('end', (output) => {
                   this.saveAvailableCoins(coinJSONTarget);
@@ -113,6 +116,12 @@ class Home extends React.Component {
               })
             }}
             >{makeButton("Get Started","arrow_forward")}</AButton>
+            <AButton color="accent" onClick={()=>{
+              return new Promise((resolve, reject) => {
+                 this.afterHomeDir(true, resolve);
+              })
+            }}
+            >{makeButton("Update","update")}</AButton>            
          {/* 
            <AButton color="primary" raised onClick={()=>{
               return new Promise((resolve, reject) => {

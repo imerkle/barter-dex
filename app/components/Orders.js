@@ -9,7 +9,7 @@ import { observer, inject } from 'mobx-react';
 
 import { withStyles } from 'material-ui/styles';
 import { stylesY } from '../utils/constants';
-import { labelDisp, coinLogoFromTicker, makeButton, zeroGray } from '../utils/basic.js';
+import { Tooltip, labelDisp, coinLogoFromTicker, makeButton, zeroGray } from '../utils/basic.js';
 import FlipMove from 'react-flip-move';
 import cx from 'classnames';
 import AButton from './AButton';
@@ -26,7 +26,7 @@ import AButton from './AButton';
   	this.props.HomeStore.getBotList();
   }
   render() {
-	const { classes, HomeStore } = this.props;
+	const { classes, HomeStore, DarkErrorStore } = this.props;
   const { tradeHistory, bots } = HomeStore;
     return (
        <div className={styles.container2}>
@@ -104,7 +104,7 @@ import AButton from './AButton';
             }
 
             return (
-              <div className={cx(styles.tr,styles.col)}>
+              <div className={cx(styles.tr,styles.col,{[styles.dim]: o.stopped})}>
               <div className={cx(styles.tr, styles.trflex)}>
                 <div className={cx(styles.bflex,styles.widthauto)}>
                   {coinLogoFromTicker(from, true)}

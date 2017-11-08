@@ -432,3 +432,7 @@ table{
 .bigbot{
     font-size: 65px;
 }
+.dim{
+  opacity: .4;
+  cursor: default;
+}
