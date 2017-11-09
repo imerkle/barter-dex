@@ -11,7 +11,8 @@ import Pin from './components/Pin';
 import PinConfirm from './components/PinConfirm';
 import Register from './components/Register';
 import StartupScreen from './components/StartupScreen';
-import MainPage from './components/MainPage';
+/*import MainPage from './components/MainPage';*/
+import ShapeShift from './components/ShapeShift';
 import Settings from './components/Settings';
 import Wallet from './components/Wallet';
 import CoinSelection from './components/CoinSelection';
@@ -49,7 +50,7 @@ class MainRoutes extends React.Component {
         <Route path="/coinSelection" component={CoinSelection} />
         <Route path="/wallet" component={Wallet} />
         <Route path="/settings" component={Settings} />
-        <Route path="/mainPage" component={MainPage} />
+        <Route path="/shapeShift" component={ShapeShift} />
         <Route path="/startup" component={StartupScreen} />
         <Route path="/register" component={Register} />
         <Route path="/pinConfirm" component={PinConfirm} />

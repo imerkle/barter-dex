@@ -436,3 +436,67 @@ table{
   opacity: .4;
   cursor: default;
 }
+.shapeshiftbox{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.shapeshiftbox .boxes{
+    flex: 5%;
+    display: flex;
+    justify-content: center;  
+    align-items: center;  
+    flex-direction: column;
+}
+.boxhead{
+  margin:  10px 0;
+  font-size: 24px;
+  opacity: .7;
+}
+.shapeshiftbox svg,.shapeshiftbox .customLogo,
+.coinList svg,.coinList .customLogo{
+  height: 120px;
+  width: 120px;  
+}
+.shapeshiftbox .compareIcon{
+  font-size: 50px;
+  opacity: .7;
+  margin: 0 10px;
+}
+.shapeshiftbox .customLogo,
+.coinList .customLogo{
+  font-size: 74px;
+  line-height: 120px;
+  padding: 0;
+  font-family: "Montserrat";
+}
+.boxes:hover{
+  opacity: .7;
+  cursor: pointer;
+}
+.boxcon2 .boxes:hover{
+  opacity: 1;
+  cursor: default;
+}
+.shapeshiftbox.boxcon2 svg,.shapeshiftbox.boxcon2 .customLogo{
+  height: 60px;
+  width: 60px;
+}
+.shapeshiftbox.boxcon2 .customLogo{
+  font-size: 32px;
+  line-height: 60px;
+}
+.coinList{
+  color:  #FFF;
+  margin-top: 70px!important;
+
+  display: flex!important;
+  align-items: flex-start!important;
+  flex-wrap: wrap!important;    
+}
+.coinList li{
+    display: flex!important;
+    flex-direction: column!important;
+    flex: 30% 1!important;
+    flex-wrap: wrap!important;  
+}

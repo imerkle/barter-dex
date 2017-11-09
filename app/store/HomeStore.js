@@ -39,6 +39,7 @@ class HomeStore{
 	@observable tradeHistory = [];
 	@observable bots = [];
 	@observable curlMain = null;
+	@observable currentPrice = 0;
 
 	
   @action runCommand = (method, data = {}) => {
@@ -114,8 +115,8 @@ class HomeStore{
             coins[o.coin].value = coins[o.coin].balance;
           }
           const obook = res;
-          obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
-          obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
+          //obook.asks = obook.asks.filter((ask) => ask.numutxos > 0);
+          //obook.bids = obook.bids.filter((bid) => bid.numutxos > 0);
           
           this.obook = obook;
         }).catch(err => {});
@@ -218,8 +219,7 @@ splitAmounts = (coin, amounts, force = false) => {
 	  }
 	  @action getWalletPriceHistory = () => {
 	  	const { coins, base, maxdecimal, currentCoin } = this;
-	  	Object.keys(coins).map((k,v)=>{
-	  		const o = coins[k];
+	  		const o = currentCoin;
 	        if(base.coin != o.coin){
 	            this.runCommand("pricearray",{base: o.coin, rel: base.coin, timescale: 10}).then((res)=>{
 	              if(res[res.length - 1]){
@@ -228,10 +228,10 @@ splitAmounts = (coin, amounts, force = false) => {
 	                const change = ((today - yesterday)/yesterday * 100).toFixed(2);
 	                coins[o.coin].change = change;
 	                coins[o.coin].priceHistory = res;
+	                this.currentPrice = today;
 	              }
 	            }).catch(err => {});
 	        }
-	     });	
 	  }
 		@action setListUnspent(coin, smartaddress){
 		    this.runCommand("listunspent",{coin: coin, address: smartaddress }).then((res)=>{
