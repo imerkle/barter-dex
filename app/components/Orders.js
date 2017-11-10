@@ -96,11 +96,13 @@ import AButton from './AButton';
               pauseButton.icon = "play_arrow";
               pauseButton.color="accent";
               pauseButton.method="bot_resume";
+              pauseButton.isPaused = true;
             }else{
               pauseButton.title = "pause";
               pauseButton.icon = "pause";
               pauseButton.color = "primary";
               pauseButton.method="bot_pause";
+              pauseButton.isPaused = false;
             }
 
             return (
@@ -122,6 +124,7 @@ import AButton from './AButton';
                         if(res.error){
                           DarkErrorStore.alert(res.error);
                         }else{
+                          HomeStore.getBotList();
                           DarkErrorStore.alert(`Bot ${o.botid} ${pauseButton.title}d`,true);
                         }
                         resolve();
@@ -135,6 +138,7 @@ import AButton from './AButton';
                         if(res.error){
                           DarkErrorStore.alert(res.error);
                         }else{
+                          HomeStore.getBotList();
                           DarkErrorStore.alert(`Bot ${o.botid} Stopped`,true);
                         }
                         resolve();
