@@ -23,7 +23,7 @@ export default class Home extends Component {
         <div className={cx(styles.container, styles.nomargin)}>
       		<AppLogo />	
            <div className={cx(styles.nav)}>
-            <Link to="/mainPage"><Button raised={(primary == "exchange")} color="accent">{makeButton("Exchange","swap_calls", true)}</Button></Link>
+            <Link to="/shapeShift"><Button raised={(primary == "exchange")} color="accent">{makeButton("Exchange","swap_calls", true)}</Button></Link>
             <Link to="/wallet"><Button raised={(primary == "wallet")} color="accent" >{makeButton("Wallet","account_balance_wallet", true)}</Button></Link>
             <Link to="/orders"><Button raised={(primary == "orders")} color="accent">{makeButton("Orders","featured_play_list", true)}</Button></Link>
             <Link to="/debug"><Button raised={(primary == "debug")} color="accent">{makeButton("Debug","code", true)}</Button></Link>

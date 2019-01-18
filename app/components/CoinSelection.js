@@ -199,7 +199,7 @@ const whitelist = ["BTC","LTC","DASH","KMD","HUSH","REVS","CHIPS","MNZ"];
 						 </FormGroup>
 						{/*<Button raised color="primary" onClick={this._handleStartup}>Save</Button>*/}
 						<Button raised color="accent" onClick={()=>{
-							this.props.history.push("/mainPage");
+							this.props.history.push("/shapeShift");
 						}}>
 				             <div className={styles.bflex}>
 				                  <div className={styles.bflextxt}>Continue to Exchange</div>

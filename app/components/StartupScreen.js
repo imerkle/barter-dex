@@ -56,8 +56,11 @@ import { observer, inject } from 'mobx-react';
                       }
                   });
               });
-              if(HomeStore.enabled_coins[0]){
-                HomeStore.base = {coin: HomeStore.enabled_coins[0]};
+              if(HomeStore.enabled_coins[0] && HomeStore.enabled_coins[1]){
+                HomeStore.base = {coin: HomeStore.enabled_coins[0], balance: 0};
+                HomeStore.currentCoin = {coin: HomeStore.enabled_coins[1], balance: 0};
+              }else if (HomeStore.enabled_coins[0]){
+                HomeStore.base = {coin: HomeStore.enabled_coins[0], balance: 0};
               }
               
 
